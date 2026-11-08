@@ -10,7 +10,7 @@ import ffmpegPath from 'ffmpeg-static';
 const execFileP = promisify(execFile);
 export { ffmpegPath };
 export const TMP = path.join(os.tmpdir(), 'etho-bot');
-fs.mkdirSync(TMP, { recursive: true });
+try { fs.mkdirSync(TMP, { recursive: true }); } catch {}
 
 export const jidNorm = (j = '') => j.replace(/:\d+@/, '@');
 export const jidNum = (j = '') => j.split('@')[0].split(':')[0];

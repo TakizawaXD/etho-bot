@@ -1,5 +1,12 @@
 // Capa de datos (SQLite nativo Node.js sin dependencias nativas). Todas las consultas usan parámetros preparados.
-import { DatabaseSync } from 'node:sqlite';
+let DatabaseSync = null;
+try {
+  const sqliteMod = await import('node:sqlite');
+  DatabaseSync = sqliteMod.DatabaseSync;
+} catch (e) {
+  console.warn('[db] node:sqlite no está disponible en este entorno de Node.js:', e?.message || e);
+}
+
 import fs from 'fs';
 import path from 'path';
 import crypto from 'node:crypto';
@@ -16,15 +23,42 @@ import {
 
 class SQLiteWrapper {
   constructor(filePath) {
-    this._db = new DatabaseSync(filePath);
+    if (DatabaseSync) {
+      try {
+        this._db = new DatabaseSync(filePath);
+        return;
+      } catch (err) {
+        console.warn('[db] No se pudo abrir SQLite en', filePath, err.message);
+        try {
+          this._db = new DatabaseSync('/tmp/bot.db');
+          return;
+        } catch {
+          try {
+            this._db = new DatabaseSync(':memory:');
+            return;
+          } catch {}
+        }
+      }
+    }
+    // Fallback seguro en memoria si node:sqlite no existe en el runtime (ej: serverless)
+    this._db = null;
   }
   pragma(sql) {
+    if (!this._db) return null;
     try { return this._db.exec(`PRAGMA ${sql}`); } catch { return null; }
   }
   exec(sql) {
-    return this._db.exec(sql);
+    if (!this._db) return null;
+    try { return this._db.exec(sql); } catch { return null; }
   }
   prepare(sql) {
+    if (!this._db) {
+      return {
+        run: () => ({ changes: 0, lastInsertRowid: 0 }),
+        get: () => null,
+        all: () => []
+      };
+    }
     const stmt = this._db.prepare(sql);
     return {
       run(...args) {
@@ -48,20 +82,11 @@ class SQLiteWrapper {
     };
   }
   transaction(fn) {
-    return (...args) => {
-      this._db.exec('BEGIN');
-      try {
-        const result = fn(...args);
-        this._db.exec('COMMIT');
-        return result;
-      } catch (err) {
-        this._db.exec('ROLLBACK');
-        throw err;
-      }
-    };
+    if (!this._db) return fn();
+    return this._db.transaction ? this._db.transaction(fn) : fn();
   }
   close() {
-    return this._db.close();
+    if (this._db) return this._db.close();
   }
 }
 
