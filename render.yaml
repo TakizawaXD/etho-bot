@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: etho-bot-hub
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: HOST
+        value: 0.0.0.0
+      - key: DB_PATH
+        value: /app/data/bot.db
+      - key: SESSION_DIR
+        value: /app/data/sessions
+      - key: AUTH_SECRET
+        generateValue: true
+    disk:
+      name: etho-data
+      mountPath: /app/data
+      sizeGB: 2
+

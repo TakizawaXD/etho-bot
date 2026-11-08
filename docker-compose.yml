@@ -1,0 +1,18 @@
+services:
+  etho-bot:
+    build: .
+    container_name: etho-bot-hub
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      DB_PATH: /app/data/bot.db
+      SESSION_DIR: /app/data/sessions
+    volumes:
+      - ./data:/app/data

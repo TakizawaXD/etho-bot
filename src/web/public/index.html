@@ -1,0 +1,3520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#07090f">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Etho Hub">
+  <title>Etho Hub - Panel Multi-Bot VIP</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css?v=8.2.0">
+</head>
+<body>
+  <!-- ================= PÁGINA PRINCIPAL / HERO PÚBLICA (VISITANTES & REGISTRO) ================= -->
+  <div class="hero-page-wrapper" id="heroLandingPage">
+    <!-- NAVBAR PÚBLICA -->
+    <header class="hero-navbar">
+      <div class="hero-brand">
+        <div class="brand-logo"><i class="fa-brands fa-whatsapp"></i></div>
+        <div class="brand-info">
+          <h2>Etho <span>Multi-Bot</span></h2>
+          <span class="brand-badge">SaaS WhatsApp & IA</span>
+        </div>
+      </div>
+      <nav class="hero-nav-links" id="heroNavLinks">
+        <a href="#heroCapabilitiesSection" class="hero-link">Capacidades</a>
+        <a href="#heroFacetsSection" class="hero-link">Facetas de Bots</a>
+        <a href="#heroRulesSection" class="hero-link">Reglas & Moderación</a>
+        <a href="#heroPricingSection" class="hero-link">Planes & Precios</a>
+      </nav>
+      <div class="hero-nav-actions" id="heroNavActions">
+        <button type="button" class="btn btn-secondary btn-sm music-trigger-btn" id="heroMusicBtn" onclick="handleMusicButtonClick(event)" title="Reproductor de música ambiental">
+          <span class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span class="nav-text-full music-btn-label">Música</span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm nav-btn-install install-app-trigger" onclick="triggerInstallApp()" title="Instalar aplicación en Escritorio o Celular">
+          <i class="fa-solid fa-desktop"></i> <span class="nav-text-full">Instalar en Escritorio</span><span class="nav-text-short">App</span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm nav-btn-login" onclick="openAuthModal('login')">
+          <i class="fa-solid fa-right-to-bracket"></i> <span class="nav-text-full">Iniciar Sesión</span><span class="nav-text-short">Entrar</span>
+        </button>
+        <a href="#heroRegisterCard" class="btn btn-primary btn-sm nav-btn-cta">
+          <i class="fa-solid fa-bolt"></i> <span class="nav-text-full">Crear Mi Bot Gratis</span><span class="nav-text-short">Crear</span>
+        </a>
+        <button type="button" class="hero-mobile-toggle" id="heroMobileToggle" onclick="toggleHeroMobileMenu()" aria-label="Abrir Menú">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- MENÚ LATERAL DESPLEGABLE PARA CELULARES (MOBILE DRAWER) -->
+    <div class="hero-mobile-menu" id="heroMobileMenu">
+      <div class="hero-mobile-menu-header">
+        <div class="hero-brand">
+          <div class="brand-logo"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="brand-info">
+            <h2>Etho <span>Multi-Bot</span></h2>
+          </div>
+        </div>
+        <button type="button" class="btn-close-mobile-menu" onclick="toggleHeroMobileMenu(false)">&times;</button>
+      </div>
+      <div class="hero-mobile-links">
+        <a href="#heroCapabilitiesSection" class="mobile-link" onclick="toggleHeroMobileMenu(false)">
+          <i class="fa-solid fa-layer-group text-purple"></i> ¿Qué Puede Hacer?
+        </a>
+        <a href="#heroFacetsSection" class="mobile-link" onclick="toggleHeroMobileMenu(false)">
+          <i class="fa-solid fa-robot text-blue"></i> Facetas & Asistentes
+        </a>
+        <a href="#heroRulesSection" class="mobile-link" onclick="toggleHeroMobileMenu(false)">
+          <i class="fa-solid fa-shield-halved text-green"></i> Reglas & Moderación
+        </a>
+        <a href="#heroPricingSection" class="mobile-link" onclick="toggleHeroMobileMenu(false)">
+          <i class="fa-solid fa-tag text-orange"></i> Planes & Precios (3 Días Gratis)
+        </a>
+      </div>
+      <div class="hero-mobile-menu-actions">
+        <button type="button" class="btn btn-install-accent btn-block install-app-trigger" onclick="triggerInstallApp(); toggleHeroMobileMenu(false);">
+          <i class="fa-solid fa-download"></i> Instalar App en Escritorio / Celular
+        </button>
+        <button type="button" class="btn btn-primary btn-block" onclick="openAuthModal('register'); toggleHeroMobileMenu(false);">
+          <i class="fa-solid fa-bolt"></i> Crear Mi Bot Gratis
+        </button>
+        <button type="button" class="btn btn-secondary btn-block" onclick="openAuthModal('login'); toggleHeroMobileMenu(false);">
+          <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión en Mi Panel
+        </button>
+      </div>
+    </div>
+    <div class="hero-mobile-backdrop" id="heroMobileBackdrop" onclick="toggleHeroMobileMenu(false)"></div>
+
+    <!-- CINTA DE ACTIVIDAD EN VIVO (HERO LIFE TICKER) -->
+    <div class="hero-live-ticker-wrap">
+      <div class="ticker-badge"><span class="live-dot-pulse"></span> EN VIVO</div>
+      <div class="ticker-track">
+        <div class="ticker-item"><i class="fa-solid fa-microphone text-green"></i> Bot VIP transcribió nota de voz de 28s y cerró venta</div>
+        <div class="ticker-item"><i class="fa-solid fa-crown text-orange"></i> Cliente activó Plan Negocio VIP Premium</div>
+        <div class="ticker-item"><i class="fa-solid fa-store text-green"></i> Bot Pizzería tomó pedido de $32.00 por WhatsApp</div>
+        <div class="ticker-item"><i class="fa-solid fa-microphone-lines text-purple"></i> Modo Hablar por Mí atendió 14 mensajes privados</div>
+        <div class="ticker-item"><i class="fa-solid fa-headset text-blue"></i> Bot Consultorio agendó turno para las 4:30 PM</div>
+        <div class="ticker-item"><i class="fa-solid fa-brain text-orange"></i> IA Cognitiva recordó datos aprendidos sin emojis</div>
+        <div class="ticker-item"><i class="fa-solid fa-shield-halved text-green"></i> Moderación frenó flood de spam automáticamente</div>
+        <!-- Duplicado para loop continuo suave -->
+        <div class="ticker-item"><i class="fa-solid fa-microphone text-green"></i> Bot VIP transcribió nota de voz de 28s y cerró venta</div>
+        <div class="ticker-item"><i class="fa-solid fa-crown text-orange"></i> Cliente activó Plan Negocio VIP Premium</div>
+        <div class="ticker-item"><i class="fa-solid fa-store text-green"></i> Bot Pizzería tomó pedido de $32.00 por WhatsApp</div>
+      </div>
+    </div>
+
+    <!-- HERO MAIN SECTION -->
+    <main class="hero-main">
+      <div class="hero-ambient-glow top-left"></div>
+      <div class="hero-ambient-glow bottom-right"></div>
+      <div class="hero-container">
+        
+        <!-- COLUMNA IZQUIERDA: PROPUESTA DE VALOR & BENEFICIOS -->
+        <div class="hero-content-col">
+          <div class="hero-pill-badge">
+            <span class="live-dot"></span> Plataforma Multi-Bot con Inteligencia Artificial
+          </div>
+          
+          <h1 class="hero-title">
+            Crea tu Propio <span>Bot de WhatsApp</span> en Minutos para tu Negocio
+          </h1>
+
+          <p class="hero-description">
+            Automatiza la atención a clientes 24/7, responde dudas con Inteligencia Artificial, ofrece tu catálogo con fotos y captura ventas directamente en WhatsApp. Pruébalo <strong>3 días gratis</strong> sin compromiso.
+          </p>
+
+          <div class="hero-trust-list">
+            <div class="hero-trust-item">
+              <i class="fa-solid fa-circle-check text-green"></i>
+              <span><strong>Recepción de Audios:</strong> Tu bot escucha y responde notas de voz de clientes.</span>
+            </div>
+            <div class="hero-trust-item">
+              <i class="fa-solid fa-crown text-orange"></i>
+              <span><strong>Categoría VIP Premium:</strong> Atención ejecutiva 24/7 sin caídas ni interrupciones.</span>
+            </div>
+            <div class="hero-trust-item">
+              <i class="fa-solid fa-circle-check text-green"></i>
+              <span><strong>Sin programar:</strong> Configuración guiada en 2 minutos con código QR.</span>
+            </div>
+            <div class="hero-trust-item">
+              <i class="fa-solid fa-circle-check text-green"></i>
+              <span><strong>Control total:</strong> Enciende o apaga tu bot cuando quieras desde tu panel.</span>
+            </div>
+          </div>
+
+          <!-- WIDGET VISUAL INTERACTIVO CON VIDA (LIVE PREVIEW CHAT) -->
+          <div class="hero-live-chat-preview">
+            <div class="chat-preview-header">
+              <div class="chat-preview-bot">
+                <div class="chat-bot-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                  <strong>Asistente Etho</strong>
+                  <small><span class="status-dot green"></span> En línea &bull; IA Activa</small>
+                </div>
+              </div>
+              <span class="chat-preview-tag"><span class="live-dot-pulse"></span> Simulación en Vivo</span>
+            </div>
+            <div class="chat-preview-body" id="heroLiveChatBody">
+              <div class="chat-bubble incoming">
+                <p>Hola, buenas tardes. ¿Tienen disponibilidad para pedidos hoy y cuál es el horario?</p>
+                <span class="chat-time">14:02</span>
+              </div>
+              <div class="chat-bubble outgoing">
+                <p>¡Buenas tardes! Sí, estamos atendiendo con normalidad de Lunes a Sábado hasta las 8:00 PM. Puedes escribir <strong>#catalogo</strong> para ver opciones o decirme qué buscas.</p>
+                <span class="chat-time">14:02 <i class="fa-solid fa-check-double text-blue"></i></span>
+              </div>
+              <div class="chat-typing-row" id="chatTypingIndicator">
+                <span class="typing-text">Etho está procesando respuesta natural...</span>
+                <span class="typing-dots"><span></span><span></span><span></span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MINI STATS -->
+          <div class="hero-stats-row">
+            <div class="hero-stat-box">
+              <strong>24/7</strong>
+              <small>Atención sin pausas</small>
+            </div>
+            <div class="hero-stat-box">
+              <strong>3 Días</strong>
+              <small>Prueba sin costo</small>
+            </div>
+            <div class="hero-stat-box">
+              <strong>+6 Facetas</strong>
+              <small>Ventas, Soporte, Grupos</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: TARJETA HERO DE REGISTRO & CREACIÓN DE BOT -->
+        <div class="hero-form-col" id="heroRegisterCard">
+          <div class="hero-register-card">
+            <div class="register-card-header">
+              <div class="card-badge-gift"><i class="fa-solid fa-gift"></i> 3 DÍAS DE PRUEBA GRATIS</div>
+              <h3>Registra tu Cuenta & Solicita tu Bot</h3>
+              <p>Completa tus datos y define para qué negocio quieres el bot. Se activará al instante.</p>
+            </div>
+
+            <form id="heroRegisterForm" onsubmit="handleHeroRegister(event)">
+              <div class="form-group">
+                <label>Tu Nombre Completo *</label>
+                <input type="text" id="heroName" class="form-input" placeholder="Ej: Carlos Gómez" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label>Nombre de Usuario *</label>
+                  <input type="text" id="heroUsername" class="form-input" placeholder="Ej: carlosg" required>
+                </div>
+                <div class="form-group flex-1">
+                  <label>WhatsApp de Contacto *</label>
+                  <input type="text" id="heroWhatsapp" class="form-input" placeholder="Ej: 521234567890" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Contraseña de Acceso *</label>
+                <input type="password" id="heroPassword" class="form-input" placeholder="Mínimo 4 caracteres" required>
+              </div>
+
+              <!-- PREGUNTA CLAVE SOLICITADA POR EL USUARIO -->
+              <div class="form-group hero-purpose-group">
+                <label class="label-highlight">
+                  <i class="fa-solid fa-bullseye text-purple"></i> ¿Para qué quieres tu bot? (Negocio o Propósito) *
+                </label>
+                <textarea id="heroPurpose" class="form-input form-textarea" rows="2" placeholder="Ej: Pizzería Roma para tomar pedidos y delivery, Inmobiliaria para propiedades, o Asistente personal..." required></textarea>
+                <small class="text-muted">El administrador supervisará el propósito de tu bot para asignarte soporte y activación.</small>
+              </div>
+
+              <!-- SELECCIÓN DE FACETA -->
+              <div class="form-group">
+                <label>Elige la Faceta de tu Bot:</label>
+                <div class="hero-facet-selector">
+                  <label class="hero-facet-chip">
+                    <input type="radio" name="heroFacet" value="advisor" checked>
+                    <span><i class="fa-solid fa-store"></i> Ventas & Negocios</span>
+                  </label>
+                  <label class="hero-facet-chip">
+                    <input type="radio" name="heroFacet" value="assistant">
+                    <span><i class="fa-solid fa-briefcase"></i> Asistente Personal</span>
+                  </label>
+                  <label class="hero-facet-chip">
+                    <input type="radio" name="heroFacet" value="recreational">
+                    <span><i class="fa-solid fa-users"></i> Comunidad & Grupos</span>
+                  </label>
+                  <label class="hero-facet-chip">
+                    <input type="radio" name="heroFacet" value="ai_autonomous">
+                    <span><i class="fa-solid fa-brain"></i> Cerebro Autónomo IA</span>
+                  </label>
+                  <label class="hero-facet-chip">
+                    <input type="radio" name="heroFacet" value="support">
+                    <span><i class="fa-solid fa-headset"></i> Soporte & Citas</span>
+                  </label>
+                  <label class="hero-facet-chip">
+                    <input type="radio" name="heroFacet" value="tutor">
+                    <span><i class="fa-solid fa-graduation-cap"></i> Tutor Educativo</span>
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-hero-submit" id="heroSubmitBtn">
+                <i class="fa-solid fa-rocket"></i> Crear Mi Cuenta y Obtener Bot Gratis
+              </button>
+
+              <div class="hero-form-footer">
+                <small class="text-muted">
+                  ¿Ya tienes cuenta o eres el Administrador? 
+                  <a href="javascript:void(0)" onclick="openAuthModal('login')" style="color: var(--primary); font-weight: 600;">Iniciar Sesión</a>
+                </small>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- ================= GRAN CARRUSEL INTERACTIVO DE CAPACIDADES ================= -->
+      <section class="hero-carousel-section" id="heroCapabilitiesSection">
+        <div class="hero-section-title">
+          <span class="sub-pill">CAPACIDADES DE NUESTRO SERVICIO</span>
+          <h2>Todo lo que Puedes Hacer con Nuestra Plataforma</h2>
+          <p>Potentes herramientas empresariales, automatización sin código e inteligencia artificial aplicada directamente en WhatsApp.</p>
+        </div>
+
+        <!-- TABS RÁPIDAS DEL CARRUSEL -->
+        <div class="carousel-tabs-nav" id="carouselTabsNav">
+          <button type="button" class="carousel-tab-btn active" data-slide="0" onclick="goToCarouselSlide(0)">
+            <i class="fa-solid fa-store"></i> <span>Ventas & Catálogo</span>
+          </button>
+          <button type="button" class="carousel-tab-btn" data-slide="1" onclick="goToCarouselSlide(1)">
+            <i class="fa-solid fa-microphone-lines"></i> <span>Hablar por Mí</span>
+          </button>
+          <button type="button" class="carousel-tab-btn" data-slide="2" onclick="goToCarouselSlide(2)">
+            <i class="fa-solid fa-brain"></i> <span>IA Conversacional</span>
+          </button>
+          <button type="button" class="carousel-tab-btn" data-slide="3" onclick="goToCarouselSlide(3)">
+            <i class="fa-solid fa-briefcase"></i> <span>Asistente Ejecutivo</span>
+          </button>
+          <button type="button" class="carousel-tab-btn" data-slide="4" onclick="goToCarouselSlide(4)">
+            <i class="fa-solid fa-shield-halved"></i> <span>Moderación & Grupos</span>
+          </button>
+          <button type="button" class="carousel-tab-btn" data-slide="5" onclick="goToCarouselSlide(5)">
+            <i class="fa-solid fa-sliders"></i> <span>Personalidad & Filtros</span>
+          </button>
+          <button type="button" class="carousel-tab-btn" data-slide="6" onclick="goToCarouselSlide(6)">
+            <i class="fa-solid fa-microphone text-green"></i> <span>Recepción de Audios</span>
+          </button>
+        </div>
+
+        <!-- CONTENEDOR DEL CARRUSEL -->
+        <div class="carousel-wrapper">
+          <button type="button" class="carousel-nav-btn prev" onclick="prevCarouselSlide()" aria-label="Anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          
+          <div class="carousel-track-container" id="carouselTrackContainer">
+            <div class="carousel-track" id="carouselTrack">
+
+              <!-- SLIDE 1: VENTAS & CATÁLOGO -->
+              <div class="carousel-slide" data-slide="0">
+                <div class="slide-content-col">
+                  <span class="slide-badge purple"><i class="fa-solid fa-store"></i> ATENCIÓN AL CLIENTE & VENTAS 24/7</span>
+                  <h3 class="slide-title">Vende, Atiende y Muestra tu Catálogo Automáticamente</h3>
+                  <p class="slide-desc">
+                    Nunca más pierdas un cliente por responder tarde. Tu bot atiende consultas las 24 horas, comparte tu catálogo con fotos y precios, y captura clientes potenciales en tu CRM.
+                  </p>
+                  <ul class="slide-features-list">
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Catálogo Digital Dinámico:</strong> Envío inmediato con comando <code>#catalogo</code> o al preguntar por precios.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Captura Automática de Leads:</strong> Detecta nombres y correos guardándolos en tu base de prospectos.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Horarios de Atención:</strong> Mensajes automáticos de fuera de oficina cuando tu negocio está cerrado.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Transferencia a Humanos:</strong> Comando <code>#asesor</code> para conectar al cliente con un agente real.</li>
+                  </ul>
+                  <div class="slide-actions">
+                    <a href="#heroRegisterCard" class="btn btn-primary btn-sm"><i class="fa-solid fa-rocket"></i> Activar Asesor de Ventas Gratis</a>
+                  </div>
+                </div>
+                <div class="slide-preview-col">
+                  <div class="mockup-chat-card">
+                    <div class="mockup-header">
+                      <div class="mockup-bot-meta">
+                        <span class="avatar-circle green"><i class="fa-solid fa-store"></i></span>
+                        <div>
+                          <strong>Pizzería & Restaurante Bot</strong>
+                          <small><span class="status-dot green"></span> En línea &bull; Ventas 24/7</small>
+                        </div>
+                      </div>
+                      <span class="badge-mockup green">Catálogo Activo</span>
+                    </div>
+                    <div class="mockup-body">
+                      <div class="msg-bubble in">
+                        <p>Hola, buenas tardes. ¿Qué pizzas tienen disponibles y cuál es el precio?</p>
+                        <span class="msg-meta">14:10</span>
+                      </div>
+                      <div class="msg-bubble out">
+                        <p>¡Buenas tardes! Con gusto te comparto nuestras opciones disponibles de hoy:<br><br>
+                        <strong>1. Pizza Pepperoni Especial</strong> - $12.50<br>
+                        <strong>2. Pizza Cuatro Quesos Gourmet</strong> - $14.00<br>
+                        <strong>3. Combo Familiar + Bebida</strong> - $22.00<br><br>
+                        <em>Escribe *#asesor* si deseas que un agente humano tome tu orden directamente.</em></p>
+                        <span class="msg-meta">14:10 <i class="fa-solid fa-check-double text-blue"></i></span>
+                      </div>
+                      <div class="msg-lead-notice">
+                        <i class="fa-solid fa-address-card text-blue"></i> Lead registrado en CRM: Cliente potencial capturado
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 2: MODO HABLAR POR MÍ -->
+              <div class="carousel-slide" data-slide="1">
+                <div class="slide-content-col">
+                  <span class="slide-badge blue"><i class="fa-solid fa-microphone-lines"></i> PILOTO AUTOMÁTICO</span>
+                  <h3 class="slide-title">Modo "Hablar por Mí": Tu Clon Inteligente en WhatsApp</h3>
+                  <p class="slide-desc">
+                    ¿Estás ocupado en reuniones, trabajando o descansando? Activa el piloto automático para que la IA responda tus mensajes privados con total educación y naturalidad, recopilando recados para ti.
+                  </p>
+                  <ul class="slide-features-list">
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Modo Clon Personal (1ra Persona):</strong> Habla diciendo "yo", de forma cotidiana y relajada sin parecer un bot.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Modo Asistente Formal:</strong> Se presenta como tu asistente personal y toma nota de cualquier mensaje.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Pausa Inteligente:</strong> Si escribes tú manualmente en el chat, el piloto se pausa solo para no interrumpirte.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Buzón de Recados:</strong> Revisa desde la web o con <code>#recados</code> quién te escribió y qué le respondió la IA.</li>
+                  </ul>
+                  <div class="slide-actions">
+                    <a href="#heroRegisterCard" class="btn btn-primary btn-sm"><i class="fa-solid fa-microphone-lines"></i> Probar Piloto Automático</a>
+                  </div>
+                </div>
+                <div class="slide-preview-col">
+                  <div class="mockup-chat-card">
+                    <div class="mockup-header">
+                      <div class="mockup-bot-meta">
+                        <span class="avatar-circle purple"><i class="fa-solid fa-user-tie"></i></span>
+                        <div>
+                          <strong>Tu WhatsApp Personal</strong>
+                          <small><span class="status-dot green"></span> Piloto Automático Activo</small>
+                        </div>
+                      </div>
+                      <span class="badge-mockup purple">Modo Clon Activado</span>
+                    </div>
+                    <div class="mockup-body">
+                      <div class="msg-bubble in">
+                        <p>Hola Carlos, ¿cómo vas? Necesito coordinar contigo el pago de los contratos hoy, ¿puedes hablar?</p>
+                        <span class="msg-meta">15:22</span>
+                      </div>
+                      <div class="msg-bubble out">
+                        <p>¡Hola! Todo bien por acá. Ando ocupado trabajando en una reunión en este momento, pero cuéntame qué detalles tienes o si gustas me dejas el dato y lo reviso con calma en cuanto me desocupe.</p>
+                        <span class="msg-meta">15:22 <i class="fa-solid fa-check-double text-blue"></i></span>
+                      </div>
+                      <div class="msg-recado-pill">
+                        <i class="fa-solid fa-inbox text-purple"></i> Recado guardado en panel: "Coordinar pago de contratos"
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 3: IA CONVERSACIONAL COGNITIVA -->
+              <div class="carousel-slide" data-slide="2">
+                <div class="slide-content-col">
+                  <span class="slide-badge orange"><i class="fa-solid fa-brain"></i> INTELIGENCIA ARTIFICIAL COGNITIVA</span>
+                  <h3 class="slide-title">Respuestas Como una Persona Real: Sin Emojis Cringe ni Modismos</h3>
+                  <p class="slide-desc">
+                    Olvídate de los bots infantiles. Nuestro motor de Inteligencia Artificial analiza el contexto, recuerda quién le habla, memoriza el nombre y ciudad del usuario, y responde con educación y criterio adulto.
+                  </p>
+                  <ul class="slide-features-list">
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Memoria de Aprendizaje:</strong> Extrae y recuerda el nombre, negocio y ciudad de cada persona con la que habla.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Cero Emojis Estricto:</strong> Comunicación sobria, legible y profesional sin saturación gráfica.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Filtro Anti-Nekotina Permanente:</strong> Prohibición total de maullidos, anime o modismos extraños.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Motor Multi-Tier Sin Caídas:</strong> Respaldo cognitivo con tolerancia cero a desconexiones.</li>
+                  </ul>
+                  <div class="slide-actions">
+                    <a href="#heroRegisterCard" class="btn btn-primary btn-sm"><i class="fa-solid fa-brain"></i> Probar IA Conversacional</a>
+                  </div>
+                </div>
+                <div class="slide-preview-col">
+                  <div class="mockup-chat-card">
+                    <div class="mockup-header">
+                      <div class="mockup-bot-meta">
+                        <span class="avatar-circle orange"><i class="fa-solid fa-brain"></i></span>
+                        <div>
+                          <strong>Asistente Autónomo con IA</strong>
+                          <small><span class="status-dot green"></span> Memoria & Razonamiento Activo</small>
+                        </div>
+                      </div>
+                      <span class="badge-mockup green">Cero Emojis Activo</span>
+                    </div>
+                    <div class="mockup-body">
+                      <div class="msg-bubble in">
+                        <p>Oye, ¿te acuerdas de qué ciudad soy y cuál era el negocio que te mencioné?</p>
+                        <span class="msg-meta">16:04</span>
+                      </div>
+                      <div class="msg-bubble out">
+                        <p>Sí, me comentaste que vives en Medellín y que tu negocio es de distribución textil. Lo recuerdo con claridad de nuestra conversación anterior. ¿En qué te puedo apoyar hoy con eso?</p>
+                        <span class="msg-meta">16:04 <i class="fa-solid fa-check-double text-blue"></i></span>
+                      </div>
+                      <div class="msg-memory-box">
+                        <div class="memory-tag"><i class="fa-solid fa-location-dot"></i> Ciudad: Medellín</div>
+                        <div class="memory-tag"><i class="fa-solid fa-briefcase"></i> Negocio: Textil</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 4: ASISTENTE PERSONAL EJECUTIVO -->
+              <div class="carousel-slide" data-slide="3">
+                <div class="slide-content-col">
+                  <span class="slide-badge cyan"><i class="fa-solid fa-briefcase"></i> PRODUCTIVIDAD & ASISTENCIA</span>
+                  <h3 class="slide-title">Tu Asistente Ejecutivo para Tareas, Recordatorios y Notas</h3>
+                  <p class="slide-desc">
+                    Centraliza tu productividad directamente dentro de WhatsApp. Programa recordatorios con avisos automáticos, guarda notas privadas y realiza operaciones matemáticas con un comando.
+                  </p>
+                  <ul class="slide-features-list">
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Recordatorios Automáticos:</strong> <code>#recordar 45m llamar al banco</code> y te enviará un aviso puntual al chat.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Bloc de Notas Privado:</strong> Guarda ideas, listas y tareas privadas con <code>#nota add [texto]</code> y consúltalas cuando quieras.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Cálculos y Finanzas:</strong> Resuelve fórmulas matemáticas complejas con <code>#calc</code> sin salir del chat.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Pronóstico del Tiempo & Clima:</strong> Consulta el clima exacto de cualquier ciudad con <code>#clima</code>.</li>
+                  </ul>
+                  <div class="slide-actions">
+                    <a href="#heroRegisterCard" class="btn btn-primary btn-sm"><i class="fa-solid fa-calendar-check"></i> Activar Asistente Personal</a>
+                  </div>
+                </div>
+                <div class="slide-preview-col">
+                  <div class="mockup-chat-card">
+                    <div class="mockup-header">
+                      <div class="mockup-bot-meta">
+                        <span class="avatar-circle blue"><i class="fa-solid fa-briefcase"></i></span>
+                        <div>
+                          <strong>Asistente Ejecutivo</strong>
+                          <small><span class="status-dot green"></span> Productividad Activa</small>
+                        </div>
+                      </div>
+                      <span class="badge-mockup blue">Agenda & Tareas</span>
+                    </div>
+                    <div class="mockup-body">
+                      <div class="msg-bubble in">
+                        <p>#recordar 30m Entregar informe final de ventas al cliente</p>
+                        <span class="msg-meta">11:15</span>
+                      </div>
+                      <div class="msg-bubble out">
+                        <p>Recordatorio programado para dentro de *30 minutos*:<br>Entregar informe final de ventas al cliente.</p>
+                        <span class="msg-meta">11:15 <i class="fa-solid fa-check-double text-blue"></i></span>
+                      </div>
+                      <div class="msg-bubble in">
+                        <p>#calc 1250 * 0.16 + 450</p>
+                        <span class="msg-meta">11:16</span>
+                      </div>
+                      <div class="msg-bubble out">
+                        <p>1250 * 0.16 + 450<br>= *650*</p>
+                        <span class="msg-meta">11:16 <i class="fa-solid fa-check-double text-blue"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 5: MODERACIÓN & GRUPOS -->
+              <div class="carousel-slide" data-slide="4">
+                <div class="slide-content-col">
+                  <span class="slide-badge green"><i class="fa-solid fa-shield-halved"></i> GESTIÓN & COMUNIDAD</span>
+                  <h3 class="slide-title">Grupos de WhatsApp Protegidos, Activos y Sin Spam</h3>
+                  <p class="slide-desc">
+                    Mantén el orden en tus grupos de trabajo, clientes o amigos. Bloquea enlaces publicitarios no autorizados, frena el flood de mensajes y realiza anuncios masivos de forma limpia.
+                  </p>
+                  <ul class="slide-features-list">
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Anti-Link con Expulsión:</strong> Detecta enlaces de otros grupos o sitios sospechosos y expulsa al infractor.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Anti-Spam & Flood:</strong> Protege el grupo contra personas que intentan saturar el chat de comandos repetidos.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Menciones Masivas Limpias:</strong> <code>#tagall</code> y <code>#hidetag</code> para notificar avisos importantes sin saturar la pantalla.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Stickers & Multimedia:</strong> Convierte imágenes o videos en stickers al instante con <code>#s</code>.</li>
+                  </ul>
+                  <div class="slide-actions">
+                    <a href="#heroRegisterCard" class="btn btn-primary btn-sm"><i class="fa-solid fa-users"></i> Proteger Mi Grupo Ahora</a>
+                  </div>
+                </div>
+                <div class="slide-preview-col">
+                  <div class="mockup-chat-card">
+                    <div class="mockup-header">
+                      <div class="mockup-bot-meta">
+                        <span class="avatar-circle green"><i class="fa-solid fa-shield-halved"></i></span>
+                        <div>
+                          <strong>Grupo Oficial de Clientes</strong>
+                          <small><span class="status-dot green"></span> Moderación 24/7 Activa</small>
+                        </div>
+                      </div>
+                      <span class="badge-mockup green">Anti-Spam Activo</span>
+                    </div>
+                    <div class="mockup-body">
+                      <div class="msg-bubble in alert-strike">
+                        <p style="color: #f87171;"><i class="fa-solid fa-ban"></i> [Usuario envió enlace sospechoso eliminado]</p>
+                        <span class="msg-meta">17:40</span>
+                      </div>
+                      <div class="msg-bubble out alert-warn">
+                        <p><strong>[SISTEMA DE MODERACIÓN]</strong><br>El usuario fue expulsado del grupo por enviar enlaces externos no autorizados (Regla Anti-Link activa).</p>
+                        <span class="msg-meta">17:40 <i class="fa-solid fa-check-double text-blue"></i></span>
+                      </div>
+                      <div class="msg-bubble in">
+                        <p>#tagall Reunión de equipo en 15 minutos en el enlace de costumbre.</p>
+                        <span class="msg-meta">17:42</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 6: PERSONALIDAD & PALABRAS -->
+              <div class="carousel-slide" data-slide="5">
+                <div class="slide-content-col">
+                  <span class="slide-badge purple"><i class="fa-solid fa-sliders"></i> CONTROL TOTAL</span>
+                  <h3 class="slide-title">Personalidad, Tonos y Filtro de Palabras Prohibidas</h3>
+                  <p class="slide-desc">
+                    Tú decides exactamente cómo habla y qué palabras puede o no pronunciar tu bot. Configura un prompt personalizado, selecciona el tono adecuado y censura términos no deseados con asteriscos.
+                  </p>
+                  <ul class="slide-features-list">
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Selección de Tono:</strong> Elige entre Profesional, Ejecutivo, Amigable o Directo con un clic.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Lista Negra de Palabras:</strong> Palabras prohibidas que se censuran automáticamente con <code>***</code> si la IA intenta decirlas.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Términos Prioritarios:</strong> Indica a la IA los nombres de tus productos clave o marca para que los favorezca.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Apagado Seguro sin Borrar:</strong> Al cambiar la personalidad, el sistema apaga el bot temporalmente protegiendo todos tus datos.</li>
+                  </ul>
+                  <div class="slide-actions">
+                    <a href="#heroRegisterCard" class="btn btn-primary btn-sm"><i class="fa-solid fa-sliders"></i> Probar Personalización</a>
+                  </div>
+                </div>
+                <div class="slide-preview-col">
+                  <div class="mockup-chat-card">
+                    <div class="mockup-header">
+                      <div class="mockup-bot-meta">
+                        <span class="avatar-circle purple"><i class="fa-solid fa-sliders"></i></span>
+                        <div>
+                          <strong>Panel de Personalidad</strong>
+                          <small><span class="status-dot green"></span> Directivas Sincronizadas</small>
+                        </div>
+                      </div>
+                      <span class="badge-mockup purple">Filtro Activo</span>
+                    </div>
+                    <div class="mockup-body" style="font-size: 12px;">
+                      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); padding: 10px; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted); font-size: 11px;">Tono Activo:</span>
+                        <strong style="color: #c084fc; display: block;">Ejecutivo (Directo, conciso, orientado a resultados)</strong>
+                      </div>
+                      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); padding: 10px; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted); font-size: 11px;">Palabras Prohibidas (Blacklist):</span>
+                        <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
+                          <span style="background: rgba(239,68,68,0.2); color:#fca5a5; padding: 2px 6px; font-size: 10.5px;">nekotina [***]</span>
+                          <span style="background: rgba(239,68,68,0.2); color:#fca5a5; padding: 2px 6px; font-size: 10.5px;">nya [***]</span>
+                          <span style="background: rgba(239,68,68,0.2); color:#fca5a5; padding: 2px 6px; font-size: 10.5px;">cringe [***]</span>
+                        </div>
+                      </div>
+                      <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); padding: 8px 10px; color: #34d399; font-weight: 600;">
+                        <i class="fa-solid fa-shield-halved"></i> Cero Emojis y Filtro Nekotina 100% Blindado
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SLIDE 7: AUDIOS Y NOTAS DE VOZ MULTIMODAL (VIP) -->
+              <div class="carousel-slide" data-slide="6">
+                <div class="slide-content-col">
+                  <span class="slide-badge green"><i class="fa-solid fa-microphone"></i> VIP PREMIUM &bull; MULTIMODAL</span>
+                  <h3 class="slide-title">Recepción, Escucha y Comprensión de Notas de Voz</h3>
+                  <p class="slide-desc">
+                    El 80% de tus clientes en WhatsApp prefieren enviar notas de voz en lugar de escribir textos largos. Tu bot ahora escucha los audios, transcribe las palabras y responde con total naturalidad al instante.
+                  </p>
+                  <ul class="slide-features-list">
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Escucha Activa:</strong> Procesa notas de voz recibidas de clientes o prospectos en segundos.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Transcripción Inteligente:</strong> Comprende el mensaje y las intenciones del usuario sin importar acentos ni modismos.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Respuesta Instantánea:</strong> Si el cliente pregunta precios o pide un producto por audio, el bot le envía la información de inmediato.</li>
+                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Ahorro Masivo de Tiempo:</strong> Ya no tienes que pasar horas escuchando audios repetitivos; tu bot lo hace por ti 24/7.</li>
+                  </ul>
+                  <div class="slide-actions">
+                    <a href="#heroRegisterCard" class="btn btn-primary btn-sm"><i class="fa-solid fa-bolt"></i> Obtener Bot con Soporte de Audios</a>
+                  </div>
+                </div>
+                <div class="slide-preview-col">
+                  <div class="mockup-chat-card">
+                    <div class="mockup-header">
+                      <div class="mockup-bot-meta">
+                        <span class="avatar-circle green"><i class="fa-solid fa-microphone"></i></span>
+                        <div>
+                          <strong>Recepción de Audios VIP</strong>
+                          <small><span class="status-dot green"></span> Transcripción IA Activa</small>
+                        </div>
+                      </div>
+                      <span class="badge-mockup green">Audio Escuchado</span>
+                    </div>
+                    <div class="mockup-body">
+                      <div class="mockup-msg user" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-play" style="color: #25d366; font-size: 14px;"></i>
+                        <div style="flex: 1;">
+                          <div style="height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative;">
+                            <div style="width: 65%; height: 100%; background: #25d366;"></div>
+                          </div>
+                          <span style="font-size: 10px; color: var(--text-dim); margin-top: 3px; display: block;">Nota de voz (0:18)</span>
+                        </div>
+                      </div>
+                      <div style="font-size: 10.5px; color: #a78bfa; margin: 4px 8px; font-style: italic;">
+                        [Transcrito]: "¿Hola buenas tardes, tienen disponible la pizza mediana con entrega a domicilio?"
+                      </div>
+                      <div class="mockup-msg bot">
+                        ¡Buenas tardes! Sí, tenemos disponible la pizza mediana artesanal con entrega a domicilio en 35 minutos. Te comparto nuestro menú para que elijas tus ingredientes favoritos.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <button type="button" class="carousel-nav-btn next" onclick="nextCarouselSlide()" aria-label="Siguiente">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- FOOTER DEL CARRUSEL -->
+        <div class="carousel-footer-controls">
+          <div class="carousel-dots" id="carouselDots">
+            <span class="carousel-dot active" onclick="goToCarouselSlide(0)"></span>
+            <span class="carousel-dot" onclick="goToCarouselSlide(1)"></span>
+            <span class="carousel-dot" onclick="goToCarouselSlide(2)"></span>
+            <span class="carousel-dot" onclick="goToCarouselSlide(3)"></span>
+            <span class="carousel-dot" onclick="goToCarouselSlide(4)"></span>
+            <span class="carousel-dot" onclick="goToCarouselSlide(5)"></span>
+            <span class="carousel-dot" onclick="goToCarouselSlide(6)"></span>
+          </div>
+          <div class="carousel-counter" id="carouselCounter">01 / 07</div>
+        </div>
+      </section>
+
+
+      <!-- SECCIÓN INFORMATIVA: FACETAS DISPONIBLES -->
+      <section class="hero-section" id="heroFacetsSection">
+        <div class="hero-section-title">
+          <span class="sub-pill">MULTITAREA & FLEXIBLE</span>
+          <h2>Facetas de Bots Disponibles</h2>
+          <p>Elige la personalidad y superpoderes que mejor se adapten a tus metas.</p>
+        </div>
+
+        <div class="hero-facets-showcase-grid">
+          <div class="hero-showcase-card">
+            <div class="showcase-icon purple"><i class="fa-solid fa-store"></i></div>
+            <h4>Asesor Comercial & Ventas</h4>
+            <p>Atención a clientes 24/7, catálogo digital con fotos y precios, cotizaciones y captura automática de prospectos (CRM).</p>
+          </div>
+          <div class="hero-showcase-card">
+            <div class="showcase-icon blue"><i class="fa-solid fa-briefcase"></i></div>
+            <h4>Asistente Ejecutivo Personal</h4>
+            <p>Agenda privada, recordatorios automáticos (!recordar), notas privadas (!nota) y organización personal.</p>
+          </div>
+          <div class="hero-showcase-card">
+            <div class="showcase-icon green"><i class="fa-solid fa-gamepad"></i></div>
+            <h4>Comunidad & Grupos</h4>
+            <p>Economía de coins (#daily, #work), stickers, minijuegos, gacha de anime y moderación para comunidades de WhatsApp.</p>
+          </div>
+          <div class="hero-showcase-card">
+            <div class="showcase-icon orange"><i class="fa-solid fa-brain"></i></div>
+            <h4>Cerebro Autónomo con IA</h4>
+            <p>Conversación fluida e inteligente con IA generativa, comprensión profunda de lenguaje natural y empatía humana.</p>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- SECCIÓN: REGLAS Y MODERACIÓN (LIBERTAD CON RESPETO & PENALIZACIONES) -->
+      <section class="hero-section" id="heroRulesSection">
+        <div class="hero-section-title">
+          <span class="sub-pill">SEGURIDAD & CONVIVENCIA</span>
+          <h2>Reglas de Uso & Sistema de Moderación</h2>
+          <p>Crea y experimenta libremente con tus bots, con reglas claras para proteger la estabilidad de tus números y el servicio.</p>
+        </div>
+
+        <div class="hero-facets-showcase-grid">
+          <div class="hero-showcase-card" style="border-top: 3px solid #10b981;">
+            <div class="showcase-icon green"><i class="fa-solid fa-check"></i></div>
+            <h4>100% Permitido: Crea lo que Quieras</h4>
+            <p>Automatizar ventas, soporte 24/7 de tu negocio, bots de juegos y economía para tus grupos de amigos, recordatorios personales o asistentes autónomos con IA.</p>
+          </div>
+
+          <div class="hero-showcase-card" style="border-top: 3px solid #f59e0b;">
+            <div class="showcase-icon orange"><i class="fa-solid fa-shield-halved"></i></div>
+            <h4>Límites de Velocidad & Anti-Spam</h4>
+            <p>Para evitar bloqueos de WhatsApp y saturación, se limita el spam excesivo (máx 6 comandos por 5s). El sistema emite advertencias (strikes) automáticas si hay flood.</p>
+          </div>
+
+          <div class="hero-showcase-card" style="border-top: 3px solid #ef4444;">
+            <div class="showcase-icon red"><i class="fa-solid fa-ban"></i></div>
+            <h4>Tolerancia Cero con Abusos</h4>
+            <p>Estrictamente prohibido el phishing, estafas, links maliciosos, hostigamiento masivo, venta de contenido ilícito o suplantación fraudulenta de identidad.</p>
+          </div>
+
+          <div class="hero-showcase-card" style="border-top: 3px solid #ef4444;">
+            <div class="showcase-icon red"><i class="fa-solid fa-gavel"></i></div>
+            <h4>Cierre y Penalización con Días</h4>
+            <p>Si un bot es usado de mala manera o acumula 3 strikes, <strong>el sistema lo cierra al instante y lo penaliza descontando días</strong> de servicio de su cuenta.</p>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- SECCIÓN DE PRECIOS -->
+      <section class="hero-section" id="heroPricingSection">
+        <div class="hero-section-title">
+          <span class="sub-pill">TRANSPARENCIA TOTAL &bull; CATEGORÍA VIP PREMIUM</span>
+          <h2>Planes Transparentes, Potentes y Flexibles</h2>
+          <p>Comienza gratis hoy y activa el poder de la automatización con IA multimodal y soporte de notas de voz en tu negocio.</p>
+        </div>
+
+        <div class="hero-pricing-grid">
+          <div class="hero-price-card">
+            <div class="price-tier">Prueba Gratuita</div>
+            <div class="price-val">$0 <span>/ 3 días</span></div>
+            <p>Para probar la vinculación y ver tu bot funcionando en vivo.</p>
+            <ul class="price-features">
+              <li><i class="fa-solid fa-check text-green"></i> 1 Bot de WhatsApp propio exclusivo</li>
+              <li><i class="fa-solid fa-check text-green"></i> Vinculación inmediata vía código QR</li>
+              <li><i class="fa-solid fa-check text-green"></i> <strong>Recepción de notas de voz (Audios)</strong></li>
+              <li><i class="fa-solid fa-check text-green"></i> Respuestas inteligentes sin emojis</li>
+              <li><i class="fa-solid fa-check text-green"></i> Todas las facetas y tonos disponibles</li>
+              <li><i class="fa-solid fa-check text-green"></i> Catálogo digital y captura de leads</li>
+              <li><i class="fa-solid fa-check text-green"></i> Memoria conversacional básica</li>
+            </ul>
+            <a href="#heroRegisterCard" class="btn btn-secondary" style="width: 100%;">Comenzar Gratis</a>
+          </div>
+
+          <div class="hero-price-card featured">
+            <div class="featured-ribbon">POPULAR &bull; PRO</div>
+            <div class="price-tier">Plan Mensual Pro</div>
+            <div class="price-val">$29.99 <span>/ mes</span></div>
+            <p>Ideal para negocios, tiendas y emprendedores en crecimiento activo.</p>
+            <ul class="price-features">
+              <li><i class="fa-solid fa-check text-green"></i> 30 días de servicio ininterrumpido 24/7</li>
+              <li><i class="fa-solid fa-check text-green"></i> <strong>Comprensión avanzada de audios con IA</strong></li>
+              <li><i class="fa-solid fa-check text-green"></i> Catálogo ilimitado con fotos, precios y pedidos</li>
+              <li><i class="fa-solid fa-check text-green"></i> Modo "Hablar por Mí" (Piloto Automático en privados)</li>
+              <li><i class="fa-solid fa-check text-green"></i> CRM automático de prospectos y clientes</li>
+              <li><i class="fa-solid fa-check text-green"></i> Horarios comerciales y respuestas fuera de oficina</li>
+              <li><i class="fa-solid fa-check text-green"></i> Filtro estricto de palabras prohibidas y anti-flood</li>
+              <li><i class="fa-solid fa-check text-green"></i> Respaldo seguro en la nube y estadísticas en vivo</li>
+              <li><i class="fa-solid fa-check text-green"></i> Soporte prioritario y renovación directa por WhatsApp</li>
+            </ul>
+            <a href="#heroRegisterCard" class="btn btn-primary" style="width: 100%;">Solicitar Plan</a>
+          </div>
+
+          <div class="hero-price-card vip-premium-card">
+            <div class="featured-ribbon vip-ribbon">EXCLUSIVO VIP</div>
+            <div class="price-tier vip-tier-title"><i class="fa-solid fa-crown text-orange"></i> Plan Negocio VIP Premium</div>
+            <div class="price-val">$79.99 <span>/ 3 meses</span></div>
+            <p>Ahorra 15%, asegura tu bot activo con soporte preferencial y tecnología multimodal VIP.</p>
+            <ul class="price-features">
+              <li><i class="fa-solid fa-check text-green"></i> <strong>90 días de servicio continuo sin interrupciones</strong></li>
+              <li><i class="fa-solid fa-check text-green"></i> <strong>IA Multimodal VIP: Audios, Fotos y Textos</strong></li>
+              <li><i class="fa-solid fa-check text-green"></i> <strong>Soporte VIP Directo 1-a-1 con el Administrador</strong></li>
+              <li><i class="fa-solid fa-check text-green"></i> Memoria infinita de clientes y aprendizaje continuo</li>
+              <li><i class="fa-solid fa-check text-green"></i> Personalidad y tono 100% personalizados a tu marca</li>
+              <li><i class="fa-solid fa-check text-green"></i> Transferencia inteligente a asesores humanos (#asesor)</li>
+              <li><i class="fa-solid fa-check text-green"></i> Exportación de bases de datos de leads a Excel / CSV</li>
+              <li><i class="fa-solid fa-check text-green"></i> Garantía de Uptime 99.9% y SLA Empresarial</li>
+              <li><i class="fa-solid fa-check text-green"></i> Máxima prioridad en servidores y actualizaciones</li>
+            </ul>
+            <a href="#heroRegisterCard" class="btn btn-primary btn-glow vip-btn" style="width: 100%;">Contactar Administrador VIP</a>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- FOOTER PÚBLICO -->
+      <footer class="hero-footer">
+        <p>© 2026 Etho Multi-Bot Hub. Plataforma de Automatización y Bots de WhatsApp.</p>
+        <p class="text-muted" style="font-size: 12px; margin-top: 4px;">Plataforma Empresarial de Automatización y Alta Disponibilidad para WhatsApp.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ================= APLICACIÓN INTERNA / PANEL DE CONTROL ================= -->
+  <div class="app-layout" id="appLayout" style="display: none;">
+    <!-- ================= BARRA LATERAL (SIDEBAR DE CONTROL) ================= -->
+    <aside class="app-sidebar" id="appSidebar">
+      <!-- SIDEBAR BRAND -->
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <i class="fa-brands fa-whatsapp"></i>
+        </div>
+        <div class="brand-info">
+          <h1>Etho <span>Hub</span></h1>
+          <span class="brand-badge">Multi-Bot Pro</span>
+        </div>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Cerrar barra lateral">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- BOTONES RÁPIDOS SIDEBAR: WEB PÚBLICA & INSTALAR APP -->
+      <div class="sidebar-quick-actions">
+        <button type="button" class="btn btn-secondary btn-sm sidebar-hero-link" onclick="showHeroLandingPage()">
+          <i class="fa-solid fa-globe text-blue"></i> Ver Web de Clientes
+        </button>
+        <button type="button" class="btn btn-install-accent btn-sm install-app-trigger" id="sidebarInstallBtn" onclick="triggerInstallApp()">
+          <i class="fa-solid fa-desktop"></i> Instalar en Escritorio / App
+        </button>
+      </div>
+
+      <!-- BOT METRICS MINI-WIDGET EN SIDEBAR -->
+      <div class="sidebar-widget">
+        <div class="widget-top">
+          <span class="widget-title">Ecosistema WhatsApp</span>
+          <span class="live-pill"><span class="status-dot green"></span> Live</span>
+        </div>
+        <div class="widget-stats-row">
+          <div class="widget-stat-item">
+            <span class="widget-val" id="sidebarOnlineCount">0 / 4</span>
+            <span class="widget-lbl">Conectados</span>
+          </div>
+          <div class="widget-stat-item">
+            <span class="widget-val" id="sidebarTotalLogsMini">0</span>
+            <span class="widget-lbl">Registros</span>
+          </div>
+        </div>
+        <div class="widget-bar">
+          <div class="widget-bar-fill" id="sidebarProgressBar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- NAVEGACIÓN AGRUPADA -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">GESTIÓN & BOTS</div>
+        <button class="nav-btn active" data-tab="bots">
+          <i class="fa-solid fa-robot"></i>
+          <span>Instancias & Bots</span>
+          <span class="nav-pill" id="sidebarBotsCount">1</span>
+        </button>
+        <button class="nav-btn" data-tab="leads">
+          <i class="fa-solid fa-address-book"></i>
+          <span>CRM & Leads</span>
+          <span class="nav-pill green" id="navLeadsCount">0</span>
+        </button>
+        <button class="nav-btn" data-tab="catalog">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Catálogo & Tienda</span>
+        </button>
+
+        <div class="nav-section-title">INTELIGENCIA & REGLAS</div>
+        <button class="nav-btn" data-tab="functions">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Funciones & Reglas</span>
+        </button>
+        <button class="nav-btn" data-tab="moderation">
+          <i class="fa-solid fa-shield-halved text-red"></i>
+          <span>Moderación & Reglas</span>
+        </button>
+        <button class="nav-btn" data-tab="logs">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Logs en Vivo</span>
+          <span class="nav-dot-pulse"></span>
+        </button>
+
+        <div class="nav-section-title">CONFIGURACIÓN & VENTA</div>
+        <button class="nav-btn" data-tab="pricing">
+          <i class="fa-solid fa-tags"></i>
+          <span>Guía de Precios</span>
+        </button>
+        <button class="nav-btn" data-tab="settings">
+          <i class="fa-solid fa-database"></i>
+          <span>Copia de Seguridad</span>
+        </button>
+
+        <!-- SECCIÓN EXCLUSIVA DE ADMINISTRACIÓN (TÚ COMO ADMIN) -->
+        <div id="adminNavSection" style="display: none;">
+          <div class="nav-section-title" style="color: #fbbf24; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-crown"></i> ADMINISTRACIÓN (TÚ)
+          </div>
+          <button class="nav-btn" data-tab="admin">
+            <i class="fa-solid fa-user-shield" style="color: #fbbf24;"></i>
+            <span>Clientes & Tiempos</span>
+            <span class="nav-pill" id="adminUsersCount" style="display: none;"></span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- SIDEBAR FOOTER (USUARIO & ESTADO DEL SISTEMA) -->
+      <div class="sidebar-footer">
+        <div class="sidebar-user-card" id="sidebarUserCard">
+          <div class="user-avatar" id="sidebarUserAvatar">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <div class="user-info">
+            <strong id="sidebarUserName">Cargando...</strong>
+            <span class="user-role-badge" id="sidebarUserRole">Verificando</span>
+          </div>
+          <button class="btn-auth-action" id="authBtn" title="Iniciar Sesión / Salir">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- BACKDROP PARA MÓVILES -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ================= CONTENEDOR PRINCIPAL / VIEWPORT ================= -->
+    <div class="app-viewport">
+      <!-- TOPBAR SUPERIOR -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="topbar-toggle-btn" id="sidebarToggleBtn" aria-label="Abrir Menú">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+          <div class="topbar-breadcrumbs">
+            <span class="bc-home"><i class="fa-solid fa-house"></i> Etho Hub</span>
+            <span class="bc-sep">/</span>
+            <span class="bc-current" id="topbarCurrentTitle">Instancias de WhatsApp</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- BOTÓN MÚSICA AMBIENTAL VIP -->
+          <button type="button" class="btn btn-secondary btn-sm music-trigger-btn" id="topbarMusicBtn" onclick="handleMusicButtonClick(event)" title="Controlar música de la página">
+            <span class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="topbar-label-desktop music-btn-label">Música</span>
+          </button>
+
+          <!-- BOTÓN PÁGINA PRINCIPAL / HERO (SOLO ESCRITORIO, EN MÓVIL ESTÁ EN MENÚ) -->
+          <button type="button" class="btn btn-secondary btn-sm topbar-hero-btn" onclick="showHeroLandingPage()" title="Ver la página principal explicativa y propuesta del servicio">
+            <i class="fa-solid fa-compass text-blue"></i>
+            <span>Página Principal</span>
+          </button>
+
+          <!-- BOTÓN INSTALAR EN ESCRITORIO / APP NATIVA -->
+          <button type="button" class="btn btn-install-accent btn-sm topbar-install-btn install-app-trigger" id="topbarInstallBtn" onclick="triggerInstallApp()" title="Instalar aplicación directa en Escritorio o Celular">
+            <i class="fa-solid fa-desktop"></i>
+            <span class="topbar-label-desktop">Instalar en Escritorio</span>
+            <span class="topbar-label-mobile">Instalar</span>
+          </button>
+
+          <!-- LIVE BOT COUNTER -->
+          <div class="bots-counter-badge" id="topbarBotsPill">
+            <i class="fa-solid fa-robot"></i>
+            <span id="headerBotsCount" class="bots-count-desktop">0 / 4 Bots</span>
+            <span id="headerBotsCountShort" class="bots-count-mobile">0/4</span>
+          </div>
+
+          <!-- BOTÓN RÁPIDO CREAR BOT -->
+          <button type="button" class="btn btn-primary btn-glow" id="openAddBotBtn">
+            <i class="fa-solid fa-plus"></i>
+            <span id="openAddBotBtnText" class="topbar-add-label">Nuevo Bot</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENEDOR DE PESTAÑAS -->
+      <main class="app-main">
+
+        <!-- ================= PESTAÑA 1: GESTIÓN DE BOTS ================= -->
+        <section id="tab-bots" class="tab-content active">
+          <div class="section-header">
+            <div>
+              <h2>Instancias de WhatsApp</h2>
+              <p>Gestiona tus bots, elige su faceta (Recreativo, Asistente, Asesor, Autónomo IA) y personaliza sus ajustes avanzados. Máximo 4 bots activos.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary btn-sm" onclick="fetchBots()">
+                <i class="fa-solid fa-rotate"></i> Actualizar
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros Rápidos de Facetas -->
+          <div class="facet-filters-bar">
+            <button class="facet-filter-btn active" data-facet="all">
+              <i class="fa-solid fa-layer-group"></i> Todos los Bots (<span id="facetCountAll">0</span>)
+            </button>
+            <button class="facet-filter-btn" data-facet="recreational">
+              <i class="fa-solid fa-gamepad text-purple"></i> Recreativos (<span id="facetCountRec">0</span>)
+            </button>
+            <button class="facet-filter-btn" data-facet="assistant">
+              <i class="fa-solid fa-briefcase text-blue"></i> Asistentes (<span id="facetCountAst">0</span>)
+            </button>
+            <button class="facet-filter-btn" data-facet="advisor">
+              <i class="fa-solid fa-store text-green"></i> Asesores (<span id="facetCountAdv">0</span>)
+            </button>
+            <button class="facet-filter-btn" data-facet="ai_autonomous">
+              <i class="fa-solid fa-brain text-orange"></i> Autónomos IA (<span id="facetCountAi">0</span>)
+            </button>
+          </div>
+
+          <!-- Métricas Rápidas -->
+          <div class="stats-grid">
+            <div class="stat-card stat-purple">
+              <div class="stat-top">
+                <span class="stat-label">Capacidad de Bots</span>
+                <div class="stat-icon purple"><i class="fa-solid fa-network-wired"></i></div>
+              </div>
+              <div class="stat-bottom">
+                <h3 id="statTotalBots">0 / 4</h3>
+                <span class="stat-trend" id="statTotalBotsTrend"><i class="fa-solid fa-robot"></i> Máximo 4 bots permitidos</span>
+              </div>
+            </div>
+
+            <div class="stat-card stat-green">
+              <div class="stat-top">
+                <span class="stat-label">Bots Conectados</span>
+                <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+              <div class="stat-bottom">
+                <h3 id="statOnlineBots">0</h3>
+                <span class="stat-trend green"><i class="fa-solid fa-signal"></i> Enlace WhatsApp activo</span>
+              </div>
+            </div>
+
+            <div class="stat-card stat-orange">
+              <div class="stat-top">
+                <span class="stat-label">Bots Apagados</span>
+                <div class="stat-icon orange"><i class="fa-solid fa-power-off"></i></div>
+              </div>
+              <div class="stat-bottom">
+                <h3 id="statOfflineBots">0</h3>
+                <span class="stat-trend muted"><i class="fa-solid fa-moon"></i> Pausados o inactivos</span>
+              </div>
+            </div>
+
+            <div class="stat-card stat-blue">
+              <div class="stat-top">
+                <span class="stat-label">Actividad del Sistema</span>
+                <div class="stat-icon blue"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+              </div>
+              <div class="stat-bottom">
+                <h3 id="statTotalLogs">0</h3>
+                <span class="stat-trend blue"><i class="fa-solid fa-shield-halved"></i> Eventos procesados</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista de Bots -->
+          <div class="bots-grid" id="botsGrid">
+            <div class="loading-state">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <p>Cargando bots registrados...</p>
+            </div>
+          </div>
+        </section>
+
+      <!-- ================= PESTAÑA 2: CRM LEADS & CONTACTOS ================= -->
+      <section id="tab-leads" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>CRM: Prospectos y Contactos Capturados</h2>
+            <p>Clientes potenciales capturados automáticamente por el bot por correo, teléfono o interés comercial.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" id="exportLeadsBtn">
+              <i class="fa-solid fa-file-excel text-green"></i> Exportar a Excel (CSV)
+            </button>
+            <button class="btn btn-primary" id="openAddLeadBtn">
+              <i class="fa-solid fa-user-plus"></i> Añadir Lead Manual
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros de Leads -->
+        <div class="card filter-bar">
+          <div class="filter-group">
+            <label><i class="fa-solid fa-filter"></i> Filtrar por Bot:</label>
+            <select id="leadBotFilter" class="form-input">
+              <option value="all">Todos los Bots</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Estado del Lead:</label>
+            <select id="leadStatusFilter" class="form-input">
+              <option value="all">Todos los Estados</option>
+              <option value="nuevo">Nuevo</option>
+              <option value="contactado">En Seguimiento</option>
+              <option value="ganado">Venta Cerrada</option>
+              <option value="perdido">Perdido</option>
+            </select>
+          </div>
+          <div class="filter-group search-group">
+            <label>Buscar Prospecto:</label>
+            <input type="text" id="leadSearchInput" class="form-input" placeholder="Buscar por nombre, teléfono, email...">
+          </div>
+        </div>
+
+        <!-- Tabla de Leads -->
+        <div class="card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Teléfono WhatsApp</th>
+                  <th>Correo Electrónico</th>
+                  <th>Interés / Consulta</th>
+                  <th>Bot Asignado</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="leadsTableBody">
+                <tr>
+                  <td colspan="8" class="text-center text-muted">Cargando prospectos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- ================= PESTAÑA 3: CATÁLOGO DE PRODUCTOS ================= -->
+      <section id="tab-catalog" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Catálogo de Productos & Servicios</h2>
+            <p>Los productos que tus bots envían automáticamente cuando un cliente escribe <code>#catalogo</code> o consulta precios.</p>
+          </div>
+          <button class="btn btn-primary" id="openAddProductBtn">
+            <i class="fa-solid fa-plus"></i> Añadir Producto
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-boxes-stacked"></i> Productos Registrados</h3>
+            <span class="text-muted" id="catalogCount">0 productos</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Descripción</th>
+                  <th>Bot Asignado</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="catalogTableBody">
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Cargando catálogo...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- ================= PESTAÑA 4: FUNCIONES Y REGLAS ================= -->
+      <section id="tab-functions" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Funciones & Respuestas Dinámicas</h2>
+            <p>Configura comandos propios, respuestas por palabras clave y reglas de atención sin tocar código.</p>
+          </div>
+          <button class="btn btn-primary" id="openAddFunctionBtn">
+            <i class="fa-solid fa-plus"></i> Añadir Función
+          </button>
+        </div>
+
+        <!-- Tabla de Funciones Personalizadas -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-bolt"></i> Reglas y Respuestas Personalizadas Creadas</h3>
+            <span class="text-muted" id="functionsCount">0 funciones</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Tipo Disparador</th>
+                  <th>Palabra / Clave</th>
+                  <th>Texto de Respuesta</th>
+                  <th>Bot Asignado</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="functionsTableBody">
+                <tr>
+                  <td colspan="7" class="text-center text-muted">Cargando funciones...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- ================= PESTAÑA 5: LOGS EN VIVO ================= -->
+      <section id="tab-logs" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Registro de Actividad en Tiempo Real</h2>
+            <p>Historial y registro en tiempo real de toda la actividad de tus asistentes de WhatsApp.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" id="refreshLogsBtn">
+              <i class="fa-solid fa-rotate-right"></i> Refrescar
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros de Logs -->
+        <div class="card filter-bar">
+          <div class="filter-group">
+            <label><i class="fa-solid fa-filter"></i> Filtrar por Bot:</label>
+            <select id="logBotFilter" class="form-input">
+              <option value="all">Todos los Bots</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Tipo de Evento:</label>
+            <select id="logTypeFilter" class="form-input">
+              <option value="all">Todos los Tipos</option>
+              <option value="command">Comandos (#)</option>
+              <option value="message">Mensajes Entrantes</option>
+              <option value="ai_response">Respuestas IA</option>
+              <option value="custom_rule">Reglas Personalizadas</option>
+              <option value="connection">Conexión / QR</option>
+              <option value="error">Errores</option>
+            </select>
+          </div>
+          <div class="filter-group search-group">
+            <label>Buscar:</label>
+            <input type="text" id="logSearchInput" class="form-input" placeholder="Buscar texto, usuario o comando...">
+          </div>
+        </div>
+
+        <!-- Tabla de Logs -->
+        <div class="card">
+          <div class="table-responsive logs-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Bot</th>
+                  <th>Tipo</th>
+                  <th>Remitente / Chat</th>
+                  <th>Contenido / Detalle</th>
+                  <th>Sincronización</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted">Esperando actividad...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- ================= PESTAÑA 6: GUÍA DE PRECIOS ================= -->
+      <section id="tab-pricing" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Guía Comercial: Cómo Vender Bots a Precio Fijo</h2>
+            <p>Modelos de paquetes por faceta, estructura de costos y calculadora de ganancias.</p>
+          </div>
+        </div>
+
+        <!-- Planes de Venta Sugeridos -->
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <span class="plan-tag">Faceta Asesor / Pyme</span>
+              <h3>Plan Asesor Comercial</h3>
+              <p>Ideal para restaurantes, consultorios, tiendas de ropa y servicios locales.</p>
+              <div class="price-box">
+                <span class="price-val">$150 - $250</span>
+                <span class="price-period">USD / Pago Único</span>
+              </div>
+              <div class="recurring-note">+ $25 - $35 USD/mes mantenimiento opcional</div>
+            </div>
+            <ul class="plan-features">
+              <li><i class="fa-solid fa-check"></i> 1 Número de WhatsApp</li>
+              <li><i class="fa-solid fa-check"></i> Catálogo con fotos y precios (#catalogo)</li>
+              <li><i class="fa-solid fa-check"></i> Horarios de atención y fuera de oficina</li>
+              <li><i class="fa-solid fa-check"></i> Captura automática de prospectos (CRM)</li>
+              <li><i class="fa-solid fa-check"></i> Transferencia a asesor humano (#asesor)</li>
+            </ul>
+          </div>
+
+          <div class="pricing-card popular">
+            <div class="popular-ribbon">Más Rentable</div>
+            <div class="pricing-header">
+              <span class="plan-tag">Faceta Asistente & IA</span>
+              <h3>Plan Asistente Ejecutivo & IA</h3>
+              <p>Para profesionales, empresas, agentes inmobiliarios y directivos.</p>
+              <div class="price-box">
+                <span class="price-val">$350 - $500</span>
+                <span class="price-period">USD / Pago Único</span>
+              </div>
+              <div class="recurring-note">+ $45 - $60 USD/mes mantenimiento opcional</div>
+            </div>
+            <ul class="plan-features">
+              <li><i class="fa-solid fa-check"></i> Responde por sí mismo con Inteligencia Artificial</li>
+              <li><i class="fa-solid fa-check"></i> Recordatorios automáticos en WhatsApp</li>
+              <li><i class="fa-solid fa-check"></i> Webhook a Make / Zapier para sincronizar CRM</li>
+              <li><i class="fa-solid fa-check"></i> Panel de control web privado para el cliente</li>
+              <li><i class="fa-solid fa-check"></i> Soporte y garantía por 3 meses</li>
+            </ul>
+          </div>
+
+          <div class="pricing-card">
+            <div class="pricing-header">
+              <span class="plan-tag">Faceta Recreativa / Comunidad</span>
+              <h3>Plan Multi-Bot Marca Blanca</h3>
+              <p>Para comunidades gamer, creadores de contenido y agencias digitales.</p>
+              <div class="price-box">
+                <span class="price-val">$700 - $1,200</span>
+                <span class="price-period">USD / Pago Único</span>
+              </div>
+              <div class="recurring-note">+ $80 - $120 USD/mes soporte dedicado</div>
+            </div>
+            <ul class="plan-features">
+              <li><i class="fa-solid fa-check"></i> Hasta 4 números de WhatsApp simultáneos</li>
+              <li><i class="fa-solid fa-check"></i> Economía completa, gacha anime, ruleta y stickers</li>
+              <li><i class="fa-solid fa-check"></i> Marca blanca con su propio nombre y logo</li>
+              <li><i class="fa-solid fa-check"></i> Moderación antispam/antilink para decenas de grupos</li>
+              <li><i class="fa-solid fa-check"></i> Capacitación directa de uso</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Calculadora de Ganancias -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-calculator"></i> Calculadora Interactiva de Proyección de Ganancias</h3>
+            <span class="badge badge-success">Margen Neto: ~90%</span>
+          </div>
+          <div class="calculator-grid">
+            <div class="calc-controls">
+              <div class="calc-field">
+                <label>¿Cuántos bots activos gestionarás en este panel? (Máximo 4):</label>
+                <div class="slider-wrapper">
+                  <input type="range" id="botsSalesRange" min="1" max="4" value="4" class="slider">
+                  <span id="botsSalesCount" class="slider-value">4 bots</span>
+                </div>
+              </div>
+              <div class="calc-field">
+                <label>Precio de Venta Promedio por Bot (USD):</label>
+                <input type="number" id="botPriceInput" class="form-input" value="300" min="50" step="25">
+              </div>
+              <div class="calc-field">
+                <label>Cuota de Mantenimiento Mensual cobrada al cliente (USD):</label>
+                <input type="number" id="botMonthlyInput" class="form-input" value="35" min="0" step="5">
+              </div>
+            </div>
+
+            <div class="calc-results">
+              <div class="result-box">
+                <span class="result-label">Ingreso Inmediato (Venta de Bots):</span>
+                <h4 id="calcImmediateRevenue" class="text-green">$1,500 USD</h4>
+              </div>
+              <div class="result-box">
+                <span class="result-label">Ingreso Recurrente Mensual (Mantenimiento):</span>
+                <h4 id="calcMonthlyRevenue" class="text-blue">$175 USD / mes</h4>
+              </div>
+              <div class="result-box">
+                <span class="result-label">Costo Estimado de Infraestructura y Nube:</span>
+                <h4 id="calcCost" class="text-red">-$8 USD / mes</h4>
+              </div>
+              <div class="result-box highlight">
+                <span class="result-label">Ganancia Neta Anual Estimada:</span>
+                <h3 id="calcNetAnnual" class="text-purple">$20,004 USD</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- ================= PESTAÑA 7: SUPABASE Y CONFIG ================= -->
+      <section id="tab-settings" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Copia de Seguridad & Almacenamiento en la Nube</h2>
+            <p>Supervisa el estado de la copia de seguridad, redundancia de datos y sincronización de tus asistentes.</p>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-cloud-arrow-up text-blue"></i> Estado del Respaldo en la Nube</h3>
+            <button class="btn btn-secondary btn-sm" id="testSupabaseBtn">
+              <i class="fa-solid fa-arrows-rotate"></i> Verificar Sincronización Ahora
+            </button>
+          </div>
+          <div id="supabaseDiagnostic" class="diagnostic-box">
+            <p class="text-muted">Presiona 'Verificar Sincronización Ahora' para comprobar la salud de la copia en la nube.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-shield-halved text-purple"></i> Respaldo & Configuración de Almacenamiento</h3>
+            <button class="btn btn-secondary btn-sm" onclick="const b = document.getElementById('techDbDetails'); b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+              <i class="fa-solid fa-terminal"></i> Ver Ajustes Técnicos
+            </button>
+          </div>
+          <p class="text-muted mb-2">
+            La plataforma almacena todos tus bots, prospectos del CRM, catálogo de productos y registros de forma redundante y protegida en la nube.
+          </p>
+          <div id="techDbDetails" style="display: none; margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <small class="text-muted">Estructura de tablas y base de datos relacional para réplicas en la nube:</small>
+              <button class="btn btn-primary btn-sm" id="copySqlBtn">
+                <i class="fa-solid fa-copy"></i> Copiar Esquema
+              </button>
+            </div>
+            <pre class="code-block" id="sqlCodeBlock">-- TABLA DE BOTS CON FACETAS
+create table if not exists bots (
+  id text primary key,
+  name text not null,
+  phone text,
+  prefix text default '#',
+  status text default 'offline',
+  qr_code text,
+  pairing_code text,
+  is_active boolean default true,
+  personality text default 'recreational',
+  system_prompt text,
+  ai_auto_reply boolean default false,
+  settings jsonb default '{}'::jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- TABLA DE LOGS DE ACTIVIDAD
+create table if not exists bot_logs (
+  id bigserial primary key,
+  bot_id text references bots(id) on delete cascade,
+  type text not null,
+  chat_jid text,
+  sender_jid text,
+  sender_name text,
+  content text,
+  details jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+-- TABLA DE FUNCIONES Y REGLAS
+create table if not exists bot_custom_functions (
+  id text primary key,
+  bot_id text default 'all',
+  name text not null,
+  description text,
+  trigger_type text default 'command',
+  trigger_value text not null,
+  response_text text not null,
+  response_type text default 'text',
+  is_enabled boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- TABLA DE PROSPECTOS CRM (LEADS)
+create table if not exists bot_leads (
+  id text primary key,
+  bot_id text references bots(id) on delete cascade,
+  name text,
+  phone text,
+  email text,
+  interest text,
+  notes text,
+  status text default 'nuevo',
+  created_at timestamptz default now()
+);
+
+-- TABLA DE CATÁLOGO DE PRODUCTOS
+create table if not exists bot_products (
+  id text primary key,
+  bot_id text references bots(id) on delete cascade,
+  name text not null,
+  description text,
+  price numeric default 0,
+  currency text default 'USD',
+  image_url text,
+  category text default 'General',
+  is_active boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table bots enable row level security;
+alter table bot_logs enable row level security;
+alter table bot_custom_functions enable row level security;
+alter table bot_leads enable row level security;
+alter table bot_products enable row level security;
+
+create policy "etho bots policy" on bots for all using (true) with check (true);
+create policy "etho bot_logs policy" on bot_logs for all using (true) with check (true);
+create policy "etho custom_functions policy" on bot_custom_functions for all using (true) with check (true);
+create policy "etho bot_leads policy" on bot_leads for all using (true) with check (true);
+create policy "etho bot_products policy" on bot_products for all using (true) with check (true);</pre>
+          </div>
+        </div>
+      </section>
+
+      
+
+      <!-- ================= PESTAÑA 8: ADMINISTRACIÓN MASTER (SOLO ADMIN) ================= -->
+      <section id="tab-admin" class="tab-content">
+        <div class="section-header">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 3px 10px; border-radius: 0px; font-size: 11px; font-weight: 700;">
+                <i class="fa-solid fa-crown"></i> PANEL DE CONTROL MASTER
+              </span>
+            </div>
+            <h2>Control de Clientes, Tiempos & Suscripciones</h2>
+            <p>Supervisa de qué son los bots de cada usuario, gestiona su tiempo de prueba o mensualidad y cóbrales al vencer.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="fetchAdminData()">
+              <i class="fa-solid fa-rotate-right"></i> Actualizar Datos
+            </button>
+          </div>
+        </div>
+
+        <!-- Métricas del Negocio (Admin) -->
+        <div class="stats-grid">
+          <div class="stat-card stat-purple">
+            <div class="stat-top">
+              <span class="stat-label">Clientes Registrados</span>
+              <div class="stat-icon purple"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="stat-bottom">
+              <h3 id="adminStatUsers">0</h3>
+              <span class="stat-trend"><i class="fa-solid fa-id-card"></i> Cuentas registradas</span>
+            </div>
+          </div>
+
+          <div class="stat-card stat-orange">
+            <div class="stat-top">
+              <span class="stat-label">Bots en Prueba Activa</span>
+              <div class="stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+            </div>
+            <div class="stat-bottom">
+              <h3 id="adminStatTrial">0</h3>
+              <span class="stat-trend muted"><i class="fa-solid fa-clock"></i> Periodo de prueba gratuito</span>
+            </div>
+          </div>
+
+          <div class="stat-card stat-green">
+            <div class="stat-top">
+              <span class="stat-label">Suscripciones Pagadas</span>
+              <div class="stat-icon green"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
+            </div>
+            <div class="stat-bottom">
+              <h3 id="adminStatPaid">0</h3>
+              <span class="stat-trend green"><i class="fa-solid fa-circle-check"></i> Clientes activos al día</span>
+            </div>
+          </div>
+
+          <div class="stat-card stat-blue">
+            <div class="stat-top">
+              <span class="stat-label">Bots Vencidos / Bloqueados</span>
+              <div class="stat-icon blue" style="background: rgba(239, 68, 68, 0.15); color: #f87171;"><i class="fa-solid fa-ban"></i></div>
+            </div>
+            <div class="stat-bottom">
+              <h3 id="adminStatExpired">0</h3>
+              <span class="stat-trend" style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> Pendientes de cobro</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA 1: GESTIÓN DE BOTS DE CLIENTES (TIEMPOS & SUSCRIPCIONES) -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-robot text-orange"></i> Bots de Clientes (Propósito, Vencimiento y Cobros)</h3>
+            <div class="filter-group">
+              <input type="text" id="adminBotsSearch" class="form-input form-input-sm" placeholder="Buscar por cliente, bot o negocio..." style="min-width: 250px;">
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Cliente / Dueño</th>
+                  <th>Bot / Faceta</th>
+                  <th>¿De qué es el Bot? (Propósito)</th>
+                  <th>Estado de Pago</th>
+                  <th>Tiempo Restante</th>
+                  <th>Acciones de Administrador</th>
+                </tr>
+              </thead>
+              <tbody id="adminBotsTableBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted">Cargando bots de clientes...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TABLA 2: DIRECTORIO DE USUARIOS REGISTRADOS -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-users-gear text-purple"></i> Directorio de Usuarios Registrados</h3>
+            <span class="text-muted" id="adminUsersCountLabel">0 usuarios</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Nombre Completo</th>
+                  <th>WhatsApp Contacto</th>
+                  <th>Correo</th>
+                  <th>Bots Creados</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody">
+                <tr>
+                  <td colspan="8" class="text-center text-muted">Cargando directorio de usuarios...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PESTAÑA: REGLAS & MODERACIÓN ACTIVA ================= -->
+      <section id="tab-moderation" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2><i class="fa-solid fa-shield-halved text-red"></i> Sistema de Reglas & Moderación Activa</h2>
+            <p>Monitoreo anti-abuso, políticas de convivencia y penalizaciones. Si se aplican de mala manera, el bot se cierra y se penaliza con días.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="fetchModerationData()">
+              <i class="fa-solid fa-rotate"></i> Actualizar
+            </button>
+            <button class="btn btn-danger btn-sm admin-only-btn" id="btnOpenPenalize" onclick="openPenalizeModal()" style="display: none;">
+              <i class="fa-solid fa-gavel"></i> Penalizar Bot con Días
+            </button>
+            <button class="btn btn-secondary btn-sm admin-only-btn" id="btnOpenPardon" onclick="openPardonModal()" style="display: none;">
+              <i class="fa-solid fa-dove text-green"></i> Indultar Sanción
+            </button>
+          </div>
+        </div>
+
+        <div class="moderation-container">
+          <div>
+            <h3 style="font-size: 15px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+              <i class="fa-solid fa-scale-balanced text-purple"></i> Términos & Normas de la Plataforma
+            </h3>
+            <div class="moderation-rules-grid" id="moderationRulesGrid"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-triangle-exclamation text-yellow"></i> Historial de Infracciones & Penalizaciones</h3>
+              <span class="text-muted" id="moderationLogsCountLabel">0 incidentes</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Fecha / Hora</th>
+                    <th>Bot Implicado</th>
+                    <th>Infracción / Motivo</th>
+                    <th>Severidad</th>
+                    <th>Días Penalizados</th>
+                    <th>Detalles Técnicos</th>
+                  </tr>
+                </thead>
+                <tbody id="moderationLogsTableBody">
+                  <tr>
+                    <td colspan="6" class="text-center text-muted">Cargando registro de moderación...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      </main>
+
+      <!-- FOOTER DISCRETO DEL VIEWPORT -->
+      <footer class="app-footer">
+        <div class="footer-content">
+          <span><i class="fa-brands fa-whatsapp text-green"></i> <strong>Etho Hub</strong> &bull; Conectividad WhatsApp Empresarial</span>
+          <span>Infraestructura Segura 24/7 &bull; Alta Disponibilidad</span>
+        </div>
+      </footer>
+    </div> <!-- Cierre de .app-viewport -->
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR NATIVA PARA CELULARES (MOBILE BOTTOM NAV) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+      <button type="button" class="mobile-nav-btn active" data-tab="bots">
+        <i class="fa-solid fa-robot"></i>
+        <span>Bots</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-tab="leads">
+        <i class="fa-solid fa-address-book"></i>
+        <span>CRM</span>
+      </button>
+      <button type="button" class="mobile-nav-btn mobile-fab-trigger" id="mobileAddBotFab" aria-label="Crear Nuevo Bot">
+        <div class="fab-circle">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+        <span>Crear</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-tab="catalog">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <span>Tienda</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" id="mobileMoreMenuBtn" data-more-menu="true">
+        <i class="fa-solid fa-bars"></i>
+        <span>Menú</span>
+      </button>
+    </nav>
+  </div> <!-- Cierre de .app-layout -->
+
+  <!-- ================= MODAL: ESTUDIO AVANZADO DE CREACIÓN Y EDICIÓN DE BOTS ================= -->
+  <div class="modal" id="addBotModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-2xl">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> Estudio de Creación de Bots</h3>
+          <p class="subtitle">Diseña la faceta, tono de voz, módulos inteligentes y vista previa de tu asistente WhatsApp.</p>
+        </div>
+        <button class="modal-close" data-close="addBotModal">&times;</button>
+      </div>
+
+      <!-- STEPPER NAV CON INDICADORES DE PROGRESO -->
+      <div class="studio-stepper" id="studioStepper">
+        <button type="button" class="studio-step-btn active" data-step="1" onclick="jumpToStudioStep(1)">
+          <span class="step-circle">1</span>
+          <span>Faceta & Rol</span>
+        </button>
+        <button type="button" class="studio-step-btn" data-step="2" onclick="jumpToStudioStep(2)">
+          <span class="step-circle">2</span>
+          <span>Identidad & Tono</span>
+        </button>
+        <button type="button" class="studio-step-btn" data-step="3" onclick="jumpToStudioStep(3)">
+          <span class="step-circle">3</span>
+          <span>Superpoderes</span>
+        </button>
+        <button type="button" class="studio-step-btn" data-step="4" onclick="jumpToStudioStep(4)">
+          <span class="step-circle">4</span>
+          <span>IA & Bienvenida</span>
+        </button>
+        <button type="button" class="studio-step-btn" data-step="5" onclick="jumpToStudioStep(5)">
+          <span class="step-circle">5</span>
+          <span>Resumen & Vinculación</span>
+        </button>
+      </div>
+
+      <form id="addBotForm">
+        <input type="hidden" id="editBotIdInput" value="">
+        <input type="hidden" id="botIndustryInput" value="ecommerce">
+        <input type="hidden" id="botToneInput" value="friendly">
+
+        <div class="studio-body-layout">
+          <!-- COLUMNA IZQUIERDA: FORMULARIO MULTI-PASO -->
+          <div class="studio-form-col">
+
+            <!-- PASO 1: SELECCIONAR FACETA (6 FACETAS CON SUPERPODERES) -->
+            <div class="studio-step-pane active" id="studioStep1">
+              <div class="studio-step-header">
+                <h4><i class="fa-solid fa-shapes text-purple"></i> 1. Elige la Faceta Especializada</h4>
+                <p>Define la vocación principal de tu bot. Puedes activar y desactivar funciones individuales más adelante.</p>
+              </div>
+
+              <div class="facet-selection-grid-6">
+                <!-- 1. RECREATIVO -->
+                <div class="facet-card active" data-facet="recreational" onclick="selectStudioFacet('recreational')">
+                  <div class="facet-radio-dot"></div>
+                  <div class="facet-icon-box purple">
+                    <i class="fa-solid fa-gamepad"></i>
+                  </div>
+                  <div class="facet-card-info">
+                    <h4><i class="fa-solid fa-users"></i> Comunidad & Grupos</h4>
+                    <p>Dinámicas grupales, recordatorios en comunidad, moderación de chat y bienvenida automática.</p>
+                    <div class="facet-perks-pills">
+                      <span class="facet-perk">Dinámicas</span>
+                      <span class="facet-perk">Comunidad</span>
+                      <span class="facet-perk">Moderación</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. ASISTENTE PERSONAL -->
+                <div class="facet-card" data-facet="assistant" onclick="selectStudioFacet('assistant')">
+                  <div class="facet-radio-dot"></div>
+                  <div class="facet-icon-box blue">
+                    <i class="fa-solid fa-briefcase"></i>
+                  </div>
+                  <div class="facet-card-info">
+                    <h4><i class="fa-solid fa-briefcase"></i> Asistente Ejecutivo</h4>
+                    <p>Agenda privada, recordatorios programados (#recordar), toma de notas (#nota) y organización personal.</p>
+                    <div class="facet-perks-pills">
+                      <span class="facet-perk">Recordatorios</span>
+                      <span class="facet-perk">Notas</span>
+                      <span class="facet-perk">Productividad</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. ASESOR COMERCIAL -->
+                <div class="facet-card" data-facet="advisor" onclick="selectStudioFacet('advisor')">
+                  <div class="facet-radio-dot"></div>
+                  <div class="facet-icon-box green">
+                    <i class="fa-solid fa-store"></i>
+                  </div>
+                  <div class="facet-card-info">
+                    <h4><i class="fa-solid fa-store"></i> Asesor Comercial & Ventas</h4>
+                    <p>Atención a clientes 24/7, catálogo digital, precios, horarios y captura automática de prospectos (CRM).</p>
+                    <div class="facet-perks-pills">
+                      <span class="facet-perk">Catálogo</span>
+                      <span class="facet-perk">CRM & Leads</span>
+                      <span class="facet-perk">Ventas 24/7</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. BOT AUTÓNOMO CON IA -->
+                <div class="facet-card" data-facet="ai_autonomous" onclick="selectStudioFacet('ai_autonomous')">
+                  <div class="facet-radio-dot"></div>
+                  <div class="facet-icon-box orange">
+                    <i class="fa-solid fa-brain"></i>
+                  </div>
+                  <div class="facet-card-info">
+                    <h4><i class="fa-solid fa-brain"></i> Cerebro Autónomo IA</h4>
+                    <p>Conversación inteligente y libre usando Inteligencia Artificial sin necesidad de prefijos ni comandos.</p>
+                    <div class="facet-perks-pills">
+                      <span class="facet-perk">Inteligencia Artificial</span>
+                      <span class="facet-perk">Lenguaje Natural</span>
+                      <span class="facet-perk">Razonamiento</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 5. SOPORTE & CITAS -->
+                <div class="facet-card" data-facet="support" onclick="selectStudioFacet('support')">
+                  <div class="facet-radio-dot"></div>
+                  <div class="facet-icon-box cyan">
+                    <i class="fa-solid fa-headset"></i>
+                  </div>
+                  <div class="facet-card-info">
+                    <h4><i class="fa-solid fa-headset"></i> Soporte, Turnos & Citas</h4>
+                    <p>Resolución de dudas frecuentes (FAQ), toma de turnos o citas y derivación inteligente a asesores humanos.</p>
+                    <div class="facet-perks-pills">
+                      <span class="facet-perk">Turnos</span>
+                      <span class="facet-perk">Preguntas FAQ</span>
+                      <span class="facet-perk">Transferencia</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 6. TUTOR EDUCATIVO -->
+                <div class="facet-card" data-facet="tutor" onclick="selectStudioFacet('tutor')">
+                  <div class="facet-radio-dot"></div>
+                  <div class="facet-icon-box amber">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                  </div>
+                  <div class="facet-card-info">
+                    <h4><i class="fa-solid fa-graduation-cap"></i> Tutor Educativo & Clases</h4>
+                    <p>Explicaciones didácticas paso a paso, cuestionarios interactivos, trivias de estudio y material didáctico.</p>
+                    <div class="facet-perks-pills">
+                      <span class="facet-perk">Lecciones</span>
+                      <span class="facet-perk">Evaluaciones</span>
+                      <span class="facet-perk">Pedagógico</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- PASO 2: IDENTIDAD, INDUSTRIA & TONO -->
+            <div class="studio-step-pane" id="studioStep2">
+              <div class="studio-step-header">
+                <h4><i class="fa-solid fa-id-card text-purple"></i> 2. Identidad del Asistente & Tono</h4>
+                <p>Configura el nombre visible, el negocio al que pertenece y cómo debe expresarse al chatear.</p>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="botNameInput"><i class="fa-solid fa-robot text-purple"></i> Nombre Público del Bot *</label>
+                  <input type="text" id="botNameInput" class="form-input" placeholder="Ej: Etho Ventas / Pizzería Roma Bot" oninput="updatePreviewLive()" required>
+                  <small class="text-muted">Aparecerá como encabezado en WhatsApp y en tus paneles.</small>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="botPhoneInput"><i class="fa-brands fa-whatsapp text-green"></i> Número de WhatsApp de la Línea *</label>
+                  <input type="text" id="botPhoneInput" class="form-input" placeholder="Ej: 573171736519 (código de país, sin +)" oninput="updatePreviewLive()" required>
+                  <small class="text-muted">Obligatorio. Línea que se conectará para responder mensajes.</small>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="botIndustrySelect">Sector o Industria del Negocio:</label>
+                  <select id="botIndustrySelect" class="form-input" onchange="applyIndustryPresets(this.value)">
+                    <option value="ecommerce">E-Commerce / Tienda de Productos</option>
+                    <option value="restaurant">Gastronomía, Restaurante o Cafetería</option>
+                    <option value="realestate">Inmobiliaria / Bienes Raíces</option>
+                    <option value="health">Salud, Belleza o Consultorio</option>
+                    <option value="services">Servicios Profesionales / Consultoría</option>
+                    <option value="fitness">Gimnasio, Fitness & Deportes</option>
+                    <option value="community">Comunidad, Canales & Grupos</option>
+                    <option value="general">Empresa / Negocio General</option>
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="botPurposeInput">¿Para qué negocio o fin es este bot? *</label>
+                  <input type="text" id="botPurposeInput" class="form-input" placeholder="Ej: Pizzería Roma para pedidos a domicilio" oninput="updatePreviewLive()" required>
+                  <small class="text-muted">Requerido para la supervisión y activación del administrador.</small>
+                </div>
+                <div class="form-group" style="width: 140px;">
+                  <label for="botPrefixInput">Prefijo</label>
+                  <select id="botPrefixInput" class="form-input">
+                    <option value="#"># (Recomendado)</option>
+                    <option value="!">!</option>
+                    <option value="/">/</option>
+                    <option value=".">.</option>
+                    <option value="">Sin prefijo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Tono de Voz y Estilo de Comunicación:</label>
+                <div class="tone-selector-grid">
+                  <div class="tone-card active" data-tone="friendly" onclick="selectStudioTone('friendly')">
+                    <i class="fa-solid fa-face-smile"></i>
+                    <strong>Amigable</strong>
+                    <small>Cálido, empático y cercano</small>
+                  </div>
+                  <div class="tone-card" data-tone="formal" onclick="selectStudioTone('formal')">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <strong>Formal</strong>
+                    <small>Trato de usted y protocolo</small>
+                  </div>
+                  <div class="tone-card" data-tone="persuasive" onclick="selectStudioTone('persuasive')">
+                    <i class="fa-solid fa-fire"></i>
+                    <strong>Vendedor</strong>
+                    <small>Persuasivo y enfocado en compras</small>
+                  </div>
+                  <div class="tone-card" data-tone="concise" onclick="selectStudioTone('concise')">
+                    <i class="fa-solid fa-bolt"></i>
+                    <strong>Directo</strong>
+                    <small>Breve, al grano, sin rodeos</small>
+                  </div>
+                  <div class="tone-card" data-tone="technical" onclick="selectStudioTone('technical')">
+                    <i class="fa-solid fa-microchip"></i>
+                    <strong>Analítico</strong>
+                    <small>Técnico y altamente preciso</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASO 3: SUPERPODERES & MÓDULOS ACTIVOS -->
+            <div class="studio-step-pane" id="studioStep3">
+              <div class="studio-step-header">
+                <h4><i class="fa-solid fa-bolt text-purple"></i> 3. Superpoderes & Dónde Activar</h4>
+                <p>Elige en qué lugares podrá responder tu bot y qué capacidades tendrá activas.</p>
+              </div>
+
+              <div class="form-group" style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.28); padding: 12px 14px; margin-bottom: 14px;">
+                <label for="botInitialScopeSelect" style="color: #34d399; font-weight: 700; margin-bottom: 6px; display: block;">
+                  <i class="fa-solid fa-shield-halved"></i> ¿Dónde puede activarse este bot?
+                </label>
+                <select id="botInitialScopeSelect" class="form-input">
+                  <option value="private_and_groups" selected>Chats Privados + Solo los Grupos que yo Habilite (Otros grupos bloqueados)</option>
+                  <option value="groups_only">Exclusivo para Grupos Habilitados (Ignorar chats privados y otros grupos)</option>
+                  <option value="private_only">Solo Chats Privados (Bloqueado en todos los grupos)</option>
+                </select>
+                <small class="text-muted" style="display: block; margin-top: 6px;">Por seguridad, ningún grupo de tu WhatsApp tendrá acceso al bot hasta que lo actives con el botón <strong>Dónde Activar</strong> en tu panel.</small>
+              </div>
+
+              <div class="module-cards-grid">
+                <!-- MODULO IA -->
+                <div class="module-card">
+                  <div class="module-card-icon">
+                    <i class="fa-solid fa-brain"></i>
+                  </div>
+                  <div class="module-card-body">
+                    <strong>IA Conversacional Activa</strong>
+                    <p>Responde inteligentemente en chats privados sin necesidad de comandos.</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="botAiAutoReplyInput" checked onchange="updatePreviewLive()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- MODULO AUDIO & NOTAS DE VOZ VIP -->
+                <div class="module-card">
+                  <div class="module-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                    <i class="fa-solid fa-microphone"></i>
+                  </div>
+                  <div class="module-card-body">
+                    <strong>Recepción y Transcripción de Audios <span style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-size:9px; padding: 2px 6px; font-weight:800; letter-spacing: 0.05em;">VIP PREMIUM</span></strong>
+                    <p>Tu bot escucha notas de voz, las transcribe con IA y responde al cliente de inmediato.</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="modAudioToggle" checked onchange="updatePreviewLive()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- MODULO CATALOGO -->
+                <div class="module-card">
+                  <div class="module-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                  </div>
+                  <div class="module-card-body">
+                    <strong>Catálogo Digital de Productos</strong>
+                    <p>Ofrece productos con precios y descripciones cuando pregunten por servicios o precios.</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="modCatalogToggle" checked onchange="updatePreviewLive()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- MODULO LEADS CRM -->
+                <div class="module-card">
+                  <div class="module-card-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+                    <i class="fa-solid fa-address-book"></i>
+                  </div>
+                  <div class="module-card-body">
+                    <strong>Captura Automática de Prospectos (CRM)</strong>
+                    <p>Guarda automáticamente en la base de datos a quien pida información.</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="modCrmToggle" checked onchange="updatePreviewLive()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- MODULO HORARIO -->
+                <div class="module-card">
+                  <div class="module-card-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                    <i class="fa-solid fa-clock"></i>
+                  </div>
+                  <div class="module-card-body">
+                    <strong>Horario Comercial & Fuera de Hora</strong>
+                    <p>Avisa educadamente cuando te escriban fuera de tu jornada laboral.</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="modHoursToggle" onchange="updatePreviewLive()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- MODULO DERIVACION HUMANO -->
+                <div class="module-card">
+                  <div class="module-card-icon" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                    <i class="fa-solid fa-user-shield"></i>
+                  </div>
+                  <div class="module-card-body">
+                    <strong>Derivación a Asesor Humano</strong>
+                    <p>Pausa el bot si el cliente escribe "asesor", "humano" o "persona".</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="modHandoffToggle" checked onchange="updatePreviewLive()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <!-- MODULO MODERACION -->
+                <div class="module-card">
+                  <div class="module-card-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                  </div>
+                  <div class="module-card-body">
+                    <strong>Filtro Antispam & Antilink</strong>
+                    <p>Control de spam e infracciones en grupos comunitarios.</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="modAntispamToggle" onchange="updatePreviewLive()">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASO 4: IA, BIENVENIDA & CONOCIMIENTO -->
+            <div class="studio-step-pane" id="studioStep4">
+              <div class="studio-step-header">
+                <h4><i class="fa-solid fa-brain text-purple"></i> 4. Entrenamiento de IA & Bienvenida</h4>
+                <p>Personaliza el primer mensaje que verán tus clientes y las instrucciones maestras de conversación.</p>
+              </div>
+
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label>Mensaje de Bienvenida Automático:</label>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="regenerateStudioWelcome()" style="font-size: 11px; padding: 3px 10px;">
+                    <i class="fa-solid fa-rotate"></i> Cargar sugerido
+                  </button>
+                </div>
+                <textarea id="botWelcomeMsgInput" class="form-input form-textarea" rows="3" oninput="updatePreviewLive()" placeholder="¡Hola! Bienvenido a..."></textarea>
+                <small class="text-muted">Se envía automáticamente cuando un cliente escribe por primera vez.</small>
+              </div>
+
+              <div class="form-group">
+                <label>Instrucciones de Personalidad y Base de Conocimiento (System Prompt):</label>
+                <textarea id="botSystemPromptInput" class="form-input form-textarea" rows="4" placeholder="Describe cómo debe actuar, qué reglas seguir y qué información tiene de tu negocio..."></textarea>
+                <small class="text-muted">Define los límites, políticas de devolución, formas de pago y conocimientos clave de tu marca.</small>
+              </div>
+
+              <div class="form-group">
+                <label>Datos Rápidos de Contacto & FAQ (Opcional):</label>
+                <input type="text" id="botFaqQuickInput" class="form-input" placeholder="Ej: Horario: Lun-Vie 9am-7pm | Dirección: Av. Central 123 | Pagos: Efectivo, Transferencia">
+              </div>
+            </div>
+
+            <!-- PASO 5: RESUMEN & VINCULACIÓN -->
+            <div class="studio-step-pane" id="studioStep5">
+              <div class="studio-step-header">
+                <h4><i class="fa-solid fa-qrcode text-purple"></i> 5. Resumen & Método de Vinculación</h4>
+                <p>Revisa la configuración y selecciona cómo vincularás WhatsApp con tu teléfono.</p>
+              </div>
+
+              <!-- RESUMEN EJECUTIVO -->
+              <div class="studio-summary-card">
+                <div class="summary-item-row">
+                  <span class="summary-item-label"><i class="fa-solid fa-robot"></i> Nombre del Bot:</span>
+                  <span class="summary-item-val" id="sumBotName">Mi Bot</span>
+                </div>
+                <div class="summary-item-row">
+                  <span class="summary-item-label"><i class="fa-solid fa-shapes"></i> Faceta Principal:</span>
+                  <span class="summary-item-val" id="sumBotFacet">Recreativo</span>
+                </div>
+                <div class="summary-item-row">
+                  <span class="summary-item-label"><i class="fa-solid fa-building"></i> Sector de Negocio:</span>
+                  <span class="summary-item-val" id="sumBotIndustry">E-Commerce</span>
+                </div>
+                <div class="summary-item-row">
+                  <span class="summary-item-label"><i class="fa-solid fa-comment-dots"></i> Tono de Comunicación:</span>
+                  <span class="summary-item-val" id="sumBotTone">Amigable</span>
+                </div>
+                <div class="summary-item-row">
+                  <span class="summary-item-label"><i class="fa-solid fa-shield"></i> Propósito Declarado:</span>
+                  <span class="summary-item-val" id="sumBotPurpose">Negocio</span>
+                </div>
+                <div class="summary-item-row">
+                  <span class="summary-item-label"><i class="fa-brands fa-whatsapp text-green"></i> Línea WhatsApp:</span>
+                  <span class="summary-item-val" id="sumBotPhone">No asignado</span>
+                </div>
+              </div>
+
+              <!-- METODO DE VINCULACION -->
+              <div class="form-group">
+                <label>Método de Vinculación con WhatsApp:</label>
+                <div class="form-row">
+                  <div class="form-group flex-1" style="background: rgba(255,255,255,0.03); padding: 12px; border: 1px solid var(--border-subtle);">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                      <input type="radio" name="pairingMode" value="qr" checked onchange="toggleStudioPairingMode('qr')">
+                      <strong>Código QR (Recomendado)</strong>
+                    </label>
+                    <small class="text-muted" style="display: block; margin-top: 4px;">Genera un código QR dinámico de alta velocidad para escanear con la cámara de WhatsApp.</small>
+                  </div>
+                  <div class="form-group flex-1" style="background: rgba(255,255,255,0.03); padding: 12px; border: 1px solid var(--border-subtle);">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                      <input type="radio" name="pairingMode" value="code" onchange="toggleStudioPairingMode('code')">
+                      <strong>Código de 8 Dígitos</strong>
+                    </label>
+                    <small class="text-muted" style="display: block; margin-top: 4px;">Usa tu número registrado para vincular mediante notificación de código sin cámara.</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group" id="pairingPhoneGroup" style="display: none;">
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); padding: 10px 12px; font-size: 12px; color: var(--text-main);">
+                  <i class="fa-brands fa-whatsapp text-green"></i> El código de 8 dígitos se solicitará para el número configurado en el Paso 2: <strong id="pairingPhoneDisplayVal">Línea del Bot</strong>.
+                </div>
+              </div>
+
+              <div class="alert alert-info" style="margin-top: 10px; font-size: 12.5px;">
+                <i class="fa-solid fa-circle-info"></i>
+                <span id="subTrialNotice">Al crearlo recibirás <strong>3 días de prueba gratuita</strong> para probar todas las funciones. Puedes renovar con el Administrador.</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- COLUMNA DERECHA: SIMULADOR DE WHATSAPP EN VIVO -->
+          <div class="studio-preview-col">
+            <div class="wa-phone-mockup">
+              <div class="wa-phone-notch">
+                <div class="wa-phone-notch-bar"></div>
+              </div>
+              
+              <!-- HEADER DE WHATSAPP -->
+              <div class="wa-phone-header">
+                <i class="fa-solid fa-arrow-left wa-back-btn"></i>
+                <div class="wa-avatar" id="prevWaAvatar">
+                  <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div class="wa-header-info">
+                  <div class="wa-bot-name" id="prevWaName">Mi Asistente</div>
+                  <div class="wa-bot-status">en línea</div>
+                </div>
+                <div class="wa-header-actions">
+                  <i class="fa-solid fa-video"></i>
+                  <i class="fa-solid fa-phone"></i>
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </div>
+              </div>
+
+              <!-- CHAT BODY -->
+              <div class="wa-chat-screen">
+                <div class="wa-date-chip">HOY</div>
+                
+                <!-- BURBUJA DE BIENVENIDA DEL BOT -->
+                <div class="wa-bubble-bot">
+                  <span id="prevWaMsg">¡Hola! ¿En qué puedo ayudarte hoy?</span>
+                  <div class="wa-quick-actions" id="prevWaActions">
+                    <span class="wa-action-pill" id="prevPillCatalog">Ver Catálogo & Precios</span>
+                    <span class="wa-action-pill" id="prevPillAgent">Hablar con un Asesor</span>
+                  </div>
+                  <div class="wa-msg-meta">
+                    <span>12:00 p. m.</span>
+                    <i class="fa-solid fa-check-double" style="color: #53bdeb;"></i>
+                  </div>
+                </div>
+
+                <!-- BURBUJA SIMULADA DEL USUARIO -->
+                <div class="wa-bubble-user">
+                  <span>Hola, me gustaría más información</span>
+                  <div class="wa-msg-meta">
+                    <span>12:01 p. m.</span>
+                    <i class="fa-solid fa-check-double" style="color: #53bdeb;"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- INPUT INFERIOR -->
+              <div class="wa-chat-input-bar">
+                <div class="wa-fake-input">Escribe un mensaje...</div>
+                <div class="wa-send-btn">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- BADGES DE CONFIGURACION EN VIVO -->
+            <div class="studio-preview-badges">
+              <span class="badge badge-purple" id="prevBadgeFacet">Comunidad</span>
+              <span class="badge badge-info" id="prevBadgeTone">Amigable</span>
+              <span class="badge badge-success" id="prevBadgeAI">IA Activa</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER NAVEGACIÓN ENTRE PASOS -->
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <button type="button" class="btn btn-secondary" id="studioPrevBtn" onclick="navigateStudioStep(-1)" style="display: none;">
+              <i class="fa-solid fa-arrow-left"></i> Anterior
+            </button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-secondary" data-close="addBotModal">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="studioNextBtn" onclick="navigateStudioStep(1)">
+              Siguiente <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveBotSubmitBtn" style="display: none; background: #10b981; border-color: #10b981;">
+              <i class="fa-solid fa-bolt"></i> <span id="saveBotSubmitText">Crear & Activar Bot</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AJUSTES AVANZADOS DEL BOT (#11 Horarios, #20 Humano, #42 Webhook) ================= -->
+  <div class="modal" id="botSettingsModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="botSettingsModalTitle"><i class="fa-solid fa-sliders text-purple"></i> Ajustes Avanzados del Bot</h3>
+          <p class="subtitle">Configura horarios comerciales, atención humana, webhooks y parámetros de IA.</p>
+        </div>
+        <button class="modal-close" data-close="botSettingsModal">&times;</button>
+      </div>
+      <form id="botSettingsForm">
+        <input type="hidden" id="advancedBotIdInput">
+        <div class="modal-body">
+
+          <!-- Pestañas internas del modal -->
+          <div class="settings-tabs">
+            <button type="button" class="settings-tab-btn active" data-subtab="hours"><i class="fa-solid fa-clock"></i> Horarios & Fuera de Oficina</button>
+            <button type="button" class="settings-tab-btn" data-subtab="human"><i class="fa-solid fa-headset"></i> Atención Humana</button>
+            <button type="button" class="settings-tab-btn" data-subtab="ai"><i class="fa-solid fa-sliders"></i> Parámetros de IA</button>
+            <button type="button" class="settings-tab-btn" data-subtab="webhook"><i class="fa-solid fa-link"></i> Webhook (Make/Zapier)</button>
+          </div>
+
+          <!-- Subtab 1: Horarios de Atención -->
+          <div id="subtab-hours" class="subtab-content active">
+            <div class="form-group form-check mb-2">
+              <label class="toggle-switch">
+                <input type="checkbox" id="setBhEnabled">
+                <span class="toggle-slider"></span>
+              </label>
+              <div>
+                <strong>Activar Horario de Atención Comercial</strong>
+                <p class="text-muted" style="font-size: 12px;">El bot avisará cuando un cliente escriba fuera del horario laboral configurado.</p>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Hora de Apertura (HH:MM)</label>
+                <input type="time" id="setBhStart" class="form-input" value="09:00">
+              </div>
+              <div class="form-group flex-1">
+                <label>Hora de Cierre (HH:MM)</label>
+                <input type="time" id="setBhEnd" class="form-input" value="18:00">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Días de Atención:</label>
+              <div class="days-checkbox-group">
+                <label class="day-check"><input type="checkbox" class="day-opt" value="1" checked> Lun</label>
+                <label class="day-check"><input type="checkbox" class="day-opt" value="2" checked> Mar</label>
+                <label class="day-check"><input type="checkbox" class="day-opt" value="3" checked> Mié</label>
+                <label class="day-check"><input type="checkbox" class="day-opt" value="4" checked> Jue</label>
+                <label class="day-check"><input type="checkbox" class="day-opt" value="5" checked> Vie</label>
+                <label class="day-check"><input type="checkbox" class="day-opt" value="6"> Sáb</label>
+                <label class="day-check"><input type="checkbox" class="day-opt" value="0"> Dom</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Mensaje Fuera de Horario:</label>
+              <textarea id="setBhOffMsg" class="form-input form-textarea" rows="2" placeholder="En este momento estamos fuera de horario. Tu mensaje ha sido recibido y te responderemos a primera hora."></textarea>
+            </div>
+          </div>
+
+          <!-- Subtab 2: Atención Humana -->
+          <div id="subtab-human" class="subtab-content">
+            <div class="form-group">
+              <label>Palabras clave para transferir a un humano:</label>
+              <input type="text" class="form-input" value="#asesor, #humano, #soporte" readonly>
+              <small class="text-muted">Si un usuario escribe alguna de estas palabras, el bot pausará sus respuestas para ese chat.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Tiempo de pausa para ese chat (Minutos):</label>
+              <input type="number" id="setHandoffMinutes" class="form-input" value="60" min="5" max="1440">
+              <small class="text-muted">Durante este tiempo el bot se mantendrá en silencio para que el agente humano atienda con calma.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Mensaje de aviso enviado al cliente:</label>
+              <textarea id="setHandoffMsg" class="form-input form-textarea" rows="2" placeholder="He transferido esta conversación a un asesor humano. En breve uno de nuestros agentes te atenderá."></textarea>
+            </div>
+          </div>
+
+          <!-- Subtab 3: Parámetros de IA -->
+          <div id="subtab-ai" class="subtab-content">
+            <div class="form-group">
+              <label>Creatividad de la IA (Temperatura): <span id="tempValueDisplay" class="text-purple font-bold">0.7</span></label>
+              <input type="range" id="setAiTemp" class="slider" min="0.1" max="1.0" step="0.1" value="0.7">
+              <small class="text-muted">Valores bajos (0.2) = respuestas exactas y precisas. Valores altos (0.8) = respuestas más creativas y variadas.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Tono de Comunicación:</label>
+              <select id="setAiTone" class="form-input">
+                <option value="friendly">Amigable & Cercano</option>
+                <option value="formal">Formal & Ejecutivo</option>
+                <option value="sales">Comercial & Persuasivo de Ventas</option>
+                <option value="concise">Directo & Conciso</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Subtab 4: Webhooks -->
+          <div id="subtab-webhook" class="subtab-content">
+            <div class="form-group">
+              <label>URL de Webhook Saliente (Make / Zapier / N8N):</label>
+              <input type="url" id="setWebhookUrl" class="form-input" placeholder="https://hook.eu1.make.com/tu-webhook-secreto">
+              <small class="text-muted">Cada vez que se capture un prospecto o se pida hablar con un humano, enviaremos un POST JSON a esta URL.</small>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="botSettingsModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Ajustes Avanzados</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: SIMULADOR DE CHAT EN VIVO (#8) ================= -->
+  <div class="modal" id="chatSimulatorModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-simulator">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="bot-avatar online" style="width: 36px; height: 36px; font-size: 16px;">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <h3 id="simModalTitle" style="font-size: 16px;">Simulador de Chat</h3>
+            <span class="text-muted" style="font-size: 11px;">Prueba reglas, catálogo e IA sin enviar mensajes reales</span>
+          </div>
+        </div>
+        <button class="modal-close" data-close="chatSimulatorModal">&times;</button>
+      </div>
+      <div class="modal-body simulator-body">
+        <div class="chat-messages-container" id="simMessagesContainer">
+          <div class="chat-bubble bot">
+            <span>¡Hola! Soy tu bot en modo de simulación. Escribe cualquier mensaje o comando para probar cómo respondo.</span>
+          </div>
+        </div>
+        <form id="simChatForm" class="simulator-input-bar">
+          <input type="text" id="simChatInput" class="form-input" placeholder="Escribe un mensaje de prueba..." autocomplete="off" required>
+          <button type="submit" class="btn btn-primary btn-icon"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AÑADIR / EDITAR PRODUCTO (#9) ================= -->
+  <div class="modal" id="productModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="productModalTitle"><i class="fa-solid fa-box text-green"></i> Añadir Producto al Catálogo</h3>
+        <button class="modal-close" data-close="productModal">&times;</button>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="productIdInput">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nombre del Producto / Servicio *</label>
+            <input type="text" id="prodNameInput" class="form-input" placeholder="Ej: Pizza Familiar Pepperoni" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Precio *</label>
+              <input type="number" id="prodPriceInput" class="form-input" placeholder="Ej: 15.00" step="0.01" required>
+            </div>
+            <div class="form-group flex-1">
+              <label>Moneda</label>
+              <input type="text" id="prodCurrencyInput" class="form-input" value="USD" placeholder="USD / MXN / COP">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Categoría</label>
+              <input type="text" id="prodCategoryInput" class="form-input" value="General" placeholder="Ej: Comida, Servicios, Cursos">
+            </div>
+            <div class="form-group flex-1">
+              <label>Asignar a Bot:</label>
+              <select id="prodBotSelect" class="form-input">
+                <option value="all">Todos los Bots</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción:</label>
+            <textarea id="prodDescInput" class="form-input form-textarea" rows="2" placeholder="Detalles, ingredientes o características..."></textarea>
+          </div>
+          <div class="form-group form-check">
+            <label class="toggle-switch">
+              <input type="checkbox" id="prodActiveInput" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span>Producto visible en el catálogo</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="productModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AÑADIR LEAD MANUAL ================= -->
+  <div class="modal" id="addLeadModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus text-blue"></i> Registrar Prospecto (Lead)</h3>
+        <button class="modal-close" data-close="addLeadModal">&times;</button>
+      </div>
+      <form id="addLeadForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nombre del Cliente *</label>
+            <input type="text" id="leadNameInput" class="form-input" placeholder="Ej: Carlos Gómez" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Teléfono de WhatsApp *</label>
+              <input type="text" id="leadPhoneInput" class="form-input" placeholder="Ej: 521234567890" required>
+            </div>
+            <div class="form-group flex-1">
+              <label>Correo Electrónico</label>
+              <input type="email" id="leadEmailInput" class="form-input" placeholder="carlos@correo.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Interés / Producto de Interés:</label>
+            <input type="text" id="leadInterestInput" class="form-input" placeholder="Ej: Cotización plan pro">
+          </div>
+          <div class="form-group">
+            <label>Estado Inicial:</label>
+            <select id="leadStatusInput" class="form-input">
+              <option value="nuevo">Nuevo</option>
+              <option value="contactado">En Seguimiento</option>
+              <option value="ganado">Venta Cerrada</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="addLeadModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CÓDIGO QR / VINCULACIÓN ================= -->
+  <div class="modal" id="qrModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-qr">
+      <div class="modal-header">
+        <h3 id="qrModalTitle"><i class="fa-solid fa-link text-purple"></i> Vincular WhatsApp</h3>
+        <button class="modal-close" data-close="qrModal">&times;</button>
+      </div>
+
+      <!-- TABS DE MÉTODO DE VINCULACIÓN -->
+      <div id="qrModalTabs" style="display: flex; gap: 8px; padding: 12px 18px 0 18px; border-bottom: 1px solid var(--border-subtle);">
+        <button type="button" class="btn btn-sm flex-1" id="tabBtnCode" onclick="switchPairingTab('code')" style="font-size: 11px; padding: 7px 10px; border-bottom: 2px solid var(--primary);">
+          <i class="fa-solid fa-key text-blue"></i> Código de 8 Dígitos
+        </button>
+        <button type="button" class="btn btn-sm btn-secondary flex-1" id="tabBtnQr" onclick="switchPairingTab('qr')" style="font-size: 11px; padding: 7px 10px; border-bottom: 2px solid transparent;">
+          <i class="fa-solid fa-qrcode text-purple"></i> Código QR (Cámara)
+        </button>
+      </div>
+
+      <div class="modal-body text-center" style="padding-top: 16px;">
+        <!-- VISTA 1: CÓDIGO NUMÉRICO DE 8 DÍGITOS -->
+        <div id="viewPairingCode" style="display: block;">
+          <p class="qr-instructions" style="font-size: 12px; margin-bottom: 14px; text-align: left; line-height: 1.5;">
+            En tu teléfono abre <strong>WhatsApp &gt; Dispositivos vinculados &gt; Vincular un dispositivo &gt; Vincular con el número de teléfono</strong> e introduce este código:
+          </p>
+
+          <div id="pairingCodeContainer" style="background: rgba(99, 102, 241, 0.08); border: 2px dashed rgba(99, 102, 241, 0.4); padding: 20px 14px; margin-bottom: 14px;">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px;">Código de Vinculación</div>
+            <div id="pairingCodeVal" style="font-size: 32px; font-weight: 900; letter-spacing: 0.18em; font-family: monospace; color: var(--text-main); line-height: 1.2;">
+              --------
+            </div>
+            <div style="margin-top: 10px; display: flex; justify-content: center; gap: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnCopyPairingCode" onclick="copyPairingCodeVal()">
+                <i class="fa-solid fa-copy"></i> Copiar Código
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="btnReqPairingCode" onclick="requestPairingCodeNow()">
+                <i class="fa-solid fa-bolt"></i> Generar Nuevo
+              </button>
+            </div>
+          </div>
+
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px;">
+            <i class="fa-solid fa-mobile-screen"></i> Vinculando línea: <strong id="pairingTargetPhone" style="color: var(--text-main);">+...</strong>
+          </div>
+        </div>
+
+        <!-- VISTA 2: CÓDIGO QR PARA ESCANEAR -->
+        <div id="viewQrCode" style="display: none;">
+          <p class="qr-instructions" style="font-size: 12px; margin-bottom: 12px;">
+            Abre <strong>WhatsApp</strong> en tu teléfono &gt; <strong>Dispositivos vinculados</strong> &gt; <strong>Vincular un dispositivo</strong> y escanea este código:
+          </p>
+
+          <div class="qr-display-box" id="qrDisplayBox">
+            <div class="qr-loading">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <p>Generando código QR seguro...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISTA 3: CONFIRMACIÓN EJECUTIVA Y REDIRECCIÓN AL DASHBOARD -->
+        <div id="viewConnectedSuccess" style="display: none; padding: 24px 16px;">
+          <div style="width: 56px; height: 56px; margin: 0 auto 14px auto; background: rgba(16, 185, 129, 0.14); border: 1.5px solid #10b981; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 26px;">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <h4 style="font-size: 18px; font-weight: 800; color: #10b981; margin-bottom: 6px;">WhatsApp Conectado con Éxito</h4>
+          <p class="text-muted" style="font-size: 13px; margin-bottom: 16px;">
+            El bot está operativo y se ha agregado directamente a tu panel de control.
+          </p>
+          <button type="button" class="btn btn-primary" onclick="finalizeConnectedBotToDashboard()">
+            <i class="fa-solid fa-gauge-high"></i> Ir al Panel de Control
+          </button>
+        </div>
+
+        <div class="qr-footer-status" id="qrStatusText" style="margin-top: 10px;">
+          <span class="status-dot yellow"></span> Esperando vinculación...
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnRefreshQr" onclick="handleRefreshQrModal()" title="Generar un nuevo código QR limpio">
+          <i class="fa-solid fa-rotate"></i> Regenerar Sesión
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" data-close="qrModal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AÑADIR / EDITAR FUNCIÓN ================= -->
+  <div class="modal" id="functionModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="functionModalTitle"><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> Nueva Función Personalizada</h3>
+        <button class="modal-close" data-close="functionModal">&times;</button>
+      </div>
+      <form id="functionForm">
+        <input type="hidden" id="functionIdInput">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nombre de la Función / Regla *</label>
+            <input type="text" id="fnNameInput" class="form-input" placeholder="Ej: Horario de Atención / Catálogo" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Tipo de Disparador *</label>
+              <select id="fnTriggerTypeInput" class="form-input">
+                <option value="command">Comando (#palabra)</option>
+                <option value="exact">Texto Exacto ("hola")</option>
+                <option value="contains">Contiene Texto ("información")</option>
+                <option value="regex">Expresión Regular (Regex)</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label>Palabra o Frase Clave *</label>
+              <input type="text" id="fnTriggerValueInput" class="form-input" placeholder="Ej: horario o #menu" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Asignar a:</label>
+            <select id="fnBotSelect" class="form-input">
+              <option value="all">Todos los Bots</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Texto de Respuesta *</label>
+            <textarea id="fnResponseTextInput" class="form-input form-textarea" rows="4" placeholder="Escribe el mensaje que enviará el bot..." required></textarea>
+            <div class="var-pills">
+              <span class="var-pill" data-var="{user}">+ {user}</span>
+              <span class="var-pill" data-var="{name}">+ {name}</span>
+              <span class="var-pill" data-var="{date}">+ {date}</span>
+              <span class="var-pill" data-var="{time}">+ {time}</span>
+              <span class="var-pill" data-var="{bot}">+ {bot}</span>
+              <span class="var-pill" data-var="{group}">+ {group}</span>
+            </div>
+          </div>
+          <div class="form-group form-check">
+            <label class="toggle-switch">
+              <input type="checkbox" id="fnEnabledInput" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span>Función activa inmediatamente</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="functionModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Función</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AUTENTICACIÓN & LOGIN / REGISTRO ================= -->
+  <div class="modal" id="authModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog auth-modal-dialog" style="max-width: 490px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="authModalTitle"><i class="fa-solid fa-shield-halved text-purple"></i> Acceso a la Plataforma</h3>
+          <p class="subtitle" id="authModalSubtitle">Acceso seguro a tu panel de control y gestión de bots autónomos.</p>
+        </div>
+        <button class="modal-close" data-close="authModal">&times;</button>
+      </div>
+
+      <!-- TABS LOGIN / REGISTRO -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="authTabLogin">
+          <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+        </button>
+        <button type="button" class="auth-tab-btn" id="authTabRegister">
+          <i class="fa-solid fa-user-plus"></i> Crear Cuenta
+        </button>
+      </div>
+
+      <!-- FORM LOGIN -->
+      <form id="loginForm" class="auth-form active">
+        <div class="modal-body auth-modal-body">
+          <div class="form-group">
+            <label for="loginUsername"><i class="fa-solid fa-user text-purple"></i> Nombre de Usuario o Correo *</label>
+            <div class="auth-input-wrap">
+              <i class="fa-solid fa-at auth-input-icon"></i>
+              <input type="text" id="loginUsername" class="form-input auth-input" placeholder="Ej: admin o tu_usuario" autocomplete="username" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <div class="auth-label-row">
+              <label for="loginPassword"><i class="fa-solid fa-lock text-purple"></i> Contraseña *</label>
+              <a href="javascript:void(0)" id="authForgotPassLink" class="auth-link-sm">
+                <i class="fa-solid fa-circle-question"></i> ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+            <div class="auth-input-wrap">
+              <i class="fa-solid fa-key auth-input-icon"></i>
+              <input type="password" id="loginPassword" class="form-input auth-input" placeholder="••••••••" autocomplete="current-password" required>
+              <button type="button" class="btn-toggle-pass" id="toggleLoginPassBtn" title="Mostrar u ocultar contraseña">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-options-row">
+            <label class="auth-checkbox-label">
+              <input type="checkbox" id="loginRemember" checked>
+              <span>Recordar sesión en este equipo</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer auth-modal-footer">
+          <button type="submit" class="btn btn-primary btn-block auth-btn-submit" id="loginSubmitBtn">
+            <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión en la Plataforma
+          </button>
+
+          <div class="auth-switch-note">
+            ¿Aún no tienes una cuenta activa?
+            <a href="javascript:void(0)" id="switchToRegisterLink">Crear cuenta gratis (3 días de prueba)</a>
+          </div>
+
+          <div class="auth-security-strip">
+            <i class="fa-solid fa-shield-halved text-green"></i>
+            <span>Conexión Cifrada SSL 256-Bit &bull; Protección Anti-Fuerza Bruta &bull; SLA 99.9%</span>
+          </div>
+        </div>
+      </form>
+
+      <!-- FORM REGISTRO -->
+      <form id="registerForm" class="auth-form" style="display: none;">
+        <div class="modal-body auth-modal-body">
+          <div class="auth-trial-badge-box">
+            <div class="auth-trial-pill">
+              <i class="fa-solid fa-bolt text-green"></i> 3 DÍAS GRATIS
+            </div>
+            <div class="auth-trial-text">
+              Despliega tu propio asistente autónomo sin tarjetas de crédito y con soporte completo.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regName"><i class="fa-solid fa-id-card text-purple"></i> Nombre Completo o Empresa *</label>
+            <div class="auth-input-wrap">
+              <i class="fa-solid fa-user auth-input-icon"></i>
+              <input type="text" id="regName" class="form-input auth-input" placeholder="Ej: Carlos Gómez o Distribuidora Andina" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regUsername"><i class="fa-solid fa-at text-purple"></i> Nombre de Usuario *</label>
+            <div class="auth-input-wrap">
+              <i class="fa-solid fa-user-tag auth-input-icon"></i>
+              <input type="text" id="regUsername" class="form-input auth-input" placeholder="Ej: carlosg (mínimo 3 caracteres)" autocomplete="username" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="regWhatsapp"><i class="fa-brands fa-whatsapp text-green"></i> WhatsApp de Contacto *</label>
+              <div class="auth-input-wrap">
+                <i class="fa-solid fa-phone auth-input-icon"></i>
+                <input type="text" id="regWhatsapp" class="form-input auth-input" placeholder="Ej: 573171736519" required>
+              </div>
+            </div>
+            <div class="form-group flex-1">
+              <label for="regEmail"><i class="fa-solid fa-envelope text-purple"></i> Correo Electrónico</label>
+              <div class="auth-input-wrap">
+                <i class="fa-solid fa-envelope auth-input-icon"></i>
+                <input type="email" id="regEmail" class="form-input auth-input" placeholder="carlos@correo.com">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPurpose"><i class="fa-solid fa-bullseye text-purple"></i> ¿Para qué usarás tu bot de WhatsApp? *</label>
+            <div class="auth-input-wrap">
+              <i class="fa-solid fa-robot auth-input-icon"></i>
+              <select id="regPurpose" class="form-input auth-input" required>
+                <option value="Ventas y Catálogo 24/7">Ventas y Catálogo 24/7 (Captura de Leads y Cobros)</option>
+                <option value="Atención al Cliente y Soporte">Atención al Cliente y Soporte Continuo</option>
+                <option value="Piloto Automático (Hablar por Mí)">Piloto Automático (Hablar por Mí / Cero Distracciones)</option>
+                <option value="Gestión de Grupos y Moderación">Gestión de Grupos y Dinámicas de Comunidad</option>
+                <option value="Asistente Ejecutivo y Productividad">Asistente Ejecutivo y Productividad</option>
+                <option value="Juegos y Recreación">Juegos y Recreación</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="regPassword"><i class="fa-solid fa-lock text-purple"></i> Contraseña *</label>
+              <div class="auth-input-wrap">
+                <i class="fa-solid fa-key auth-input-icon"></i>
+                <input type="password" id="regPassword" class="form-input auth-input" placeholder="Mínimo 4 caracteres" autocomplete="new-password" required>
+                <button type="button" class="btn-toggle-pass" id="toggleRegPassBtn" title="Mostrar u ocultar contraseña">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <div class="pass-meter">
+                <div class="pass-meter-fill" id="regPassMeterFill"></div>
+              </div>
+              <small class="pass-meter-label" id="regPassMeterLabel">Mínimo 4 caracteres</small>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="regConfirmPassword"><i class="fa-solid fa-shield-halved text-purple"></i> Confirmar Contraseña *</label>
+              <div class="auth-input-wrap">
+                <i class="fa-solid fa-check-double auth-input-icon"></i>
+                <input type="password" id="regConfirmPassword" class="form-input auth-input" placeholder="Repite la contraseña" autocomplete="new-password" required>
+                <button type="button" class="btn-toggle-pass" id="toggleRegConfirmPassBtn" title="Mostrar u ocultar contraseña">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <small class="pass-match-label" id="regPassMatchLabel"></small>
+            </div>
+          </div>
+
+          <div class="auth-terms-box">
+            <label class="auth-checkbox-label">
+              <input type="checkbox" id="regTerms" required>
+              <span>Acepto las <strong>Reglas de Uso y Política Anti-Abuso</strong>. Entiendo que las infracciones como spam masivo conllevan la suspensión de cuenta y penalización por días de servicio.</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer auth-modal-footer">
+          <button type="submit" class="btn btn-primary btn-block auth-btn-submit" id="regSubmitBtn">
+            <i class="fa-solid fa-rocket"></i> Crear Mi Cuenta & Desplegar Bot Gratis
+          </button>
+
+          <div class="auth-switch-note">
+            ¿Ya tienes una cuenta registrada?
+            <a href="javascript:void(0)" id="switchToLoginLink">Iniciar Sesión</a>
+          </div>
+
+          <div class="auth-security-strip">
+            <i class="fa-solid fa-user-lock text-green"></i>
+            <span>Tus datos y credenciales de WhatsApp se encuentran en entornos protegidos y cifrados.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: GESTIONAR TIEMPO Y SUSCRIPCIÓN (ADMIN) ================= -->
+  <div class="modal" id="subModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-clock text-orange"></i> Gestionar Tiempo & Suscripción</h3>
+          <p class="subtitle" id="subModalBotTitle">Bot del Cliente</p>
+        </div>
+        <button class="modal-close" data-close="subModal">&times;</button>
+      </div>
+      <form id="subForm">
+        <input type="hidden" id="subBotId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Añadir Tiempo de Servicio:</label>
+            <div class="quick-days-pills">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setSubDays(7)">+7 Días (Prueba)</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setSubDays(15)">+15 Días</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setSubDays(30)">+30 Días (Mes)</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setSubDays(90)">+90 Días</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setSubDays(0)">Ilimitado (VIP)</button>
+            </div>
+            <input type="number" id="subDaysInput" class="form-input mt-2" placeholder="O escribe días a añadir (ej: 30)">
+          </div>
+
+          <div class="form-group">
+            <label>Estado de Pago / Suscripción:</label>
+            <select id="subStatusSelect" class="form-input">
+              <option value="trial">Periodo de Prueba</option>
+              <option value="paid">Suscripción Pagada (Activa)</option>
+              <option value="expired">Expirado / Vencido (Pausado)</option>
+              <option value="suspended">Suspendido / Bloqueado por Admin</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>¿Para qué es el Bot? (Propósito / Negocio del Cliente):</label>
+            <input type="text" id="subPurposeInput" class="form-input" placeholder="Ej: Restaurante de sushi, Agencia inmobiliaria...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="subModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: PENALIZAR BOT CON DÍAS (ADMIN) ================= -->
+  <div class="modal" id="penalizeModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" style="max-width: 520px;">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-gavel text-red"></i> Penalizar Bot por Infracción</h3>
+          <p class="subtitle">Aplica una suspensión temporal y descuenta días de servicio por abuso de las reglas.</p>
+        </div>
+        <button class="modal-close" data-close="penalizeModal">&times;</button>
+      </div>
+      <form id="penalizeForm" onsubmit="handleApplyPenalty(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Selecciona el Bot a Penalizar *</label>
+            <select id="penalizeBotSelect" class="form-input" required>
+              <option value="">Selecciona un bot...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Días de Penalización & Suspensión *</label>
+            <select id="penalizeDaysSelect" class="form-input" required>
+              <option value="1">1 Día (Advertencia de spam leve)</option>
+              <option value="2" selected>2 Días (Flood reiterado)</option>
+              <option value="3">3 Días (Infracción reiterada - 3 strikes)</option>
+              <option value="5">5 Días (Contenido inapropiado / acoso)</option>
+              <option value="7">7 Días (Scams, phishing o enlaces maliciosos)</option>
+              <option value="14">14 Días (Suspensión grave)</option>
+              <option value="30">30 Días (Suspensión mayor)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Motivo de la Sanción *</label>
+            <input type="text" id="penalizeReasonInput" class="form-input" placeholder="Ej: Envío reiterado de spam / flood en grupos" required>
+          </div>
+
+          <div class="form-group form-check" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); padding: 12px;">
+            <label class="toggle-switch">
+              <input type="checkbox" id="penalizeDeductCheck" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span style="font-size: 12px; color: #fca5a5;">Descontar también estos días de su periodo de suscripción o prueba.</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="penalizeModal">Cancelar</button>
+          <button type="submit" class="btn btn-danger"><i class="fa-solid fa-gavel"></i> Aplicar Penalización & Cerrar Bot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: INDULTAR / LEVANTAR PENALIZACIÓN (ADMIN) ================= -->
+  <div class="modal" id="pardonModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-dove text-green"></i> Levantar Penalización / Indultar</h3>
+          <p class="subtitle">Perdona las infracciones y reactiva el bot para que su dueño pueda encenderlo.</p>
+        </div>
+        <button class="modal-close" data-close="pardonModal">&times;</button>
+      </div>
+      <form id="pardonForm" onsubmit="handleApplyPardon(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Selecciona el Bot Penalizado *</label>
+            <select id="pardonBotSelect" class="form-input" required>
+              <option value="">Selecciona un bot sancionado...</option>
+            </select>
+          </div>
+          <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.6;">
+            Al confirmar, se eliminará el bloqueo por días, los strikes se reiniciarán a 0 y el bot quedará libre para ser encendido en el panel.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="pardonModal">Cancelar</button>
+          <button type="submit" class="btn btn-success"><i class="fa-solid fa-dove"></i> Confirmar Indulto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CONFIGURAR MODO HABLAR POR MÍ (PILOTO AUTOMÁTICO) ================= -->
+  <div class="modal" id="pilotModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" style="max-width: 540px;">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-microphone-lines text-purple"></i> Modo "Hablar por Mí" (Piloto Automático)</h3>
+          <p class="subtitle">La IA responderá tus chats de WhatsApp por ti cuando no puedas o no quieras hablar.</p>
+        </div>
+        <button class="modal-close" data-close="pilotModal">&times;</button>
+      </div>
+      <form id="pilotForm" onsubmit="handleSavePilotSettings(event)">
+        <input type="hidden" id="pilotBotId">
+        <div class="modal-body">
+          <div class="form-group form-check" style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); padding: 14px;">
+            <label class="toggle-switch">
+              <input type="checkbox" id="pilotActiveCheck">
+              <span class="toggle-slider"></span>
+            </label>
+            <div>
+              <strong style="color: #c4b5fd; font-size: 13.5px; display: block;">Activar Piloto Automático (Hablar por Mí)</strong>
+              <span style="font-size: 11.5px; color: var(--text-muted);">La IA contestará automáticamente los mensajes privados que te lleguen. Si tú escribes manualmente en un chat, la IA se pausará para no interrumpirte.</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Estilo de Respuesta de la IA *</label>
+            <select id="pilotPersonaSelect" class="form-input">
+              <option value="as_me">Clon Personal (Habla en 1ra persona como tú: "Hola, ando ocupado pero dime...")</option>
+              <option value="as_assistant">Asistente Personal (Habla a tu nombre: "Hola, soy el asistente de [Tu Nombre]...")</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Tu Nombre o Apodo (para que la IA sepa a quién representa) *</label>
+            <input type="text" id="pilotOwnerNameInput" class="form-input" placeholder="Ej: Andrés, Carlos Gómez, etc.">
+          </div>
+
+          <div class="form-group">
+            <label>Instrucciones o Contexto del Día (Opcional)</label>
+            <textarea id="pilotContextInput" class="form-input form-textarea" rows="3" placeholder="Ej: Estoy en reunión de trabajo hasta las 5pm. Di que los precios están en el catálogo, atiende con amabilidad y toma los recados de quien me escriba."></textarea>
+            <small class="text-dim">La IA usará estas indicaciones para dar respuestas precisas y coherentes con tu situación.</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="pilotModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar Ajustes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: BANDEJA DE RECADOS & MENSAJES ATENDIDOS ================= -->
+  <div class="modal" id="recadosModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-inbox text-blue"></i> Mensajes & Recados Atendidos por la IA</h3>
+          <p class="subtitle" id="recadosModalSubtitle">Personas que te escribieron mientras la IA estuvo hablando por ti.</p>
+        </div>
+        <button class="modal-close" data-close="recadosModal">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height: 480px; overflow-y: auto;">
+        <div id="recadosListContainer">
+          <!-- Renderizado dinámico -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close="recadosModal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="handleMarkRecadosRead()"><i class="fa-solid fa-check-double"></i> Marcar Todos como Leídos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICACIONES -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- MODAL: GESTIÓN DE PERSONALIDAD Y PALABRAS -->
+  <div class="modal" id="personalityModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h3 class="modal-title"><i class="fa-solid fa-sliders text-purple"></i> Personalidad y Reglas de Palabras</h3>
+          <p class="modal-subtitle">Define el tono, vocabulario permitido/prohibido e instrucciones de comportamiento del bot.</p>
+        </div>
+        <button class="modal-close" data-close="personalityModal">&times;</button>
+      </div>
+      <form id="personalityForm" onsubmit="handleSavePersonality(event)">
+        <input type="hidden" id="persBotId" value="">
+        <div class="modal-body">
+          <div id="persPowerWarning" style="display: none; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); padding: 12px 14px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: flex-start; gap: 10px;">
+              <i class="fa-solid fa-power-off text-orange" style="font-size: 20px; margin-top: 2px;"></i>
+              <div>
+                <strong style="color: #fcd34d;">Este bot está encendido actualmente</strong>
+                <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">
+                  Para cambiar la personalidad o faceta del bot, es necesario <strong>apagarlo temporalmente</strong>.
+                  <br><strong style="color: var(--green);">Tranquilo: El bot NO será borrado</strong>, sus datos, mensajes y vinculación quedan 100% seguros y podrás volver a encenderlo cuando desees.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="persTone">Tono de Comunicación de la IA</label>
+            <select id="persTone" class="form-input">
+              <option value="profesional">Profesional - Formal, respetuoso, serio y sin modismos</option>
+              <option value="ejecutivo">Ejecutivo - Directo, conciso, orientado a resultados</option>
+              <option value="amigable">Amigable - Cordial, cercano y educado</option>
+              <option value="directo">Directo - Conciso, sin saludos repetitivos ni rodeos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="persFacet">Faceta / Rol del Bot</label>
+            <select id="persFacet" class="form-input">
+              <option value="ai_autonomous">Autónomo con Inteligencia Artificial (Conversacional)</option>
+              <option value="assistant">Asistente Personal (Productividad & Tareas)</option>
+              <option value="advisor">Asesor Comercial & Ventas (Atención a Clientes)</option>
+              <option value="recreational">Comunidad & Grupos (Interactivo y Serio)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="persPrompt">Instrucciones de Personalidad (System Prompt)</label>
+            <textarea id="persPrompt" class="form-input form-textarea" rows="4" placeholder="Ej: Eres un asistente profesional, educado y cercano. Respondes con datos claros..."></textarea>
+            <small class="text-muted">Describe cómo debe pensar y responder tu bot en español sin emojis ni roleplay.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="persForbidden">Palabras Prohibidas (Blacklist - Censuradas con ***)</label>
+            <input type="text" id="persForbidden" class="form-input" placeholder="nekotina, nya, miau, groserias (separadas por comas)">
+            <small class="text-muted">Cualquier palabra en esta lista será eliminada o sustituida por *** si la IA intenta escribirla.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="persPreferred">Palabras o Frases Preferidas (Vocabulario Prioritario)</label>
+            <input type="text" id="persPreferred" class="form-input" placeholder="Nombre de tu marca, promociones, términos clave (separados por comas)">
+            <small class="text-muted">Conceptos que la IA priorizará incluir de manera natural en las respuestas.</small>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 12px; margin-top: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div>
+                <strong>Cero Emojis Estricto:</strong>
+                <p class="text-muted" style="margin: 0; font-size: 12px;">Todos los emojis y emoticones gráficos están deshabilitados en los mensajes.</p>
+              </div>
+              <span class="badge badge-info" style="font-weight: 700; text-transform: uppercase;">[ACTIVO]</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <strong>Filtro Anti-Nekotina y Roleplay Cringe:</strong>
+                <p class="text-muted" style="margin: 0; font-size: 12px;">Bloqueo total de modismos anime, sonidos de gato (nya, purr) y roleplay infantil.</p>
+              </div>
+              <span class="badge badge-success" style="font-weight: 700; text-transform: uppercase;">[PROTEGIDO]</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="personalityModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSavePersonality">Guardar Personalidad</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= BANNER FLOTANTE DE INSTALACIÓN DE APP (ESCRITORIO & CELULAR) ================= -->
+  <div class="app-install-banner" id="appInstallBanner" style="display: none;">
+    <div class="app-install-banner-left">
+      <img src="/icons/icon-192.png" alt="Etho Hub" class="app-install-banner-icon">
+      <div class="app-install-banner-copy">
+        <strong>Instalar Aplicación Etho Hub</strong>
+        <span>Acceso directo en Escritorio o pantalla de inicio como app nativa</span>
+      </div>
+    </div>
+    <div class="app-install-banner-actions">
+      <button type="button" class="btn btn-primary btn-sm" onclick="triggerInstallApp()">
+        <i class="fa-solid fa-download"></i> Instalar
+      </button>
+      <button type="button" class="app-install-banner-close" onclick="dismissInstallBanner()" aria-label="Cerrar aviso">&times;</button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL EJECUTIVO: INSTALAR APLICACIÓN EN ESCRITORIO O CELULAR ================= -->
+  <div class="modal" id="installAppModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" style="max-width: 540px;">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-desktop text-green"></i> Instalar Aplicación Etho Hub</h3>
+          <p class="subtitle">Ejecuta tu panel como aplicación independiente en tu Escritorio o teléfono celular.</p>
+        </div>
+        <button class="modal-close" data-close="installAppModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="installNativeReadyBox" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); padding: 14px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div>
+              <strong style="color: #34d399; display: block; font-size: 13.5px;">Instalación Directa Lista</strong>
+              <span style="font-size: 12px; color: var(--text-muted);">Haz clic para crear el acceso directo oficial en tu equipo ahora mismo.</span>
+            </div>
+            <button type="button" class="btn btn-success btn-sm" onclick="confirmNativeInstallPrompt()">
+              <i class="fa-solid fa-download"></i> Instalar Ahora
+            </button>
+          </div>
+        </div>
+
+        <div class="install-guide-list">
+          <div class="install-guide-card" id="installGuideDesktop">
+            <div class="install-guide-icon"><i class="fa-solid fa-laptop"></i></div>
+            <div>
+              <strong>En Computadora / Escritorio (Windows o Mac)</strong>
+              <p>Haz clic en el icono de <strong>Instalar Etho Hub</strong> ubicado en el extremo derecho de la barra de direcciones de tu navegador (Chrome o Edge), o abre el menú superior derecho y selecciona <strong>Guardar y compartir &gt; Instalar página como aplicación</strong>.</p>
+            </div>
+          </div>
+
+          <div class="install-guide-card" id="installGuideAndroid">
+            <div class="install-guide-icon"><i class="fa-brands fa-android"></i></div>
+            <div>
+              <strong>En Celular Android</strong>
+              <p>Toca el menú de tres puntos en la esquina superior derecha del navegador y selecciona <strong>Instalar aplicación</strong> o <strong>Agregar a la pantalla principal</strong> para abrirla a pantalla completa.</p>
+            </div>
+          </div>
+
+          <div class="install-guide-card" id="installGuideIos">
+            <div class="install-guide-icon"><i class="fa-brands fa-apple"></i></div>
+            <div>
+              <strong>En iPhone o iPad (Safari)</strong>
+              <p>Toca el botón <strong>Compartir</strong> en la barra inferior de Safari y elige la opción <strong>Agregar a inicio</strong> para fijar el icono ejecutivo en tu pantalla.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close="installAppModal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL EJECUTIVO: DÓNDE ACTIVAR EL BOT (CONTROL DE GRUPOS Y CHATS) ================= -->
+  <div class="modal" id="botAccessModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-lg" style="max-width: 680px;">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fa-solid fa-shield-halved text-green"></i> Dónde Activar: <span id="accessModalBotName">Mi Bot</span></h3>
+          <p class="subtitle">Habilita únicamente los grupos donde quieras que responda tu bot. El resto quedará bloqueado.</p>
+        </div>
+        <button class="modal-close" data-close="botAccessModal">&times;</button>
+      </div>
+      <div class="modal-body access-modal-body">
+        <!-- SELECTOR DE MODO DE ALCANCE (1 TOQUE) -->
+        <div class="access-section-label">1. Modo de Activación General</div>
+        <div class="access-scope-grid" id="accessScopeGrid">
+          <button type="button" class="access-scope-card" data-scope="groups_only" onclick="applyBotAccessPreset('groups_only')">
+            <div class="access-scope-top">
+              <i class="fa-solid fa-users-gear"></i>
+              <span class="access-scope-check"><i class="fa-solid fa-check"></i></span>
+            </div>
+            <strong>Solo para Grupos Habilitados</strong>
+            <span>Ignora chats privados y todos tus demás grupos. Solo actúa en los grupos marcados abajo.</span>
+          </button>
+
+          <button type="button" class="access-scope-card" data-scope="private_and_groups" onclick="applyBotAccessPreset('private_and_groups')">
+            <div class="access-scope-top">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span class="access-scope-check"><i class="fa-solid fa-check"></i></span>
+            </div>
+            <strong>Privados + Grupos Habilitados</strong>
+            <span>Atiende chats individuales y únicamente los grupos que actives en la lista inferior.</span>
+          </button>
+
+          <button type="button" class="access-scope-card" data-scope="private_only" onclick="applyBotAccessPreset('private_only')">
+            <div class="access-scope-top">
+              <i class="fa-solid fa-user-lock"></i>
+              <span class="access-scope-check"><i class="fa-solid fa-check"></i></span>
+            </div>
+            <strong>Solo Chats Privados</strong>
+            <span>Responde únicamente por privado 1 a 1. Bloqueado en el 100% de tus grupos.</span>
+          </button>
+        </div>
+
+        <!-- INTERRUPTOR RÁPIDO DE CHATS PRIVADOS -->
+        <div class="access-private-bar">
+          <div class="access-private-info">
+            <i class="fa-solid fa-message"></i>
+            <div>
+              <strong>Responder en Chats Privados Individuales (1 a 1)</strong>
+              <span>Desactívalo si deseas que tu bot sea exclusivo para grupos seleccionados.</span>
+            </div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="accessPrivateToggle" onchange="togglePrivateChatsAccess(this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- LISTA DE GRUPOS DE WHATSAPP CON INTERRUPTORES INDIVIDUALES -->
+        <div class="access-groups-wrapper" id="accessGroupsWrapper">
+          <div class="access-groups-header">
+            <div>
+              <div class="access-section-label" style="margin-bottom: 2px;">2. Grupos de tu WhatsApp</div>
+              <span class="access-groups-counter" id="accessGroupsCountBadge">Cargando grupos...</span>
+            </div>
+            <div class="access-groups-actions">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="refreshBotAccessGroups()" id="btnRefreshAccessGroups">
+                <i class="fa-solid fa-rotate"></i> Actualizar
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm text-red" onclick="disableAllBotGroups()" title="Desactivar el bot en todos los grupos">
+                <i class="fa-solid fa-ban"></i> Bloquear Todos
+              </button>
+            </div>
+          </div>
+
+          <!-- AVISO SI EL BOT ESTÁ APAGADO / DESCONECTADO -->
+          <div class="access-offline-banner" id="accessOfflineNotice" style="display: none;">
+            <i class="fa-solid fa-plug-circle-exclamation"></i>
+            <div>
+              <strong>Conecta tu bot a WhatsApp para ver todos tus grupos en vivo</strong>
+              <span>Cuando el bot está en línea cargamos automáticamente tu lista de grupos para que los actives con un toque. También puedes escribir <code id="accessOfflineCmdCode">#activar</code> dentro de un grupo.</span>
+            </div>
+          </div>
+
+          <!-- BARRA DE BÚSQUEDA Y FILTRO DE GRUPOS -->
+          <div class="access-search-toolbar">
+            <div class="access-search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="accessGroupSearchInput" class="form-input" placeholder="Buscar grupo por nombre..." oninput="renderBotAccessGroupsList()" autocomplete="off">
+            </div>
+            <div class="access-filter-pills">
+              <button type="button" class="access-filter-pill active" data-gfilter="all" onclick="setAccessGroupFilter('all')">Todos</button>
+              <button type="button" class="access-filter-pill" data-gfilter="enabled" onclick="setAccessGroupFilter('enabled')">Activos</button>
+              <button type="button" class="access-filter-pill" data-gfilter="blocked" onclick="setAccessGroupFilter('blocked')">Bloqueados</button>
+            </div>
+          </div>
+
+          <!-- LISTA INTERACTIVA DE GRUPOS -->
+          <div class="access-groups-list" id="accessGroupsList">
+            <div class="access-groups-empty">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <span>Consultando grupos de WhatsApp...</span>
+            </div>
+          </div>
+
+          <div class="access-shortcut-tip">
+            <i class="fa-solid fa-terminal text-purple"></i>
+            <span>Atajo desde WhatsApp: Escribe <code id="accessTipEnableCmd">#activar</code> o <code id="accessTipDisableCmd">#desactivar</code> desde tu teléfono dentro de cualquier grupo para autorizarlo o bloquearlo al instante.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span id="accessSaveStatus" style="font-size: 11.5px; color: var(--text-muted); margin-right: auto;">Guardado instantáneo activo</span>
+        <button type="button" class="btn btn-primary" data-close="botAccessModal">
+          <i class="fa-solid fa-check"></i> Listo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PANEL FLOTANTE DE MÚSICA AMBIENTAL VIP ================= -->
+  <div class="vip-music-panel" id="vipMusicPanel" style="display: none;">
+    <div class="vip-music-header">
+      <div class="vip-music-title-wrap">
+        <span class="eq-bars eq-bars-lg" id="musicPanelEq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <div>
+          <strong id="musicCurrentTrackTitle">Lounge Ejecutivo VIP</strong>
+          <span id="musicCurrentStateLabel">Listo para reproducir</span>
+        </div>
+      </div>
+      <button type="button" class="vip-music-close" onclick="closeMusicPanel()" aria-label="Cerrar reproductor">&times;</button>
+    </div>
+
+    <div class="vip-music-controls-row">
+      <button type="button" class="btn btn-primary btn-sm vip-music-play-btn" id="musicPlayPauseBtn" onclick="toggleVipMusicPlayback()">
+        <i class="fa-solid fa-play" id="musicPlayPauseIcon"></i>
+        <span id="musicPlayPauseText">Reproducir</span>
+      </button>
+
+      <div class="vip-music-vol-wrap">
+        <button type="button" class="vip-music-mute-btn" onclick="toggleVipMusicMute()" title="Silenciar / Activar sonido">
+          <i class="fa-solid fa-volume-low" id="musicVolumeIcon"></i>
+        </button>
+        <input type="range" id="musicVolumeSlider" class="vip-music-slider" min="0" max="100" value="35" oninput="setVipMusicVolume(this.value)">
+        <span class="vip-music-vol-val" id="musicVolumeVal">35%</span>
+      </div>
+    </div>
+
+    <div class="vip-music-stations-label">Ambiente Musical</div>
+    <div class="vip-music-stations" id="vipMusicStations">
+      <button type="button" class="vip-station-btn active" data-station="lounge" onclick="selectVipMusicStation('lounge')">
+        <i class="fa-solid fa-Champagne-glasses fa-martini-glass-citrus"></i>
+        <div>
+          <strong>Lounge Ejecutivo VIP</strong>
+          <span>Acordes suaves y ambiente cálido</span>
+        </div>
+      </button>
+      <button type="button" class="vip-station-btn" data-station="focus" onclick="selectVipMusicStation('focus')">
+        <i class="fa-solid fa-moon"></i>
+        <div>
+          <strong>Enfoque Nocturno</strong>
+          <span>Atmósfera espacial relajante</span>
+        </div>
+      </button>
+      <button type="button" class="vip-station-btn" data-station="synth" onclick="selectVipMusicStation('synth')">
+        <i class="fa-solid fa-wave-square"></i>
+        <div>
+          <strong>Pulso Sintético Pro</strong>
+          <span>Ritmo electrónico suave y moderno</span>
+        </div>
+      </button>
+      <button type="button" class="vip-station-btn" data-station="custom" id="customStationBtn" onclick="triggerCustomMusicUpload()">
+        <i class="fa-solid fa-music"></i>
+        <div>
+          <strong id="customMusicTrackLabel">Cargar Mi Propia Canción (MP3)</strong>
+          <span>Selecciona un audio desde tu equipo o celular</span>
+        </div>
+      </button>
+    </div>
+    <input type="file" id="customMusicFileInput" accept="audio/*" style="display: none;" onchange="handleCustomMusicFileSelected(event)">
+  </div>
+
+  <script src="app.js?v=8.2.0"></script>
+</body>
+</html>
