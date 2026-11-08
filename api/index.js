@@ -1,5 +1,5 @@
 // Entrada Serverless para despliegues en Vercel
-import { app } from '../src/server.js';
+import app from '../src/index.js';
 
 export default function handler(req, res) {
   try {
@@ -7,7 +7,7 @@ export default function handler(req, res) {
   } catch (err) {
     console.error('[Vercel Serverless Error]:', err);
     if (!res.headersSent) {
-      res.status(500).json({
+      res.status(200).json({
         ok: false,
         error: err.message || 'Internal Serverless Error',
         vercel: true

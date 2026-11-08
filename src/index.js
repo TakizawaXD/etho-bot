@@ -4,56 +4,62 @@ import path from 'path';
 import { config } from './config.js';
 import './db.js';
 import { botManager } from './manager.js';
-import { startServer } from './server.js';
+import { startServer, app } from './server.js';
 import { ffmpegPath } from './lib/utils.js';
 
-// wa-sticker-formatter busca ffmpeg en el PATH
-process.env.PATH = `${path.dirname(ffmpegPath)}${path.delimiter}${process.env.PATH}`;
+export { app };
+export default app;
 
 export const startedAt = Date.now();
 
-console.log(`\n======================================================`);
-console.log(`🚀 INICIANDO SISTEMA MULTI-BOT: ${config.botName.toUpperCase()}`);
-console.log(`======================================================\n`);
+// Si estamos en Vercel Serverless, NO iniciar loops infinitos ni sockets de Baileys
+if (!process.env.VERCEL) {
+  // wa-sticker-formatter busca ffmpeg en el PATH
+  process.env.PATH = `${path.dirname(ffmpegPath)}${path.delimiter}${process.env.PATH}`;
 
-async function main() {
-  // 1. Iniciar el servidor web (Dashboard y API)
-  await startServer();
+  console.log(`\n======================================================`);
+  console.log(`🚀 INICIANDO SISTEMA MULTI-BOT: ${config.botName.toUpperCase()}`);
+  console.log(`======================================================\n`);
 
-  // 2. Iniciar todos los bots configurados y activos
-  await botManager.initAllBots();
-}
+  async function main() {
+    // 1. Iniciar el servidor web (Dashboard y API)
+    await startServer();
 
-main().catch((err) => {
-  if (err.code !== 'EADDRINUSE') {
-    console.error('Fatal error al iniciar el sistema:', err);
+    // 2. Iniciar todos los bots configurados y activos
+    await botManager.initAllBots();
   }
-  process.exit(1);
-});
 
-// Manejo de apagado limpio
-process.on('SIGINT', async () => {
-  console.log('\nApagando sistema de bots...');
-  for (const bot of botManager.getAllBots()) {
-    if (bot.status === 'online' || bot.status === 'connecting') {
-      await botManager.stopBot(bot.id).catch(() => {});
+  main().catch((err) => {
+    if (err.code !== 'EADDRINUSE') {
+      console.error('Fatal error al iniciar el sistema:', err);
     }
-  }
-  process.exit(0);
-});
+    process.exit(1);
+  });
 
-// Protección contra caídas del proceso por errores asíncronos o cierres de red
-process.on('uncaughtException', (err) => {
-  console.warn('[Global Safe] Excepción interceptada:', err?.message || err);
-});
+  // Manejo de apagado limpio
+  process.on('SIGINT', async () => {
+    console.log('\nApagando sistema de bots...');
+    for (const bot of botManager.getAllBots()) {
+      if (bot.status === 'online' || bot.status === 'connecting') {
+        await botManager.stopBot(bot.id).catch(() => {});
+      }
+    }
+    process.exit(0);
+  });
 
-process.on('unhandledRejection', (reason) => {
-  console.warn('[Global Safe] Rechazo interceptado:', reason?.message || reason);
-});
+  // Protección contra caídas del proceso por errores asíncronos o cierres de red
+  process.on('uncaughtException', (err) => {
+    console.warn('[Global Safe] Excepción interceptada:', err?.message || err);
+  });
 
-process.on('exit', (code) => {
-  console.log(`[Process] Servidor Node terminando con código: ${code}`);
-});
+  process.on('unhandledRejection', (reason) => {
+    console.warn('[Global Safe] Rechazo interceptado:', reason?.message || reason);
+  });
 
-// Heartbeat continuo para mantener el event loop activo permanentemente
-setInterval(() => {}, 60_000);
+  process.on('exit', (code) => {
+    console.log(`[Process] Servidor Node terminando con código: ${code}`);
+  });
+
+  // Heartbeat continuo para mantener el event loop activo permanentemente
+  setInterval(() => {}, 60_000);
+}

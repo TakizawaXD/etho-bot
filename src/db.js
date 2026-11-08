@@ -82,8 +82,23 @@ class SQLiteWrapper {
     };
   }
   transaction(fn) {
-    if (!this._db) return fn();
-    return this._db.transaction ? this._db.transaction(fn) : fn();
+    return (...args) => {
+      if (this._db) {
+        try { this._db.exec('BEGIN'); } catch {}
+      }
+      try {
+        const result = fn(...args);
+        if (this._db) {
+          try { this._db.exec('COMMIT'); } catch {}
+        }
+        return result;
+      } catch (err) {
+        if (this._db) {
+          try { this._db.exec('ROLLBACK'); } catch {}
+        }
+        throw err;
+      }
+    };
   }
   close() {
     if (this._db) return this._db.close();

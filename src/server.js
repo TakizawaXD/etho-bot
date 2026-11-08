@@ -107,13 +107,26 @@ function adminRequired(req, res, next) {
 
 // Servir frontend estático sin cache agresivo para reflejar cambios instantáneamente
 const publicDir = path.join(__dirname, 'web', 'public');
-app.use(express.static(publicDir, {
-  etag: false,
-  maxAge: 0,
-  setHeaders: (res) => {
-    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-  }
-}));
+const rootPublicDir = path.join(process.cwd(), 'public');
+
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir, {
+    etag: false,
+    maxAge: 0,
+    setHeaders: (res) => {
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    }
+  }));
+}
+if (fs.existsSync(rootPublicDir)) {
+  app.use(express.static(rootPublicDir, {
+    etag: false,
+    maxAge: 0,
+    setHeaders: (res) => {
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    }
+  }));
+}
 
 // Clientes SSE conectados
 const sseClients = new Set();
@@ -1270,7 +1283,31 @@ app.post('/api/v1/send-message', async (req, res) => {
 
 // Servir la aplicación SPA para cualquier ruta no-API
 app.get('*', (req, res) => {
-  res.sendFile(path.join(publicDir, 'index.html'));
+  const possiblePaths = [
+    path.join(publicDir, 'index.html'),
+    path.join(process.cwd(), 'src', 'web', 'public', 'index.html'),
+    path.join(process.cwd(), 'public', 'index.html')
+  ];
+  for (const p of possiblePaths) {
+    try {
+      if (fs.existsSync(p)) {
+        return res.sendFile(p);
+      }
+    } catch {}
+  }
+  res.status(200).send('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Etho Multi-Bot Hub</title></head><body style="background:#0b0f19;color:#fff;font-family:sans-serif;padding:2rem;"><h1>Etho Multi-Bot Hub</h1><p>Panel en línea. Recarga en unos segundos.</p></body></html>');
+});
+
+// Captura de errores global de Express para evitar fallos de función en Vercel
+app.use((err, req, res, next) => {
+  console.error('[Global Express Error]:', err?.message || err);
+  if (!res.headersSent) {
+    res.status(200).json({
+      ok: false,
+      error: err?.message || 'Error interno',
+      vercel: Boolean(process.env.VERCEL)
+    });
+  }
 });
 
 export function startServer(customPort = null) {

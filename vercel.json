@@ -1,6 +1,14 @@
 {
   "version": 2,
   "cleanUrls": true,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "public/**"
+    },
+    "src/index.js": {
+      "includeFiles": "public/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -8,6 +16,10 @@
     },
     {
       "source": "/health",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/api/index.js"
     }
   ]
