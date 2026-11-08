@@ -1,12 +1,6 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs22.x",
-      "maxDuration": 15
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
