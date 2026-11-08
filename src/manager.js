@@ -27,7 +27,14 @@ class BotManager extends EventEmitter {
     super();
     this.instances = new Map(); // botId -> { sock, status, qr, qrRaw, pairingCode, reconnectTimer, remindersTimer }
     this.sessionsBaseDir = path.resolve(process.cwd(), config.sessionDir || './data/sessions');
-    fs.mkdirSync(this.sessionsBaseDir, { recursive: true });
+    try {
+      fs.mkdirSync(this.sessionsBaseDir, { recursive: true });
+    } catch (e) {
+      if (config.isVercel || e.code === 'EROFS') {
+        this.sessionsBaseDir = path.resolve('/tmp', 'sessions');
+        try { fs.mkdirSync(this.sessionsBaseDir, { recursive: true }); } catch {}
+      }
+    }
   }
 
   getSessionPath(botId) {

@@ -65,9 +65,22 @@ class SQLiteWrapper {
   }
 }
 
-fs.mkdirSync(path.dirname(config.dbPath), { recursive: true });
+try {
+  fs.mkdirSync(path.dirname(config.dbPath), { recursive: true });
+} catch (e) {
+  if (config.isVercel || e.code === 'EROFS') {
+    config.dbPath = '/tmp/bot.db';
+    try { fs.mkdirSync('/tmp', { recursive: true }); } catch {}
+  }
+}
+
 export const db = new SQLiteWrapper(config.dbPath);
-db.pragma('journal_mode = WAL');
+try {
+  db.pragma('journal_mode = WAL');
+} catch (e) {
+  // En algunos entornos serverless WAL no está soportado en memoria/tmp
+  try { db.pragma('journal_mode = DELETE'); } catch {}
+}
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS users(

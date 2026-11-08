@@ -11,7 +11,7 @@
     "banner": "node scripts/banner.js"
   },
   "engines": {
-    "node": ">=22.5.0"
+    "node": "22.x"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

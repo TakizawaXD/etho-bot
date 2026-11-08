@@ -28,7 +28,9 @@ import { categories, commands } from './commands/index.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+export const app = express();
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 const AUTH_SECRET = process.env.AUTH_SECRET || 'etho_master_auth_secret_key_2026';
 const MAX_BOTS = 4;
@@ -36,6 +38,15 @@ const MAX_BOTS = 4;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Endpoint de salud para Docker / Railway / Render / Vercel
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    ok: true,
+    uptime: Math.floor(process.uptime()),
+    vercel: Boolean(process.env.VERCEL)
+  });
+});
 
 // ==========================================
 // TOKENS & MIDDLEWARE DE AUTENTICACIÓN
@@ -1263,11 +1274,12 @@ app.get('*', (req, res) => {
 });
 
 export function startServer(customPort = null) {
-  const p = customPort || process.env.PORT || 3000;
+  const p = Number(customPort || process.env.PORT || 3000);
+  const host = process.env.HOST || '0.0.0.0';
   return new Promise((resolve, reject) => {
-    const server = app.listen(p, () => {
+    const server = app.listen(p, host, () => {
       console.log(`\n======================================================`);
-      console.log(`[SERVIDOR] PANEL DE CONTROL DISPONIBLE: http://localhost:${p}`);
+      console.log(`[SERVIDOR] PANEL DE CONTROL DISPONIBLE: http://${host}:${p}`);
       console.log(`======================================================\n`);
       resolve(server);
     });
