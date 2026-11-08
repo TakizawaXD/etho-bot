@@ -53,9 +53,12 @@ class SQLiteWrapper {
   }
   prepare(sql) {
     if (!this._db) {
+      const safeRow = new Proxy({}, {
+        get: (t, p) => (p === 'c' ? 0 : (p === 'qty' ? 0 : null))
+      });
       return {
         run: () => ({ changes: 0, lastInsertRowid: 0 }),
-        get: () => null,
+        get: () => safeRow,
         all: () => []
       };
     }
