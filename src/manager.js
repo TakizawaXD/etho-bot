@@ -17,7 +17,11 @@ import { skin } from './lib/ui.js';
 import { ffmpegPath, jidNum, jidNorm } from './lib/utils.js';
 
 // wa-sticker-formatter busca ffmpeg en el PATH
-process.env.PATH = `${path.dirname(ffmpegPath)}${path.delimiter}${process.env.PATH}`;
+if (ffmpegPath && typeof ffmpegPath === 'string') {
+  try {
+    process.env.PATH = `${path.dirname(ffmpegPath)}${path.delimiter}${process.env.PATH}`;
+  } catch {}
+}
 
 const makeWASocket = baileys.default || baileys.makeWASocket;
 const { useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, Browsers } = baileys;
@@ -30,10 +34,8 @@ class BotManager extends EventEmitter {
     try {
       fs.mkdirSync(this.sessionsBaseDir, { recursive: true });
     } catch (e) {
-      if (config.isVercel || e.code === 'EROFS') {
-        this.sessionsBaseDir = path.resolve('/tmp', 'sessions');
-        try { fs.mkdirSync(this.sessionsBaseDir, { recursive: true }); } catch {}
-      }
+      this.sessionsBaseDir = path.resolve('/tmp', 'sessions');
+      try { fs.mkdirSync(this.sessionsBaseDir, { recursive: true }); } catch {}
     }
   }
 

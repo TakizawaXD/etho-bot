@@ -15,7 +15,11 @@ export const startedAt = Date.now();
 // Si estamos en Vercel Serverless, NO iniciar loops infinitos ni sockets de Baileys
 if (!process.env.VERCEL) {
   // wa-sticker-formatter busca ffmpeg en el PATH
-  process.env.PATH = `${path.dirname(ffmpegPath)}${path.delimiter}${process.env.PATH}`;
+  if (ffmpegPath && typeof ffmpegPath === 'string') {
+    try {
+      process.env.PATH = `${path.dirname(ffmpegPath)}${path.delimiter}${process.env.PATH}`;
+    } catch {}
+  }
 
   console.log(`\n======================================================`);
   console.log(`🚀 INICIANDO SISTEMA MULTI-BOT: ${config.botName.toUpperCase()}`);

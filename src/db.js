@@ -108,10 +108,8 @@ class SQLiteWrapper {
 try {
   fs.mkdirSync(path.dirname(config.dbPath), { recursive: true });
 } catch (e) {
-  if (config.isVercel || e.code === 'EROFS') {
-    config.dbPath = '/tmp/bot.db';
-    try { fs.mkdirSync('/tmp', { recursive: true }); } catch {}
-  }
+  config.dbPath = '/tmp/bot.db';
+  try { fs.mkdirSync('/tmp', { recursive: true }); } catch {}
 }
 
 export const db = new SQLiteWrapper(config.dbPath);
