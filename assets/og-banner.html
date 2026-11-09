@@ -1,0 +1,135 @@
+<!doctype html>
+<!-- Fuente del banner para redes (1200×630) → src/web/public/og-banner.png
+     Regenerar: msedge --headless=new --hide-scrollbars --window-size=1200,630 --virtual-time-budget=8000 --screenshot=og-banner.png assets/og-banner.html -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Etho Hub banner</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Public+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    background: radial-gradient(ellipse at 88% 20%, #1C5E50 0%, #0F3F36 48%, #0A2C26 100%);
+    color: #F3F1E8; font-family: 'Public Sans', Arial, sans-serif;
+  }
+  .rings { position: absolute; right: -120px; top: -140px; width: 760px; height: 760px; border-radius: 50%; border: 2px solid rgba(245,184,46,.18); }
+  .rings::after { content: ""; position: absolute; inset: 130px; border-radius: 50%; border: 2px solid rgba(245,184,46,.14); }
+  .copy { position: absolute; left: 72px; top: 64px; width: 540px; display: flex; flex-direction: column; height: 502px; }
+  .brand { display: flex; align-items: center; gap: 14px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 30px; }
+  .logo { width: 48px; height: 48px; border-radius: 14px; background: #F5B82E; display: grid; place-items: center; }
+  .eyebrow { margin-top: 56px; font-size: 16px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #F5B82E; }
+  h1 { margin-top: 16px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 58px; line-height: 1.02; letter-spacing: -1px; }
+  .cta { margin-top: auto; display: inline-flex; align-self: flex-start; align-items: center; gap: 10px; background: #F5B82E; color: #14201C; font-weight: 700; font-size: 22px; padding: 14px 26px; border-radius: 999px; }
+  .art { position: absolute; left: 680px; top: 0; width: 560px; height: 630px; }
+  .bubble { position: absolute; font-size: 18px; line-height: 1.3; padding: 12px 16px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.25); max-width: 260px; }
+  .in  { left: 640px; top: 130px; background: #FFFDF7; color: #14201C; border-bottom-left-radius: 4px; }
+  .out { left: 656px; top: 212px; background: #D9F5E1; color: #0F3F36; border-bottom-left-radius: 4px; }
+  .out small { display: block; font-size: 13px; font-weight: 700; letter-spacing: .5px; color: #1F8A4C; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+  <div class="rings"></div>
+
+  <div class="copy">
+    <div class="brand">
+      <div class="logo">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0F3F36" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+      </div>
+      Etho Hub
+    </div>
+    <div class="eyebrow">Bots de WhatsApp con IA</div>
+    <h1>Atiende a tus clientes por WhatsApp, incluso cuando no estás</h1>
+    <div class="cta">7 días gratis · sin tarjeta</div>
+  </div>
+
+  <!-- Ilustración anime: chica con lentes y abrigo amarillo usando el celular -->
+  <svg class="art" viewBox="0 0 560 630" xmlns="http://www.w3.org/2000/svg" aria-label="Chica anime con lentes y abrigo amarillo respondiendo mensajes en su celular">
+    <defs>
+      <linearGradient id="iris" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3B2414"/><stop offset=".55" stop-color="#8A4E1F"/><stop offset="1" stop-color="#E0A040"/>
+      </linearGradient>
+      <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2A2440"/><stop offset="1" stop-color="#16131F"/>
+      </linearGradient>
+    </defs>
+    <circle cx="320" cy="320" r="220" fill="#14524A"/>
+    <!-- cabello largo (atrás) -->
+    <path d="M196 250 Q182 400 196 500 L222 470 L232 520 L262 452 Q250 380 256 300 L384 300 Q390 380 378 452 L408 520 L418 470 L444 500 Q458 400 444 250 Q440 120 320 116 Q200 120 196 250 Z" fill="url(#hair)"/>
+    <!-- cuello -->
+    <path d="M298 340 L342 340 L344 410 L296 410 Z" fill="#F6D2B8"/>
+    <path d="M298 352 Q320 378 342 352 L342 340 L298 340 Z" fill="#E6B395"/>
+    <!-- abrigo amarillo con sombreado cel -->
+    <path d="M120 630 C122 486 196 414 320 404 C444 414 518 486 520 630 Z" fill="#F5B82E"/>
+    <path d="M120 630 C122 520 160 460 214 430 Q190 520 204 630 Z" fill="#DE9C18"/>
+    <path d="M520 630 C518 540 492 480 450 446 Q470 540 452 630 Z" fill="#DE9C18"/>
+    <path d="M294 408 L320 470 L346 408 Z" fill="#FFF8EC"/>
+    <path d="M320 400 L260 412 L300 548 L320 470 Z" fill="#FFC94A"/>
+    <path d="M320 400 L380 412 L340 548 L320 470 Z" fill="#E6A51F"/>
+    <path d="M320 470 L320 630" stroke="#C7860F" stroke-width="3"/>
+    <circle cx="336" cy="566" r="7" fill="#7A4E0A"/>
+    <circle cx="336" cy="612" r="7" fill="#7A4E0A"/>
+    <!-- mechones laterales -->
+    <path d="M232 250 Q222 330 240 392 L252 360 L262 396 Q258 320 262 262 Z" fill="url(#hair)"/>
+    <path d="M408 250 Q418 330 400 392 L388 360 L378 396 Q382 320 378 262 Z" fill="url(#hair)"/>
+    <!-- cara (mentón en punta, estilo anime) -->
+    <path d="M246 236 Q242 312 288 356 Q320 380 352 356 Q398 312 394 236 Q320 210 246 236 Z" fill="#FBDCC6"/>
+    <path d="M250 300 Q262 336 290 356 Q260 340 250 300 Z" fill="#EFC3A6"/>
+    <!-- rubor con líneas -->
+    <ellipse cx="270" cy="318" rx="16" ry="8" fill="#F59A9A" opacity=".45"/>
+    <ellipse cx="370" cy="318" rx="16" ry="8" fill="#F59A9A" opacity=".45"/>
+    <path d="M262 316 l4 -6 M270 316 l4 -6 M278 316 l4 -6 M362 316 l4 -6 M370 316 l4 -6 M378 316 l4 -6" stroke="#E07B7B" stroke-width="2" stroke-linecap="round"/>
+    <!-- ojos grandes -->
+    <g>
+      <ellipse cx="284" cy="284" rx="17" ry="22" fill="#FFFFFF"/>
+      <ellipse cx="285" cy="287" rx="14" ry="19" fill="url(#iris)"/>
+      <ellipse cx="285" cy="290" rx="7" ry="10" fill="#1A0F08"/>
+      <circle cx="279" cy="279" r="5.5" fill="#FFFFFF"/>
+      <circle cx="291" cy="297" r="2.5" fill="#FFFFFF"/>
+      <path d="M264 270 Q284 254 304 268 L308 262" stroke="#16131F" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="356" cy="284" rx="17" ry="22" fill="#FFFFFF"/>
+      <ellipse cx="355" cy="287" rx="14" ry="19" fill="url(#iris)"/>
+      <ellipse cx="355" cy="290" rx="7" ry="10" fill="#1A0F08"/>
+      <circle cx="349" cy="279" r="5.5" fill="#FFFFFF"/>
+      <circle cx="361" cy="297" r="2.5" fill="#FFFFFF"/>
+      <path d="M376 270 Q356 254 336 268 L332 262" stroke="#16131F" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- cejas -->
+    <path d="M268 242 Q284 236 298 242" stroke="#2A2440" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M342 242 Q356 236 372 242" stroke="#2A2440" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- lentes -->
+    <rect x="254" y="258" width="62" height="52" rx="16" fill="#FFFFFF" fill-opacity=".12" stroke="#16131F" stroke-width="4.5"/>
+    <rect x="324" y="258" width="62" height="52" rx="16" fill="#FFFFFF" fill-opacity=".12" stroke="#16131F" stroke-width="4.5"/>
+    <path d="M316 276 Q320 270 324 276" stroke="#16131F" stroke-width="4.5" fill="none"/>
+    <path d="M262 266 L272 302" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
+    <path d="M332 266 L342 302" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
+    <!-- nariz y boca -->
+    <path d="M321 312 L318 320" stroke="#D99C80" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M306 336 Q320 352 334 336 Q320 341 306 336 Z" fill="#9E3440"/>
+    <path d="M313 343 Q320 349 327 343 Q320 345 313 343 Z" fill="#F08A8A"/>
+    <!-- flequillo en puntas -->
+    <path d="M236 262 Q224 150 320 136 Q416 150 404 262 L396 258 L388 214 L372 250 L362 202 L342 244 L330 196 L314 244 L300 200 L286 248 L272 206 L262 252 L252 220 L246 262 Z" fill="url(#hair)"/>
+    <path d="M262 176 Q300 150 352 160" stroke="#4A4270" stroke-width="6" fill="none" stroke-linecap="round" opacity=".8"/>
+    <!-- mechón rebelde (ahoge) -->
+    <path d="M318 140 Q300 96 334 84 Q318 104 330 138" fill="url(#hair)"/>
+    <!-- brazo con celular -->
+    <path d="M140 600 Q140 500 210 468 Q248 466 262 498 Q228 520 220 600 Z" fill="#E6A51F"/>
+    <g transform="rotate(-12 262 470)">
+      <rect x="232" y="410" width="66" height="118" rx="12" fill="#16131F"/>
+      <rect x="238" y="420" width="54" height="96" rx="6" fill="#0F3F36"/>
+      <rect x="244" y="430" width="34" height="12" rx="6" fill="#FFFDF7"/>
+      <rect x="252" y="450" width="34" height="12" rx="6" fill="#3DD283"/>
+      <rect x="244" y="470" width="28" height="12" rx="6" fill="#FFFDF7"/>
+      <rect x="250" y="490" width="36" height="12" rx="6" fill="#3DD283"/>
+    </g>
+    <ellipse cx="240" cy="500" rx="22" ry="19" fill="#FBDCC6"/>
+    <!-- destellos -->
+    <path d="M470 150 l6 16 l16 6 l-16 6 l-6 16 l-6 -16 l-16 -6 l16 -6 Z" fill="#F5B82E"/>
+    <path d="M150 230 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4 Z" fill="#F5B82E" opacity=".7"/>
+  </svg>
+
+  <div class="bubble in">¿Tienen envío para hoy?</div>
+  <div class="bubble out"><small>BOT ETHO · 24/7</small>¡Sí! Te envío el catálogo con precios.</div>
+</body>
+</html>
