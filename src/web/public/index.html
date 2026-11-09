@@ -25,15 +25,17 @@
   <meta name="twitter:description" content="Atiende a tus clientes por WhatsApp, incluso cuando no estás. 7 días gratis, sin tarjeta.">
   <meta name="twitter:image" content="https://etho-bot.vercel.app/og-banner.png">
   <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="/icons/logo-rounded.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script src="theme.js?v=8.4.1"></script>
+  <script src="theme.js?v=9.0.0"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=8.4.1">
-  <link rel="stylesheet" href="theme-pro.css?v=8.4.1">
+  <link rel="stylesheet" href="style.css?v=9.0.0">
+  <link rel="stylesheet" href="theme-pro.css?v=9.0.0">
+  <link rel="stylesheet" href="mobile-pro.css?v=9.0.0">
 </head>
 <body>
   <!-- ================= PÁGINA PRINCIPAL / HERO PÚBLICA (VISITANTES & REGISTRO) ================= -->
@@ -41,7 +43,7 @@
     <!-- NAVBAR PÚBLICA -->
     <header class="hero-navbar">
       <div class="hero-brand">
-        <div class="brand-logo"><i class="fa-brands fa-whatsapp"></i></div>
+        <div class="brand-logo"><svg class="etho-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6c-4.6 0-8.4 3.1-8.4 7.1 0 2 1 3.9 2.6 5.2l-.8 3 3.4-1.6c1 .3 2.1.5 3.2.5 4.6 0 8.4-3.1 8.4-7.1S16.6 3.6 12 3.6z" fill="currentColor"/><circle cx="8.6" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/><circle cx="12" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/><circle cx="15.4" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/></svg></div>
         <div class="brand-info">
           <h2>Etho <span>Multi-Bot</span></h2>
           <span class="brand-badge">SaaS WhatsApp & IA</span>
@@ -81,7 +83,7 @@
     <div class="hero-mobile-menu" id="heroMobileMenu">
       <div class="hero-mobile-menu-header">
         <div class="hero-brand">
-          <div class="brand-logo"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="brand-logo"><svg class="etho-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6c-4.6 0-8.4 3.1-8.4 7.1 0 2 1 3.9 2.6 5.2l-.8 3 3.4-1.6c1 .3 2.1.5 3.2.5 4.6 0 8.4-3.1 8.4-7.1S16.6 3.6 12 3.6z" fill="currentColor"/><circle cx="8.6" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/><circle cx="12" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/><circle cx="15.4" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/></svg></div>
           <div class="brand-info">
             <h2>Etho <span>Multi-Bot</span></h2>
           </div>
@@ -880,9 +882,7 @@
     <aside class="app-sidebar" id="appSidebar">
       <!-- SIDEBAR BRAND -->
       <div class="sidebar-brand">
-        <div class="brand-logo">
-          <i class="fa-brands fa-whatsapp"></i>
-        </div>
+        <div class="brand-logo"><svg class="etho-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6c-4.6 0-8.4 3.1-8.4 7.1 0 2 1 3.9 2.6 5.2l-.8 3 3.4-1.6c1 .3 2.1.5 3.2.5 4.6 0 8.4-3.1 8.4-7.1S16.6 3.6 12 3.6z" fill="currentColor"/><circle cx="8.6" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/><circle cx="12" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/><circle cx="15.4" cy="10.7" r="1.25" fill="var(--marigold, #F5B82E)"/></svg></div>
         <div class="brand-info">
           <h1>Etho <span>Hub</span></h1>
           <span class="brand-badge">Multi-Bot Pro</span>
@@ -3823,7 +3823,8 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
     <input type="file" id="customMusicFileInput" accept="audio/*" style="display: none;" onchange="handleCustomMusicFileSelected(event)">
   </div>
 
-  <script src="app.js?v=8.4.1"></script>
-  <script src="support-billing.js?v=8.4.1"></script>
+  <script src="app.js?v=9.0.0"></script>
+  <script src="support-billing.js?v=9.0.0"></script>
+  <script src="mobile-pro.js?v=9.0.0"></script>
 </body>
 </html>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Etho Hub">
+  <defs>
+    <radialGradient id="bg" cx="0.3" cy="0.2" r="1">
+      <stop offset="0" stop-color="#1C5E50"/><stop offset="0.6" stop-color="#0F3F36"/><stop offset="1" stop-color="#0A2C26"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- globo de chat -->
+  <path d="M256 128c-77 0-140 52-140 118 0 34 17 65 44 86l-14 50 56-27c17 6 35 9 54 9 77 0 140-52 140-118s-63-118-140-118z" fill="#F5B82E"/>
+  <!-- "escribiendo…" -->
+  <circle cx="204" cy="246" r="19" fill="#0F3F36"/>
+  <circle cx="256" cy="246" r="19" fill="#0F3F36"/>
+  <circle cx="308" cy="246" r="19" fill="#0F3F36"/>
+  <!-- destello IA -->
+  <path d="M378 118l9 24 24 9-24 9-9 24-9-24-24-9 24-9z" fill="#F3F1E8"/>
+</svg>

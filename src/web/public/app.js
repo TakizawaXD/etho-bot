@@ -133,6 +133,7 @@ function authFetch(url, options = {}) {
 // TEMA EJECUTIVO OSCURO EXCLUSIVO & INSTALADOR DE APP (ESCRITORIO / MÓVIL)
 // ==========================================
 let deferredInstallPrompt = null;
+let installBannerDelayDone = false;
 
 function enforceExecutiveDarkTheme() {
   document.body.classList.remove('theme-white');
@@ -167,11 +168,15 @@ function syncInstallButtonsUI() {
 
   const banner = document.getElementById('appInstallBanner');
   if (banner) {
-    const dismissed = sessionStorage.getItem('etho_install_banner_dismissed') === '1';
+    let dismissed = false;
+    try {
+      const until = Number(localStorage.getItem('etho_install_banner_dismissed_until')) || 0;
+      dismissed = until > Date.now() || sessionStorage.getItem('etho_install_banner_dismissed') === '1';
+    } catch {}
     const isMobileScreen = window.matchMedia('(max-width: 768px)').matches;
     if (standalone || dismissed) {
       banner.style.display = 'none';
-    } else if (deferredInstallPrompt || isMobileScreen) {
+    } else if (deferredInstallPrompt || (isMobileScreen && installBannerDelayDone)) {
       banner.style.display = 'flex';
     }
   }
@@ -233,6 +238,7 @@ window.triggerInstallApp = triggerInstallApp;
 function dismissInstallBanner() {
   try {
     sessionStorage.setItem('etho_install_banner_dismissed', '1');
+    localStorage.setItem('etho_install_banner_dismissed_until', String(Date.now() + 14 * 24 * 3600 * 1000));
   } catch {}
   const banner = document.getElementById('appInstallBanner');
   if (banner) banner.style.display = 'none';
@@ -240,6 +246,9 @@ function dismissInstallBanner() {
 window.dismissInstallBanner = dismissInstallBanner;
 
 function initAppInstaller() {
+  // En móvil sin aviso nativo, el banner espera un poco para no tapar la primera vista
+  setTimeout(() => { installBannerDelayDone = true; syncInstallButtonsUI(); }, 20000);
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch(() => {});

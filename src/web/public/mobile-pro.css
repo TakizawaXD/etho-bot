@@ -1,0 +1,126 @@
+/* ==========================================================================
+   ETHO HUB — CAPA MÓVIL PROFESIONAL
+   Se carga al final. Corrige maquetación en pantallas pequeñas y convierte las
+   tablas en tarjetas (las etiquetas las pone mobile-pro.js).
+   ========================================================================== */
+
+/* ---------- Correcciones válidas en todos los tamaños ---------- */
+
+/* La cinta "en vivo" pasaba por debajo de su etiqueta y se mezclaban los textos */
+.hero-live-ticker-wrap { position: relative; }
+.ticker-badge { position: absolute !important; left: 0; top: 0; bottom: 0; z-index: 2; background: inherit !important; box-shadow: 12px 0 14px -2px rgba(0, 0, 0, 0.35); }
+.ticker-track { padding-left: 120px !important; }
+
+/* Textos con <strong> dentro de contenedores flex se partían en columnas */
+.hero-report-link { display: block; line-height: 1.5; }
+.hero-report-link i { margin-right: 6px; }
+.slide-features-list li, .price-features li { display: block !important; position: relative; padding-left: 26px; line-height: 1.5; }
+.slide-features-list li > i, .price-features li > i { position: absolute; left: 0; top: 4px; margin: 0; }
+
+/* Los botones que son enlaces no deben verse subrayados */
+a.btn, a.btn:hover, a.btn:focus { text-decoration: none !important; }
+
+/* ---------- Teléfonos y tabletas pequeñas ---------- */
+@media (max-width: 768px) {
+  html { -webkit-text-size-adjust: 100%; }
+  body { -webkit-tap-highlight-color: transparent; }
+
+  /* Evita el zoom automático de iOS al enfocar campos */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: 16px !important; }
+
+  /* Objetivos táctiles cómodos */
+  .btn, button.btn, .nav-btn, .mobile-nav-btn { min-height: 44px; }
+  .btn-sm { min-height: 38px; }
+
+  /* Barra superior: menos botones, más espacio para el título */
+  .app-topbar { gap: 8px; padding-left: 12px !important; padding-right: 12px !important; }
+  .topbar-install-btn, .topbar-hero-btn, .music-trigger-btn { display: none !important; }
+  .topbar-left { min-width: 0; flex: 1; }
+  .topbar-breadcrumbs { min-width: 0; }
+  #topbarCurrentTitle { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; }
+  .topbar-right { gap: 8px; flex-shrink: 0; }
+
+  /* Encabezados de sección con jerarquía clara */
+  .tab-content .section-header h1,
+  .tab-content .section-header h2,
+  .tab-content .page-header h1,
+  .tab-content .page-header h2 { font-size: 22px !important; line-height: 1.2 !important; letter-spacing: -0.015em; }
+  .tab-content .section-header p,
+  .tab-content .page-header p { font-size: 14px !important; line-height: 1.5 !important; }
+
+  /* Tarjetas con respiración uniforme */
+  .card { border-radius: var(--radius-lg) !important; }
+
+  /* Aviso de instalación: compacto, sobre la barra inferior y con entrada suave */
+  .app-install-banner {
+    left: 12px !important; right: 12px !important; max-width: none !important;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 10px 12px !important; border-radius: var(--radius-lg) !important;
+    animation: ethoSlideUp 0.28s ease-out;
+  }
+  .app-install-banner-icon { width: 36px !important; height: 36px !important; border-radius: 10px !important; }
+
+  /* Modales a pantalla completa desde abajo, como en apps nativas */
+  .modal-content, .modal-box, .modal-dialog {
+    width: 100% !important; max-width: 100% !important;
+    max-height: calc(100dvh - 24px) !important;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+  }
+}
+
+@keyframes ethoSlideUp { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- Tablas → tarjetas en teléfonos ---------- */
+@media (max-width: 640px) {
+  .table-responsive { overflow: visible !important; border: 0 !important; background: transparent !important; }
+  .data-table { min-width: 0 !important; width: 100% !important; border-collapse: separate !important; border-spacing: 0; background: transparent !important; }
+  .data-table thead { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .data-table tbody, .data-table tr, .data-table td { display: block; width: 100%; }
+
+  .data-table tr {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 4px 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  .data-table tr:hover td { background: transparent !important; }
+
+  .data-table td {
+    display: flex !important; align-items: flex-start; justify-content: space-between; gap: 14px;
+    padding: 10px 0 !important; border-bottom: 1px solid var(--border-subtle) !important;
+    text-align: right !important; white-space: normal !important; min-width: 0; max-width: none !important;
+  }
+  .data-table tr td:last-child { border-bottom: 0 !important; }
+  .data-table td::before {
+    content: attr(data-label);
+    flex: 0 0 40%; text-align: left;
+    font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0.03em; text-transform: uppercase;
+    color: var(--text-dim); padding-top: 2px;
+  }
+  .data-table td[data-label=""]::before, .data-table td:not([data-label])::before { display: none; }
+  .data-table td[data-label=""] { justify-content: flex-end; }
+  .data-table td > .td-value { flex: 1; min-width: 0; overflow-wrap: anywhere; display: block; text-align: right; line-height: 1.45; }
+  .data-table td > .td-value .btn, .data-table td > .td-value button { margin: 3px 0 3px 6px; vertical-align: middle; }
+  .data-table td > .td-value > div[style*="display: flex"], .data-table td > .td-value > div[style*="display:flex"] { justify-content: flex-end; flex-wrap: wrap; }
+
+  /* Celdas de acciones: etiqueta arriba y botones en una fila a todo el ancho */
+  .data-table td.td-actions { flex-direction: column; align-items: stretch; gap: 8px; }
+  .data-table td.td-actions::before { flex-basis: auto; }
+  .data-table td.td-actions > .td-value { text-align: left; }
+  .data-table td.td-actions > .td-value, .data-table td.td-actions > .td-value > div { display: flex !important; flex-wrap: wrap; gap: 8px; justify-content: flex-start !important; }
+  .data-table td.td-actions .btn, .data-table td.td-actions button { margin: 0 !important; }
+
+  /* Filas de "sin datos" */
+  .data-table tr.is-empty-row { background: transparent; border-style: dashed; box-shadow: none; padding: 18px 16px; }
+  .data-table tr.is-empty-row td { display: block !important; text-align: center !important; border: 0 !important; padding: 0 !important; }
+  .data-table tr.is-empty-row td::before { display: none; }
+  .data-table tr.is-empty-row td > .td-value { text-align: center; }
+}
+
+/* Separación entre el selector y el ícono en las facetas de la portada */
+.hero-facet-chip input[type="radio"] { margin-right: 8px !important; }
+
+/* Marca Etho (globo con puntos) en lugar del ícono de WhatsApp */
+.brand-logo .etho-mark { width: 62%; height: 62%; color: #0F3F36; display: block; }

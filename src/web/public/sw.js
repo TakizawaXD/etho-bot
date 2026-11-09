@@ -1,5 +1,5 @@
 // Service Worker de Aplicación Ejecutiva - Etho Hub
-const CACHE_NAME = 'etho-hub-shell-v8.4.0';
+const CACHE_NAME = 'etho-hub-shell-v9.0.0';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
