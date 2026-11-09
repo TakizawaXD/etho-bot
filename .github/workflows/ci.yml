@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Sintaxis de todos los módulos
+        run: for f in $(git ls-files 'src/**/*.js' 'scripts/*.js'); do node --check "$f"; done
+      - name: Pruebas de formato de mensajes
+        run: npm test
+      - name: Auditoría de dependencias (informativa)
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
+      - name: Verificar comandos (sin duplicados)
+        run: npm run check

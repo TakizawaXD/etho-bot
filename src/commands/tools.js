@@ -46,7 +46,8 @@ export default [
  saveChatMessage(botId, c.chat, botId, 'assistant', ans);
  await c.reply(ans);
  } catch (e) {
- await c.reply(`Disculpa, no pude procesar tu solicitud en este momento: ${e.message}`);
+ console.error("[tools:ia]", e.message);
+ await c.reply("No pude procesar tu solicitud en este momento. Inténtalo de nuevo en unos segundos.");
  }
  } },
  { name: 'resetia', aliases: ['olvidar', 'borrarmemoria'], desc: 'Borrar la memoria de conversación de este chat.',

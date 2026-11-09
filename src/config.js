@@ -14,5 +14,7 @@ export const config = {
   currency: process.env.CURRENCY || 'coins',
   dbPath: process.env.DB_PATH || defaultDbPath,
   sessionDir: rawSessionDir === './data/session' ? defaultSessionDir : rawSessionDir,
+  // Tope de bots conectados a la vez en este servidor (protege la memoria). Cada bot usa ~60-100 MB.
+  maxOnlineBots: Math.max(1, Number(process.env.MAX_ONLINE_BOTS) || 30),
   pairingNumber: (process.env.PAIRING_NUMBER || '').replace(/\D/g, ''),
 };

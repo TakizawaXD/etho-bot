@@ -1,6 +1,7 @@
 // Servidor Web Express: API REST + SSE en tiempo real + Dashboard Frontend
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'node:crypto';
@@ -21,6 +22,13 @@ import {
   normalizeBotAccessControl, updateBotAccessControl
 } from './db.js';
 import { testConnection } from './lib/supabase.js';
+import { resolveAuthSecret, createTokenTools, createLoginLimiter, createRateLimiter, rateLimitMiddleware } from './lib/auth.js';
+import { computeEntitlement, canCreateBot, newBotSubscription, TRIAL_DAYS, FREE_MAX_BOTS } from './lib/plans.js';
+import { ensureTrial, getBillingUser, countUserBots } from './lib/billing.js';
+import { resolveSession, tokenVersionOf, bumpTokenVersion, changePassword, adminResetPassword, AccountError } from './lib/accounts.js';
+import { registerBillingRoutes } from './routes/billing.js';
+import { registerSupportRoutes } from './routes/support.js';
+import { config } from './config.js';
 import { askAI, extractUserFacts } from './lib/ai.js';
 import { skin, SEP_BOLD, SEP_LINE, SEP_DOT } from './lib/ui.js';
 import { categories, commands } from './commands/index.js';
@@ -32,51 +40,69 @@ export const app = express();
 app.set('trust proxy', 1);
 
 const PORT = process.env.PORT || 3000;
-const AUTH_SECRET = process.env.AUTH_SECRET || 'etho_master_auth_secret_key_2026';
-const MAX_BOTS = 4;
+const AUTH_SECRET = resolveAuthSecret(process.env.AUTH_SECRET, path.dirname(path.resolve(config.dbPath)));
+const { generateToken: signToken, verifyToken } = createTokenTools(AUTH_SECRET);
+// Todo token nuevo lleva la versión de sesión actual del usuario (así se pueden revocar).
+const generateToken = (user) => signToken({ ...user, token_version: tokenVersionOf(user.id) });
+const loginLimiter = createLoginLimiter();
+const registerLimiter = createRateLimiter({ windowMs: 24 * 60 * 60 * 1000, max: Number(process.env.REGISTER_LIMIT_PER_DAY) || 5 });
+const apiLimiter = createRateLimiter({ windowMs: 60 * 1000, max: Number(process.env.API_RATE_LIMIT_PER_MIN) || 600 });
 
-app.use(cors());
-app.use(express.json());
+/** Máximo de bots que puede tener el usuario (admin: capacidad total del servidor). */
+function botCapFor(user) {
+  if (!user) return FREE_MAX_BOTS;
+  if (user.role === 'admin') return config.maxOnlineBots;
+  const row = getBillingUser(user.id);
+  return row ? computeEntitlement(row).maxBots : FREE_MAX_BOTS;
+}
+
+// CORS_ORIGIN (opcional): lista separada por comas. Sin definir, se mantiene el comportamiento abierto anterior.
+const corsOrigins = (process.env.CORS_ORIGIN || '').split(',').map((o) => o.trim()).filter(Boolean);
+app.use(cors(corsOrigins.length ? { origin: corsOrigins } : undefined));
+// Cabeceras de seguridad básicas (sin dependencias extra)
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.set({
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'SAMEORIGIN',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  });
+  if (req.secure) res.set('Strict-Transport-Security', 'max-age=15552000');
+  next();
+});
+// Límite global por IP (el SSE y el webhook de Stripe quedan fuera)
+app.use('/api', (req, res, next) => {
+  if (req.path === '/events' || req.path === '/payments/stripe/webhook') return next();
+  return rateLimitMiddleware(apiLimiter)(req, res, next);
+});
+// El webhook de Stripe necesita el cuerpo EXACTO para verificar la firma.
+app.use(express.json({
+  limit: '2mb',
+  verify: (req, res, buf) => { if (req.originalUrl.startsWith('/api/payments/stripe/webhook')) req.rawBody = buf; }
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Endpoint de salud para Docker / Railway / Render / Vercel
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    ok: true,
+const healthHandler = (req, res) => {
+  let dbOk = true;
+  try { dbOk = Number(db.prepare('SELECT 1 AS ok').get()?.ok) === 1; } catch { dbOk = false; }
+  const bots = botManager.getAllBots();
+  res.status(dbOk ? 200 : 503).json({
+    ok: dbOk,
+    db: dbOk ? 'ok' : 'error',
     uptime: Math.floor(process.uptime()),
+    memoryMb: Math.round(process.memoryUsage().rss / 1048576),
+    bots: { total: bots.length, online: bots.filter((b) => b.status === 'online').length, capacity: config.maxOnlineBots },
     vercel: Boolean(process.env.VERCEL)
   });
-});
+};
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // ==========================================
 // TOKENS & MIDDLEWARE DE AUTENTICACIÓN
 // ==========================================
-
-function generateToken(user) {
-  const payload = Buffer.from(JSON.stringify({
-    id: user.id,
-    username: user.username,
-    role: user.role,
-    name: user.name,
-    exp: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 días de validez
-  })).toString('base64url');
-  const signature = crypto.createHmac('sha256', AUTH_SECRET).update(payload).digest('base64url');
-  return `${payload}.${signature}`;
-}
-
-function verifyToken(token) {
-  if (!token || !token.includes('.')) return null;
-  const [payloadStr, signature] = token.split('.');
-  const expectedSignature = crypto.createHmac('sha256', AUTH_SECRET).update(payloadStr).digest('base64url');
-  if (signature !== expectedSignature) return null;
-  try {
-    const payload = JSON.parse(Buffer.from(payloadStr, 'base64url').toString('utf8'));
-    if (payload.exp && Date.now() > payload.exp) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-}
 
 // Middleware opcional: si hay token (header Bearer o query ?token= para SSE), asigna req.user
 app.use((req, res, next) => {
@@ -85,8 +111,10 @@ app.use((req, res, next) => {
     ? authHeader.slice(7)
     : (typeof req.query?.token === 'string' ? req.query.token : '');
   if (token) {
+    // Además de la firma, se valida contra la base de datos: cuenta activa, sesión no revocada y rol vigente.
     const decoded = verifyToken(token);
-    if (decoded) req.user = decoded;
+    const session = decoded && resolveSession(decoded);
+    if (session) req.user = session;
   }
   next();
 });
@@ -105,21 +133,111 @@ function adminRequired(req, res, next) {
   next();
 }
 
+
+// ==========================================
+// CONTROL DE ACCESO DE LA API
+// ==========================================
+// Rutas públicas (relativas a /api). Todo lo demás exige sesión iniciada.
+const PUBLIC_API = new Set([
+  'GET /health', 'GET /status', 'GET /events', 'GET /auth/me',
+  'POST /auth/login', 'POST /auth/register',
+  'GET /billing/plans', 'POST /payments/stripe/webhook', 'POST /tickets', 'POST /tickets/lookup'
+]);
+app.use('/api', (req, res, next) => {
+  if (req.method === 'OPTIONS' || PUBLIC_API.has(`${req.method} ${req.path}`)) return next();
+  return authRequired(req, res, next);
+});
+
+const isAdmin = (u) => u?.role === 'admin';
+const forbidden = (res, msg = 'No tienes permiso sobre este recurso.') =>
+  res.status(403).json({ ok: false, error: msg });
+
+function canAccessBot(user, botId) {
+  if (!user) return false;
+  if (isAdmin(user)) return true;
+  if (!botId || botId === 'all') return false;
+  const bot = getBot(botId);
+  return Boolean(bot && bot.owner_id === user.id);
+}
+
+function ownedBotIds(user) {
+  return new Set(botManager.getAllBots().filter((b) => b.owner_id === user.id).map((b) => b.id));
+}
+
+// Todas las rutas /api/bots/:id/... solo para el dueño del bot o un administrador.
+app.use('/api/bots/:id', (req, res, next) => {
+  if (!canAccessBot(req.user, req.params.id)) return forbidden(res, 'No tienes permiso sobre este bot.');
+  next();
+});
+
+// Crear recursos (leads, productos, funciones, mensajes): el bot indicado debe ser del usuario.
+function scopeWrite(req, res, next) {
+  if (isAdmin(req.user)) return next();
+  const botId = req.body?.bot_id ?? req.body?.botId;
+  if (!canAccessBot(req.user, botId)) return forbidden(res, 'No tienes permiso sobre ese bot.');
+  next();
+}
+
+// Modificar/eliminar un recurso existente (la tabla es una constante interna, nunca entrada del usuario).
+const entityScope = (table) => (req, res, next) => {
+  if (isAdmin(req.user)) return next();
+  const row = db.prepare(`SELECT bot_id FROM ${table} WHERE id=?`).get(req.params.id);
+  if (!row) {
+    if (req.method === 'PUT' && table === 'bot_products') return scopeWrite(req, res, next); // upsert
+    return res.status(404).json({ ok: false, error: 'No encontrado.' });
+  }
+  if (!canAccessBot(req.user, row.bot_id)) return forbidden(res);
+  if (req.body?.bot_id !== undefined && !canAccessBot(req.user, req.body.bot_id)) return forbidden(res);
+  next();
+};
+
+// Listados: con ?botId= se valida el bot; sin él, un usuario solo ve filas de sus propios bots.
+const scopeList = (key) => (req, res, next) => {
+  if (isAdmin(req.user)) return next();
+  const requested = req.query.botId;
+  if (requested && requested !== 'all') {
+    return canAccessBot(req.user, requested) ? next() : forbidden(res, 'No tienes permiso sobre ese bot.');
+  }
+  const owned = ownedBotIds(req.user);
+  const json = res.json.bind(res);
+  res.json = (body) => {
+    if (body && Array.isArray(body[key])) body = { ...body, [key]: body[key].filter((r) => owned.has(r.bot_id)) };
+    return json(body);
+  };
+  next();
+};
+
+const exportScope = (req, res, next) => {
+  if (isAdmin(req.user)) return next();
+  const { botId } = req.query;
+  if (!botId || botId === 'all') return res.status(400).json({ ok: false, error: 'Selecciona un bot para exportar.' });
+  return canAccessBot(req.user, botId) ? next() : forbidden(res, 'No tienes permiso sobre ese bot.');
+};
+
+// Avisos en vivo solo para administradores (tickets nuevos, pagos por revisar)
+function notifyAdmins(event, data) {
+  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (const res of sseClients) {
+    try { if (res.sseUser?.role === 'admin') res.write(payload); } catch { sseClients.delete(res); }
+  }
+}
+
+// Notifica a los paneles que cambió el plan/vencimiento de ciertos bots
+function onBotsChanged(botIds = []) {
+  for (const botId of botIds) {
+    const b = getBot(botId);
+    if (b) botManager.emit('bot_update', { botId, payment_status: b.payment_status, expires_at: b.expires_at, plan: b.plan });
+  }
+}
+
+registerBillingRoutes(app, { authRequired, adminRequired, notifyAdmins, onBotsChanged });
+registerSupportRoutes(app, { authRequired, adminRequired, notifyAdmins });
+
 // Servir frontend estático sin cache agresivo para reflejar cambios instantáneamente
 const publicDir = path.join(__dirname, 'web', 'public');
-const rootPublicDir = path.join(process.cwd(), 'public');
 
 if (fs.existsSync(publicDir)) {
   app.use(express.static(publicDir, {
-    etag: false,
-    maxAge: 0,
-    setHeaders: (res) => {
-      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    }
-  }));
-}
-if (fs.existsSync(rootPublicDir)) {
-  app.use(express.static(rootPublicDir, {
     etag: false,
     maxAge: 0,
     setHeaders: (res) => {
@@ -179,7 +297,7 @@ app.get('/api/events', (req, res) => {
   // Enviar estado inicial filtrado según sesión
   const initialPayload = {
     bots: visibleBots,
-    maxBots: MAX_BOTS,
+    maxBots: botCapFor(req.user),
     timestamp: Date.now()
   };
   res.write(`event: init\ndata: ${JSON.stringify(initialPayload)}\n\n`);
@@ -219,14 +337,14 @@ app.get('/api/status', async (req, res) => {
     stats: {
       totalBots: bots.length,
       onlineBots,
-      maxBots: MAX_BOTS,
+      maxBots: botCapFor(req.user),
       totalLogs
     },
     supabase: supaStatus
   });
 });
 
-app.post('/api/supabase/test', async (req, res) => {
+app.post('/api/supabase/test', adminRequired, async (req, res) => {
   const result = await testConnection();
   res.json(result);
 });
@@ -244,8 +362,8 @@ app.post('/api/auth/register', (req, res) => {
     if (username.length < 3) {
       return res.status(400).json({ ok: false, error: 'El nombre de usuario debe tener al menos 3 caracteres.' });
     }
-    if (password.length < 4) {
-      return res.status(400).json({ ok: false, error: 'La contraseña debe tener al menos 4 caracteres.' });
+    if (password.length < 8) {
+      return res.status(400).json({ ok: false, error: 'La contraseña debe tener al menos 8 caracteres.' });
     }
 
     const existing = getPlatformUserByUsername(username);
@@ -254,14 +372,14 @@ app.post('/api/auth/register', (req, res) => {
     }
 
     const botPurpose = req.body.botPurpose?.trim();
-    if (botPurpose && botManager.getAllBots().length >= MAX_BOTS) {
-      return res.status(400).json({
-        ok: false,
-        error: `Se ha alcanzado el límite máximo de ${MAX_BOTS} bots activos permitidos en el panel.`
-      });
+
+    // Anti-abuso de pruebas gratuitas: máximo de cuentas nuevas por IP al día
+    const waitReg = registerLimiter.hit(`reg|${req.ip}`);
+    if (waitReg) {
+      return res.status(429).json({ ok: false, error: 'Se alcanzó el límite de cuentas nuevas desde esta red. Intenta mañana o contacta a soporte.' });
     }
 
-    const user = createPlatformUser({
+    const created = createPlatformUser({
       username,
       password,
       name,
@@ -269,13 +387,15 @@ app.post('/api/auth/register', (req, res) => {
       whatsapp: whatsapp || '',
       role: 'user'
     });
+    const user = ensureTrial(created.id) || created;   // fija los 7 días de prueba una sola vez
+    const trialEnt = computeEntitlement(getBillingUser(user.id));
 
     let initialBot = null;
     if (botPurpose) {
       const botName = req.body.botName?.trim() || `Bot de ${name.split(' ')[0]}`;
       const cleanPhone = (whatsapp || '').replace(/\D/g, '');
       const botId = `bot_${cleanPhone || Date.now()}`;
-      const expiresAt = Date.now() + (3 * 24 * 60 * 60 * 1000); // 3 días de prueba gratis
+      const sub = newBotSubscription(trialEnt);
       const personality = req.body.botPersonality || 'advisor';
 
       initialBot = upsertBot({
@@ -290,9 +410,9 @@ app.post('/api/auth/register', (req, res) => {
         ai_auto_reply: 1,
         owner_id: user.id,
         purpose: botPurpose,
-        expires_at: expiresAt,
-        payment_status: 'trial',
-        plan: 'prueba',
+        expires_at: sub.expires_at,
+        payment_status: sub.payment_status,
+        plan: sub.plan,
         settings: {
           currency: 'coins',
           welcomeEnabled: true,
@@ -315,7 +435,7 @@ app.post('/api/auth/register', (req, res) => {
       user,
       token,
       bot: initialBot,
-      message: initialBot ? '¡Cuenta y Bot creados con éxito con 3 días de prueba!' : '¡Registro exitoso!'
+      message: initialBot ? `¡Cuenta y Bot creados con éxito! Tienes ${TRIAL_DAYS} días de prueba gratis.` : '¡Registro exitoso!'
     });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
@@ -329,8 +449,15 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(400).json({ ok: false, error: 'Ingresa usuario y contraseña.' });
     }
 
+    const limitKey = `${req.ip}|${String(username).toLowerCase().trim()}`;
+    const wait = loginLimiter.isBlocked(limitKey);
+    if (wait) {
+      return res.status(429).json({ ok: false, error: `Demasiados intentos fallidos. Intenta de nuevo en ${Math.ceil(wait / 60)} min.` });
+    }
+
     const user = getPlatformUserByUsername(username);
     if (!user) {
+      loginLimiter.fail(limitKey);
       return res.status(401).json({ ok: false, error: 'Usuario o contraseña incorrectos.' });
     }
 
@@ -340,8 +467,10 @@ app.post('/api/auth/login', (req, res) => {
 
     const isValid = verifyPassword(password, user.password_hash);
     if (!isValid) {
+      loginLimiter.fail(limitKey);
       return res.status(401).json({ ok: false, error: 'Usuario o contraseña incorrectos.' });
     }
+    loginLimiter.reset(limitKey);
 
     const safeUser = getPlatformUserById(user.id);
     const token = generateToken(safeUser);
@@ -349,6 +478,25 @@ app.post('/api/auth/login', (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
+});
+
+// Cambiar la contraseña propia: cierra las demás sesiones y devuelve un token nuevo para este dispositivo
+app.post('/api/auth/change-password', authRequired, (req, res) => {
+  try {
+    changePassword(req.user.id, req.body?.current, req.body?.next);
+    const user = getPlatformUserById(req.user.id);
+    res.json({ ok: true, token: generateToken(user), message: 'Contraseña actualizada. Se cerró la sesión en tus otros dispositivos.' });
+  } catch (err) {
+    if (err instanceof AccountError) return res.status(err.status).json({ ok: false, error: err.message });
+    console.error('[Auth]', err);
+    res.status(500).json({ ok: false, error: 'No se pudo cambiar la contraseña.' });
+  }
+});
+
+// Cerrar sesión en TODOS los dispositivos (incluido este: el cliente debe volver a iniciar sesión)
+app.post('/api/auth/logout-all', authRequired, (req, res) => {
+  bumpTokenVersion(req.user.id);
+  res.json({ ok: true, message: 'Se cerró la sesión en todos tus dispositivos.' });
 });
 
 app.get('/api/auth/me', (req, res) => {
@@ -366,6 +514,17 @@ app.get('/api/auth/me', (req, res) => {
 app.get('/api/admin/users', adminRequired, (req, res) => {
   const users = listPlatformUsers();
   res.json({ ok: true, users });
+});
+
+// El admin restablece la contraseña de un cliente (se devuelve una temporal una sola vez)
+app.post('/api/admin/users/:id/reset-password', adminRequired, (req, res) => {
+  try {
+    const temp = adminResetPassword(req.params.id);
+    res.json({ ok: true, temporaryPassword: temp, message: 'Contraseña restablecida. Compártela de forma segura; el cliente debe cambiarla al entrar.' });
+  } catch (err) {
+    if (err instanceof AccountError) return res.status(err.status).json({ ok: false, error: err.message });
+    res.status(500).json({ ok: false, error: 'No se pudo restablecer la contraseña.' });
+  }
 });
 
 app.put('/api/admin/users/:id', adminRequired, (req, res) => {
@@ -453,7 +612,7 @@ app.get('/api/moderation/rules', (req, res) => {
   res.json({ ok: true, rules });
 });
 
-app.get('/api/moderation/logs', (req, res) => {
+app.get('/api/moderation/logs', adminRequired, (req, res) => {
   const { botId, limit } = req.query;
   const logs = listModerationLogs({ botId, limit: Number(limit) || 50 });
   res.json({ ok: true, logs });
@@ -514,14 +673,15 @@ app.put('/api/moderation/rules/:id', adminRequired, (req, res) => {
 // ==========================================
 app.get('/api/bots', (req, res) => {
   if (!req.user) {
-    return res.json({ ok: true, bots: [], maxBots: MAX_BOTS });
+    return res.json({ ok: true, bots: [], maxBots: FREE_MAX_BOTS });
   }
   const all = botManager.getAllBots();
+  const maxBots = botCapFor(req.user);
   if (req.user.role === 'user') {
     const myBots = all.filter(b => b.owner_id === req.user.id);
-    return res.json({ ok: true, bots: myBots, maxBots: MAX_BOTS });
+    return res.json({ ok: true, bots: myBots, maxBots });
   }
-  res.json({ ok: true, bots: all, maxBots: MAX_BOTS });
+  res.json({ ok: true, bots: all, maxBots });
 });
 
 app.post('/api/bots', async (req, res) => {
@@ -563,21 +723,24 @@ app.post('/api/bots', async (req, res) => {
         });
       }
     } else {
-      const ownerBots = isUserRole ? allBots.filter(b => b.owner_id === ownerId) : allBots;
-      if (ownerBots.length >= MAX_BOTS || allBots.length >= MAX_BOTS) {
-        return res.status(400).json({
-          ok: false,
-          error: `Límite máximo alcanzado: solo se permiten hasta ${MAX_BOTS} bots en el panel de control.`
-        });
+      if (allBots.length >= config.maxOnlineBots * 3) {
+        return res.status(503).json({ ok: false, code: 'SERVER_FULL', error: 'El servidor alcanzó su capacidad. Intenta más tarde.' });
       }
     }
 
-    // Si es un usuario cliente, asignamos 3 días de prueba (o plan correspondiente)
-    const expiresAt = existingBot?.expires_at !== undefined
-      ? existingBot.expires_at
-      : (isUserRole ? (Date.now() + (3 * 24 * 60 * 60 * 1000)) : 0);
-    const paymentStatus = existingBot?.payment_status || (isUserRole ? 'trial' : 'paid');
-    const plan = existingBot?.plan || (isUserRole ? 'prueba' : 'ilimitado');
+    // Límites por plan: cuenta gratuita = 7 días y 3 bots; más requiere un plan de pago.
+    const ownerRow = getBillingUser(ownerId);
+    const ent = computeEntitlement(ownerRow || { role: req.user.role });
+    if (!existingBot && isUserRole) {
+      const verdict = canCreateBot(ent, countUserBots(ownerId));
+      if (!verdict.ok) {
+        return res.status(402).json({ ok: false, code: verdict.code, error: verdict.message, upgrade: true });
+      }
+    }
+    const sub = newBotSubscription(ent);
+    const expiresAt = existingBot?.expires_at !== undefined ? existingBot.expires_at : sub.expires_at;
+    const paymentStatus = existingBot?.payment_status || sub.payment_status;
+    const plan = existingBot?.plan || sub.plan;
 
     const created = upsertBot({
       id,
@@ -613,7 +776,7 @@ app.post('/api/bots', async (req, res) => {
     // Iniciar el bot de inmediato para generar su QR o vincular
     botManager.startBot(id).catch(err => console.error(`Error auto-iniciando ${id}:`, err.message));
 
-    res.json({ ok: true, bot: created, maxBots: MAX_BOTS });
+    res.json({ ok: true, bot: created, maxBots: botCapFor(req.user) });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -859,13 +1022,13 @@ app.post('/api/bots/:id/pairing-code', async (req, res) => {
 // ==========================================
 // RUTAS API: FUNCIONES Y REGLAS (CRUD)
 // ==========================================
-app.get('/api/functions', (req, res) => {
+app.get('/api/functions', scopeList('functions'), (req, res) => {
   const { botId } = req.query;
   const list = listCustomFunctions(botId);
   res.json({ ok: true, functions: list });
 });
 
-app.post('/api/functions', (req, res) => {
+app.post('/api/functions', scopeWrite, (req, res) => {
   try {
     const { name, description, trigger_type, trigger_value, response_text, response_type, bot_id, is_enabled } = req.body;
     if (!name || !trigger_value || !response_text) {
@@ -889,7 +1052,7 @@ app.post('/api/functions', (req, res) => {
   }
 });
 
-app.put('/api/functions/:id', (req, res) => {
+app.put('/api/functions/:id', entityScope('bot_custom_functions'), (req, res) => {
   try {
     const existing = getCustomFunction(req.params.id);
     if (!existing) return res.status(404).json({ ok: false, error: 'Función no encontrada' });
@@ -906,7 +1069,7 @@ app.put('/api/functions/:id', (req, res) => {
   }
 });
 
-app.delete('/api/functions/:id', (req, res) => {
+app.delete('/api/functions/:id', entityScope('bot_custom_functions'), (req, res) => {
   try {
     deleteCustomFunction(req.params.id);
     res.json({ ok: true, message: 'Función eliminada correctamente' });
@@ -940,7 +1103,7 @@ app.get('/api/commands', (req, res) => {
 // ==========================================
 // RUTAS API: REGISTRO DE ACTIVIDAD (LOGS)
 // ==========================================
-app.get('/api/logs', (req, res) => {
+app.get('/api/logs', scopeList('logs'), (req, res) => {
   const { limit = 80, botId, type, search } = req.query;
   const logs = getBotLogs({
     limit: parseInt(limit, 10) || 80,
@@ -954,13 +1117,13 @@ app.get('/api/logs', (req, res) => {
 // ==========================================
 // RUTAS API: CRM LEADS & CONTACTOS
 // ==========================================
-app.get('/api/leads', (req, res) => {
+app.get('/api/leads', scopeList('leads'), (req, res) => {
   const { botId, status, search } = req.query;
   const leads = listLeads({ botId, status, search });
   res.json({ ok: true, leads });
 });
 
-app.post('/api/leads', (req, res) => {
+app.post('/api/leads', scopeWrite, (req, res) => {
   try {
     const lead = addLead(req.body);
     res.json({ ok: true, lead });
@@ -969,7 +1132,7 @@ app.post('/api/leads', (req, res) => {
   }
 });
 
-app.put('/api/leads/:id', (req, res) => {
+app.put('/api/leads/:id', entityScope('bot_leads'), (req, res) => {
   try {
     const { status, notes } = req.body;
     const lead = updateLeadStatus(req.params.id, status, notes);
@@ -979,7 +1142,7 @@ app.put('/api/leads/:id', (req, res) => {
   }
 });
 
-app.delete('/api/leads/:id', (req, res) => {
+app.delete('/api/leads/:id', entityScope('bot_leads'), (req, res) => {
   try {
     deleteLead(req.params.id);
     res.json({ ok: true, message: 'Lead eliminado correctamente' });
@@ -988,7 +1151,7 @@ app.delete('/api/leads/:id', (req, res) => {
   }
 });
 
-app.get('/api/leads/export', (req, res) => {
+app.get('/api/leads/export', exportScope, (req, res) => {
   try {
     const { botId } = req.query;
     const leads = listLeads({ botId });
@@ -1011,13 +1174,13 @@ app.get('/api/leads/export', (req, res) => {
 // ==========================================
 // RUTAS API: CATÁLOGO DE PRODUCTOS / SERVICIOS
 // ==========================================
-app.get('/api/products', (req, res) => {
+app.get('/api/products', scopeList('products'), (req, res) => {
   const { botId } = req.query;
   const products = listProducts(botId);
   res.json({ ok: true, products });
 });
 
-app.post('/api/products', (req, res) => {
+app.post('/api/products', scopeWrite, (req, res) => {
   try {
     const product = addProduct(req.body);
     res.json({ ok: true, product });
@@ -1026,7 +1189,7 @@ app.post('/api/products', (req, res) => {
   }
 });
 
-app.put('/api/products/:id', (req, res) => {
+app.put('/api/products/:id', entityScope('bot_products'), (req, res) => {
   try {
     const product = addProduct({ ...req.body, id: req.params.id });
     res.json({ ok: true, product });
@@ -1035,7 +1198,7 @@ app.put('/api/products/:id', (req, res) => {
   }
 });
 
-app.delete('/api/products/:id', (req, res) => {
+app.delete('/api/products/:id', entityScope('bot_products'), (req, res) => {
   try {
     deleteProduct(req.params.id);
     res.json({ ok: true, message: 'Producto eliminado correctamente' });
@@ -1259,7 +1422,7 @@ app.post('/api/bots/:id/simulate', async (req, res) => {
 // ==========================================
 // RUTAS API: ENVÍO EXTERNO DE MENSAJES (#43)
 // ==========================================
-app.post('/api/v1/send-message', async (req, res) => {
+app.post('/api/v1/send-message', scopeWrite, async (req, res) => {
   try {
     const { botId, to, text } = req.body;
     if (!botId || !to || !text) {
@@ -1285,8 +1448,7 @@ app.post('/api/v1/send-message', async (req, res) => {
 app.get('*', (req, res) => {
   const possiblePaths = [
     path.join(publicDir, 'index.html'),
-    path.join(process.cwd(), 'src', 'web', 'public', 'index.html'),
-    path.join(process.cwd(), 'public', 'index.html')
+    path.join(process.cwd(), 'src', 'web', 'public', 'index.html')
   ];
   for (const p of possiblePaths) {
     try {
@@ -1302,7 +1464,7 @@ app.get('*', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('[Global Express Error]:', err?.message || err);
   if (!res.headersSent) {
-    res.status(200).json({
+    res.status(500).json({
       ok: false,
       error: err?.message || 'Error interno',
       vercel: Boolean(process.env.VERCEL)

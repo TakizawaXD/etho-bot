@@ -95,32 +95,47 @@ export function noEmoji(str = '') {
     .trim();
 }
 
-export const SEP_BOLD = '━━━━━━━━━━━━━━━━━━━━';
-export const SEP_LINE = '────────────────────';
-export const SEP_DOT = '┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄';
+// Separadores compactos: caben en una sola línea en cualquier celular, sin cortarse dentro de la burbuja.
+export const SEP_BOLD = '━━━━━━━━━━━━━━';
+export const SEP_LINE = '──────────────';
+export const SEP_DOT = '┄┄┄┄┄┄┄┄┄┄┄┄┄┄';
 
 export const purr = () => '';
 
 /**
- * Envuelve respuestas de comandos de WhatsApp con un encabezado visual con emojis
- * y separadores limpios para distinguir de inmediato qué comando y categoría respondió.
+ * Envuelve respuestas de comandos con un encabezado compacto y limpio:
+ *   *🎵 #play* · _Multimedia_
+ *   ──────────────
+ *   contenido
  */
-export function skin(text, { label = config.botName, command = null, prefix = '#' } = {}) {
+export function skin(text, { label = config.botName, command = null, prefix = '#', icon = null } = {}) {
   if (!text) return '';
   const body = String(text).trim();
 
   if (command) {
     const cmdEmoji = getCommandEmoji(command, label);
-    const catEmoji = getCategoryEmoji(label);
-    const p = prefix || '#';
-    return `${SEP_BOLD}\n${cmdEmoji} *${catEmoji} ${String(label).toUpperCase()} · ${p}${command}*\n${SEP_LINE}\n${body}\n${SEP_BOLD}`;
+    return `*${cmdEmoji} ${prefix || '#'}${command}* · _${label}_\n${SEP_LINE}\n${body}`;
   }
 
-  if (label && CATEGORY_EMOJIS[label]) {
-    return `${SEP_BOLD}\n${CATEGORY_EMOJIS[label]} *${String(label).toUpperCase()}*\n${SEP_LINE}\n${body}\n${SEP_BOLD}`;
+  const ico = icon || CATEGORY_EMOJIS[label];
+  if (label && ico) {
+    return `*${ico} ${String(label).toUpperCase()}*\n${SEP_LINE}\n${body}`;
   }
 
   return body;
+}
+
+/**
+ * Tarjeta de mensaje limpia y uniforme para avisos del sistema:
+ *   *✅ Título*
+ *   ──────────────
+ *   Texto principal
+ *
+ *   _Pista opcional_
+ */
+export function card({ icon = '', title = '', body = '', hint = '' } = {}) {
+  const head = `*${icon ? `${icon} ` : ''}${title}*`;
+  return [head, SEP_LINE, String(body).trim(), hint ? `\n_${String(hint).trim()}_` : ''].filter((x) => x !== '').join('\n');
 }
 
 /** Barra de progreso hecha con caracteres de bloque */

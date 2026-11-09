@@ -17,6 +17,18 @@ services:
         value: /app/data/sessions
       - key: AUTH_SECRET
         generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PUBLIC_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: TRANSFER_INSTRUCTIONS
+        sync: false
+      - key: MAX_ONLINE_BOTS
+        value: "30"
     disk:
       name: etho-data
       mountPath: /app/data

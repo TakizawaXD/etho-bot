@@ -30,6 +30,7 @@ class BotManager extends EventEmitter {
   constructor() {
     super();
     this.instances = new Map(); // botId -> { sock, status, qr, qrRaw, pairingCode, reconnectTimer, remindersTimer }
+    this.retryCounts = new Map(); // botId -> reconexiones consecutivas (para el retroceso exponencial)
     this.sessionsBaseDir = path.resolve(process.cwd(), config.sessionDir || './data/sessions');
     try {
       fs.mkdirSync(this.sessionsBaseDir, { recursive: true });
@@ -109,6 +110,15 @@ class BotManager extends EventEmitter {
     const liveStates = ['online', 'connecting', 'qr_ready', 'pairing_code_ready'];
     if (!force && inst && inst.sock && !inst.manualStop && liveStates.includes(inst.status)) {
       return this.getBot(botId);
+    }
+
+    // Protección de capacidad: cada bot conectado consume memoria (~60-100 MB).
+    const counted = inst && inst.sock && liveStates.includes(inst.status);
+    if (!counted) {
+      const active = [...this.instances.values()].filter((i) => i.sock && liveStates.includes(i.status)).length;
+      if (active >= config.maxOnlineBots) {
+        throw new Error(`El servidor alcanzó su capacidad máxima (${config.maxOnlineBots} bots conectados). Intenta más tarde o contacta a soporte.`);
+      }
     }
 
     // Si existía un socket previo, limpiar sus listeners
@@ -256,6 +266,7 @@ class BotManager extends EventEmitter {
         }
 
         if (connection === 'open') {
+          this.retryCounts.delete(botId);
           inst.status = 'online';
           inst.qr = null;
           inst.qrRaw = null;
@@ -362,13 +373,19 @@ class BotManager extends EventEmitter {
             content: isRestart ? 'Código aceptado por WhatsApp. Completando la vinculación...' : `Conexión perdida (código ${code ?? 'desconocido'}). Reconectando...`
           });
 
+          // Reintentos con retroceso exponencial (1.5 s, 3 s, 6 s... máx. 60 s) y un poco de azar:
+          // evita saturar WhatsApp y que todos los bots se reconecten a la vez tras una caída de red.
+          const attempt = this.retryCounts.get(botId) || 0;
+          if (!isRestart) this.retryCounts.set(botId, attempt + 1);
+          const delay = isRestart ? 300 : Math.min(60000, 1500 * 2 ** attempt) + Math.floor(Math.random() * 1000);
+
           clearTimeout(inst.reconnectTimer);
           inst.reconnectTimer = setTimeout(() => {
             const current = getBot(botId);
             if (current && current.is_active && !inst.manualStop) {
-              this.startBot(botId, true).catch(console.error);
+              this.startBot(botId, true).catch((e) => console.error(`[BotManager] Reintento de ${botId} falló:`, e.message));
             }
-          }, isRestart ? 300 : 1500);
+          }, delay);
         }
       });
 
@@ -648,6 +665,7 @@ class BotManager extends EventEmitter {
     }
 
     console.log(`[BotManager] Cargando ${bots.length} bot(s) registrados...`);
+    const toStart = [];
     for (const b of bots) {
       if (b.is_active) {
         if (b.penalty_until && b.penalty_until > Date.now()) {
@@ -658,10 +676,19 @@ class BotManager extends EventEmitter {
           console.log(`[BotManager] ⏳ Bot ${b.name} (${b.id}) está vencido o suspendido. No se encenderá automáticamente.`);
           continue;
         }
-        console.log(`[BotManager] Encendiendo bot: ${b.name} (${b.id})...`);
-        this.startBot(b.id).catch((e) => console.error(`[BotManager] Error iniciando ${b.id}:`, e.message));
+        toStart.push(b);
       }
     }
+
+    // Arranque escalonado: encender decenas de bots a la vez dispara picos de CPU/memoria y bloqueos de WhatsApp.
+    const stagger = Math.max(0, Number(process.env.BOOT_STAGGER_MS) || 1500);
+    (async () => {
+      for (const b of toStart) {
+        console.log(`[BotManager] Encendiendo bot: ${b.name} (${b.id})...`);
+        this.startBot(b.id).catch((e) => console.error(`[BotManager] Error iniciando ${b.id}:`, e.message));
+        if (stagger) await new Promise((r) => setTimeout(r, stagger));
+      }
+    })();
 
     // Monitoreo periódico de expiración de bots (cada 2 minutos)
     this.startExpirationMonitor();

@@ -12,9 +12,10 @@ import {
 } from './db.js';
 import { triggerWebhook } from './lib/supabase.js';
 import { commands } from './commands/index.js';
-import { jidNorm, jidNum, rand, timeLeft } from './lib/utils.js';
+import { jidNorm, jidNum, rand, sleep, timeLeft } from './lib/utils.js';
 import { getMeta, clearMeta, isAdminOf, botIsAdmin } from './lib/group.js';
-import { skin, noEmoji, SEP_BOLD, SEP_LINE, SEP_DOT } from './lib/ui.js';
+import { skin, card, noEmoji, SEP_BOLD, SEP_LINE, SEP_DOT } from './lib/ui.js';
+import { splitMessage, typingDelay } from './lib/format.js';
 import { askAI, extractUserFacts } from './lib/ai.js';
 import { processIncomingAudio } from './lib/audio.js';
 
@@ -154,8 +155,8 @@ export async function handle(rawSock, msg, botContext = {}) {
     }
     await sock.sendMessage(chat, {
       text: enableGroup
-        ? `${SEP_BOLD}\n✅ *🛡️ ACCESO DE GRUPO · ${ctrlPrefix}activar*\n${SEP_LINE}\nEl bot ha sido habilitado en *${meta?.subject || 'este grupo'}*. Responderá aquí a partir de ahora.\n${SEP_DOT}\n💡 Usa *${ctrlPrefix}desactivar* o el panel web para bloquearlo.\n${SEP_BOLD}`
-        : `${SEP_BOLD}\n🔒 *🛡️ ACCESO DE GRUPO · ${ctrlPrefix}desactivar*\n${SEP_LINE}\nEl bot ha sido bloqueado en *${meta?.subject || 'este grupo'}*. Permanecerá en silencio hasta que escribas *${ctrlPrefix}activar* o lo habilites en el panel.\n${SEP_BOLD}`
+        ? card({ icon: '✅', title: 'Bot activado en este grupo', body: `Ya respondo en *${meta?.subject || 'este grupo'}*.`, hint: `Para bloquearlo usa ${ctrlPrefix}desactivar o el panel web.` })
+        : card({ icon: '🔒', title: 'Bot desactivado en este grupo', body: `Me quedo en silencio en *${meta?.subject || 'este grupo'}* hasta que escribas *${ctrlPrefix}activar* o lo habilites en el panel.` })
     }, { quoted: msg });
     return;
   }
@@ -167,7 +168,7 @@ export async function handle(rawSock, msg, botContext = {}) {
   )) {
     resumeChat(botId, chat);
     await sock.sendMessage(chat, {
-      text: `${SEP_BOLD}\n✅ *🤖 ASESOR REACTIVADO*\n${SEP_LINE}\nEl ayudante automático volverá a responder en este chat privado hasta que el contacto use */enable*.\n${SEP_BOLD}`
+      text: card({ icon: '✅', title: 'Asistente reactivado', body: 'Volveré a responder en este chat hasta que el contacto escriba */enable*.' })
     }, { quoted: msg });
     return;
   }
@@ -195,15 +196,12 @@ export async function handle(rawSock, msg, botContext = {}) {
   );
   if (isContactEnableCmd) {
     pauseChat(botId, chat, 0, 'Contacto usó /enable (atención directa con el titular)');
-    const directMsg = [
-      SEP_BOLD,
-      `🤝 *ATENCIÓN DIRECTA HABILITADA · /enable*`,
-      SEP_LINE,
-      `Perfecto. He pausado mi asistencia automática en este chat para que puedas comunicarte directamente con *${ownerDisplay}*.`,
-      SEP_DOT,
-      `💬 Escribe tu mensaje con confianza; te responderá personalmente en cuanto esté disponible.`,
-      SEP_BOLD
-    ].join('\n');
+    const directMsg = card({
+      icon: '🤝',
+      title: 'Atención directa activada',
+      body: `Dejé en pausa mi asistencia automática para que hables directamente con *${ownerDisplay}*.`,
+      hint: 'Escribe tu mensaje; te responderá personalmente en cuanto esté disponible.'
+    });
     await sock.sendMessage(chat, { text: directMsg }, { quoted: msg });
 
     addRecado({
@@ -298,7 +296,7 @@ export async function handle(rawSock, msg, botContext = {}) {
     const pauseMin = !isGroup ? 0 : (Number(botSettings.humanHandoffMinutes) || 60);
     pauseChat(botId, chat, pauseMin, 'Solicitud de cliente');
     const handoffMsg = botSettings.humanHandoffMsg ||
-      `${SEP_BOLD}\n🤝 *ATENCIÓN DIRECTA SOLICITADA*\n${SEP_LINE}\nHe pausado mi asistencia automática en este chat para que *${ownerDisplay}* te atienda personalmente.\n${SEP_BOLD}`;
+      card({ icon: '🤝', title: 'Te paso con una persona', body: `Pausé mi asistencia automática para que *${ownerDisplay}* te atienda personalmente.` });
     await sock.sendMessage(chat, { text: handoffMsg }, { quoted: msg });
 
     if (botSettings.webhookUrl) {
@@ -356,19 +354,16 @@ export async function handle(rawSock, msg, botContext = {}) {
     const activeProducts = products.filter(p => p.is_active);
     if (activeProducts.length > 0) {
       const items = activeProducts.map((p, idx) => {
-        let block = `🏷️ *${idx + 1}. ${p.name}* — 💰 ${p.price} ${p.currency}`;
-        if (p.description) block += `\n   _${p.description}_`;
+        let block = `*${idx + 1}. ${p.name}* · ${p.price} ${p.currency}`;
+        if (p.description) block += `\n_${p.description}_`;
         return block;
       });
-      const catText = [
-        SEP_BOLD,
-        `📦 *CATÁLOGO DE PRODUCTOS — ${botName.toUpperCase()}*`,
-        SEP_LINE,
-        items.join(`\n${SEP_DOT}\n`),
-        SEP_LINE,
-        `🤝 Escribe *${botPrefix}asesor* si deseas que un agente humano tome tu pedido.`,
-        SEP_BOLD
-      ].join('\n');
+      const catText = card({
+        icon: '📦',
+        title: `Catálogo de ${botName}`,
+        body: items.join('\n\n'),
+        hint: `¿Quieres pedir algo? Escribe ${botPrefix}asesor y te atiende una persona.`
+      });
       await sock.sendMessage(chat, { text: catText }, { quoted: msg });
 
       addBotLog({
@@ -382,7 +377,7 @@ export async function handle(rawSock, msg, botContext = {}) {
       return;
     } else if (isExplicitPrefixedCatalog) {
       await sock.sendMessage(chat, {
-        text: `${SEP_BOLD}\n📦 *CATÁLOGO DE PRODUCTOS — ${botName.toUpperCase()}*\n${SEP_LINE}\nAún no hay productos activos cargados en el catálogo.\n${SEP_DOT}\n🤝 Escribe *${botPrefix}asesor* para hablar con una persona o *${botPrefix}menu* para ver todos los comandos.\n${SEP_BOLD}`
+        text: card({ icon: '📦', title: `Catálogo de ${botName}`, body: 'Todavía no hay productos cargados.', hint: `Escribe ${botPrefix}asesor para hablar con una persona o ${botPrefix}menu para ver los comandos.` })
       }, { quoted: msg });
       return;
     }
@@ -436,12 +431,12 @@ export async function handle(rawSock, msg, botContext = {}) {
           botContext.manager.stopBot(botId).catch(() => {});
         }
         await sock.sendMessage(chat, {
-          text: `⛔ *[SISTEMA DE MODERACIÓN]*\nEste bot ha sido *cerrado y penalizado por ${updated.penalty_days} días* debido a acumulación de infracciones por flood y spam masivo.\n_Contacta al Administrador para apelar esta sanción._`
+          text: card({ icon: '⛔', title: 'Bot suspendido', body: `Se cerró por ${updated.penalty_days} días por exceso de mensajes repetidos (spam).`, hint: 'Contacta al administrador si crees que fue un error.' })
         }).catch(() => {});
         return;
       } else {
         await sock.sendMessage(chat, {
-          text: `⚠️ *[ADVERTENCIA DE MODERACIÓN]*\n@${jidNum(sender)}, estás saturando el bot con comandos repetidos.\n*Infracción registrada:* Strike ${updated?.strikes || 1}/3. Si alcanzas 3 strikes, el bot será cerrado de inmediato y penalizado con días.`,
+          text: card({ icon: '⚠️', title: `Advertencia ${updated?.strikes || 1}/3`, body: `@${jidNum(sender)}, estás enviando comandos repetidos muy rápido. Con 3 advertencias el bot se suspende por varios días.` }),
           mentions: [sender]
         }, { quoted: msg }).catch(() => {});
         return;
@@ -470,6 +465,16 @@ export async function handle(rawSock, msg, botContext = {}) {
   }
 
   const send = (t, mentions = [], opts = {}) => sock.sendMessage(chat, { text: t, mentions }, { quoted: msg, ...opts });
+  // Respuestas de IA: "escribiendo..." con pausa proporcional al largo y mensajes largos partidos por párrafos.
+  const sendHuman = async (t) => {
+    const parts = splitMessage(t);
+    for (let i = 0; i < parts.length; i++) {
+      await sock.sendPresenceUpdate('composing', chat).catch(() => {});
+      await sleep(typingDelay(parts[i]));
+      await send(parts[i], [], i === 0 ? {} : { quoted: undefined });
+    }
+    await sock.sendPresenceUpdate('paused', chat).catch(() => {});
+  };
 
   // AFK: quitar estado al volver y avisar si mencionan a alguien AFK
   if (user.afk_since) {
@@ -639,7 +644,7 @@ export async function handle(rawSock, msg, botContext = {}) {
           saveChatMessage(botId, chat, botId, 'assistant', aiResponse);
 
           // 7. Enviar respuesta limpia y directa
-          await send(aiResponse);
+          await sendHuman(aiResponse);
 
           // 8. Si fue atención de Asesor/Ayudante en DM, guardar el recado para el dueño
           if (isAdvisorDM && !msg.key.fromMe) {
@@ -692,8 +697,8 @@ export async function handle(rawSock, msg, botContext = {}) {
   if (isGroup && group.onlyadmin && !isAdmin && !isOwner) return;
 
   // Verificación de módulos desactivados en grupo o en botSettings
-  if (cmd.feature && isGroup && group[cmd.feature] === 0) return reply(`⚠️ Los comandos de *${cmd.category}* están desactivados en este grupo.`);
-  if (botSettings.disabledCategories?.includes(cmd.category)) return reply(`⚠️ La categoría *${cmd.category}* está desactivada en este bot.`);
+  if (cmd.feature && isGroup && group[cmd.feature] === 0) return reply(`Los comandos de *${cmd.category}* están desactivados en este grupo.`);
+  if (botSettings.disabledCategories?.includes(cmd.category)) return reply(`La categoría *${cmd.category}* está desactivada en este bot.`);
 
   if (cmd.group && !isGroup) return reply('⚠️ Este comando solo funciona en grupos.');
   if (cmd.owner && !isOwner) return reply('⛔ Solo el dueño del bot puede usar este comando.');
@@ -755,6 +760,7 @@ export async function handle(rawSock, msg, botContext = {}) {
       content: `Error en ${botPrefix}${cmd.name}: ${err.message}`,
       details: { stack: err.stack }
     });
-    await reply(`❌ Error en *${botPrefix}${cmd.name}*: ${String(err.message || err).slice(0, 200)}`).catch(() => {});
+    console.error(`[Handler] Error en ${botPrefix}${cmd.name}:`, err);
+    await reply(`No pude completar *${botPrefix}${cmd.name}* por un problema técnico. Inténtalo de nuevo en un momento.`).catch(() => {});
   }
 }

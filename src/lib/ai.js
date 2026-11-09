@@ -3,8 +3,12 @@
 import axios from 'axios';
 import 'dotenv/config';
 import { SEP_DOT } from './ui.js';
+import { formatForWhatsApp } from './format.js';
+import { buildProtocol, detectLanguage, looksLikeInjection, trimHistory, trimToCompleteSentence, createBreaker } from './ai-quality.js';
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
+// Si un proveedor falla 3 veces seguidas se salta 60 s: la persona recibe respuesta rápido en vez de esperar timeouts.
+const breaker = createBreaker({ threshold: 3, cooldownMs: 60_000 });
 const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 export const TONE_INSTRUCTIONS = {
@@ -31,17 +35,6 @@ export const PERSONA_PROMPTS = {
     'Eres una Inteligencia Artificial Autónoma de Atención Integral en WhatsApp. ' +
     'Razonas cada consulta a fondo, recuerdas el contexto completo de la conversación, te adaptas al perfil del usuario y entregas respuestas completas, exactas y resolutivas en español.'
 };
-
-const USER_ATTENTION_PROTOCOL = [
-  `[Protocolo Maestro de Atención al Usuario]:`,
-  `1. SOLO RESPUESTAS DIRECTAS (PROHIBIDO RECOMENDAR COMANDOS): Responde directamente a lo que el usuario pregunta o necesita. NUNCA agregues listas de comandos del bot (ej. #menu, #sticker, #clima), ni bloques de "Comandos recomendados", ni sugerencias de funciones no pedidas.`,
-  `2. COMPRENSIÓN Y RESOLUCIÓN REAL: Identifica la intención exacta detrás del mensaje (consulta, soporte, cotización, urgencia, reclamo, tarea o conversación). Da una respuesta útil, completa y accionable desde el primer mensaje.`,
-  `3. EMPATÍA Y CALIDAD DE SERVICIO: Si el usuario tiene una duda compleja, urgencia o inconveniente, muestra empatía genuina primero y luego entrega la solución clara paso a paso.`,
-  `4. FORMATO ÓPTIMO PARA WHATSAPP: Usa párrafos cortos y legibles en celular, negritas (*texto*) solo para resaltar datos importantes y viñetas breves únicamente cuando enumeres pasos o características reales.`,
-  `5. VERACIDAD ESTRICTA: Si cuentas con datos del catálogo, precios, horarios o base de conocimiento en este contexto, úsalos con exactitud. Nunca inventes precios, políticas ni promesas falsas; si falta un dato comercial específico, indícalo con transparencia y ofrece tomar los datos del usuario.`,
-  `6. CONTINUIDAD DE MEMORIA: Ten siempre presente lo hablado en los mensajes anteriores y los datos conocidos del usuario (nombre, negocio, ciudad o interés) sin pedirle repetir información que ya dio.`,
-  `7. CERO RELLENO INFANTIL: Prohibido hacer maullidos, decir 'nya', 'uwu' o usar lenguaje infantil.`
-].join('\n');
 
 /**
  * Extrae hechos clave sobre el usuario de forma automática a partir de sus mensajes
@@ -161,9 +154,9 @@ export async function askAI(prompt, customSystemPrompt = null, personality = 're
 
   // Si el usuario escribió accidentalmente "#algo" que no es comando (ej. "#horarios" o "#ayuda con mi pedido"),
   // convertimos la consulta en su intención limpia para responderle directamente sin mencionar errores de comandos.
-  const effectivePrompt = unknownCommand && prompt.trim().startsWith(prefix)
+  const effectivePrompt = (unknownCommand && prompt.trim().startsWith(prefix)
     ? (prompt.trim().slice(prefix.length).trim() || prompt.trim())
-    : prompt.trim();
+    : prompt.trim()).slice(0, 2000);
 
   const ownerLabel = (ownerName && ownerName.trim()) ? ownerName.trim() : 'el titular de esta cuenta';
   const isAdvisorDM = Boolean(isAutoPilot && pilotPersona === 'as_assistant');
@@ -228,7 +221,9 @@ export async function askAI(prompt, customSystemPrompt = null, personality = 're
   const styleDirectives = [
     `\n[Directivas de Tono y Restricciones]:`,
     `- Tono requerido: ${toneInstruction}`,
-    `- Usa emojis sobrios y puntuales solo cuando aporten calidez o claridad visual (sin saturar).`
+    `- Usa emojis sobrios y puntuales solo cuando aporten calidez o claridad visual (máximo 2 por mensaje).`,
+    `- Formato WhatsApp: *negrita* con un solo asterisco, _cursiva_ y viñetas con "•". Nunca uses títulos con #, tablas, **dobles asteriscos** ni bloques de código.`,
+    `- Sé breve: ve directo al punto en 2 a 5 líneas, con párrafos cortos. No repitas el saludo ni te presentes en cada mensaje. Cierra con una sola pregunta o el siguiente paso claro.`
   ];
 
   const forbiddenList = Array.isArray(forbiddenWords)
@@ -249,62 +244,70 @@ export async function askAI(prompt, customSystemPrompt = null, personality = 're
     ? ''
     : `\nTu nombre de asistente es ${botName}. Atiende al usuario como un profesional experto y cercano.`;
 
+  const cleanHistory = trimHistory(history);
+  const protocol = buildProtocol({
+    isFirstContact: cleanHistory.length === 0,
+    userLanguage: detectLanguage(effectivePrompt),
+    injectionSuspected: looksLikeInjection(effectivePrompt)
+  });
+
   const fullSystemPrompt = [
     baseSystem + identityLine,
     operationalContext,
     factsContext,
     '',
-    USER_ATTENTION_PROTOCOL,
+    protocol,
     styleDirectives.join('\n')
   ].filter(Boolean).join('\n');
 
+  // Acabado común: recorte limpio si se cortó por límite, limpieza de formato y marca de /enable
+  const polish = (raw, truncated = false) =>
+    finalizeReply(cleanResponseText(trimToCompleteSentence(raw.trim(), { truncated }), forbiddenList));
+
   // 1. Proveedor Principal: Google Gemini (si GEMINI_API_KEY está activa)
-  if (GEMINI_KEY) {
+  if (GEMINI_KEY && breaker.allow('gemini')) {
     for (const modelName of ['gemini-2.0-flash', 'gemini-1.5-flash']) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_KEY}`;
-        const contents = [];
-        for (const turn of history.slice(-10)) {
-          if (!turn?.content) continue;
-          contents.push({
-            role: turn.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: String(turn.content) }]
-          });
-        }
+        // La clave va en la cabecera (no en la URL) para que no aparezca en logs ni en errores.
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+        const contents = cleanHistory.map((turn) => ({
+          role: turn.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: turn.content }]
+        }));
         contents.push({ role: 'user', parts: [{ text: effectivePrompt }] });
 
         const res = await axios.post(url, {
           system_instruction: { parts: [{ text: fullSystemPrompt }] },
           contents,
-          generationConfig: { maxOutputTokens: 500, temperature: 0.55 }
-        }, { timeout: 12000 });
+          generationConfig: { maxOutputTokens: 700, temperature: 0.5, topP: 0.9 }
+        }, { timeout: 12000, headers: { 'x-goog-api-key': GEMINI_KEY, 'Content-Type': 'application/json' } });
 
-        const text = res.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const cand = res.data?.candidates?.[0];
+        const text = cand?.content?.parts?.map((p) => p.text || '').join('');
         if (text && text.trim()) {
-          return finalizeReply(cleanResponseText(text.trim(), forbiddenList));
+          breaker.success('gemini');
+          return polish(text, cand?.finishReason === 'MAX_TOKENS');
         }
       } catch {
         // Intentar siguiente modelo/proveedor
       }
     }
+    breaker.failure('gemini');
   }
 
   // 2. Proveedor Neuronal OpenAI-Compatible (Pollinations Chat Completions con historial completo)
   const chatMessages = [
     { role: 'system', content: fullSystemPrompt },
-    ...history.slice(-8).filter(h => h?.content).map(h => ({
-      role: h.role === 'assistant' ? 'assistant' : 'user',
-      content: String(h.content).replace(/\n┄+[\s\S]*$/m, '').trim()
-    })),
+    ...cleanHistory,
     { role: 'user', content: effectivePrompt }
   ];
 
-  for (const endpoint of ['https://text.pollinations.ai/openai', 'https://text.pollinations.ai/']) {
+  for (const endpoint of (breaker.allow('pollinations') ? ['https://text.pollinations.ai/openai', 'https://text.pollinations.ai/'] : [])) {
     try {
       const res = await axios.post(endpoint, {
         model: 'openai',
         messages: chatMessages,
-        temperature: 0.55,
+        temperature: 0.5,
         private: true
       }, {
         timeout: 11000,
@@ -315,15 +318,17 @@ export async function askAI(prompt, customSystemPrompt = null, personality = 're
         ? res.data
         : (res.data?.choices?.[0]?.message?.content || '');
       if (rawText && rawText.trim()) {
-        const cleaned = cleanResponseText(rawText.trim(), forbiddenList);
+        const cleaned = polish(rawText);
         if (cleaned.length > 2) {
-          return finalizeReply(cleaned);
+          breaker.success('pollinations');
+          return cleaned;
         }
       }
     } catch {
       // Continuar al respaldo
     }
   }
+  if (breaker.allow('pollinations')) breaker.failure('pollinations');
 
   // 3. Motor Cognitivo Experto de Atención al Usuario (100% local, cero caídas, alimentado por catálogo y base de conocimiento)
   const cognitive = generateCognitiveResponse(effectivePrompt, personality, history, normalizedFacts, botName, {
@@ -348,19 +353,18 @@ export function cleanResponseText(str, forbiddenWords = []) {
     // Eliminar cualquier bloque de recomendaciones de comandos si algún modelo externo intentara añadirlo
     .replace(/\n*(?:━+\n)?✨?\s*\*?COMANDOS RECOMENDADOS[\s\S]*$/i, '')
     .replace(/\n*✨?\s*\*?Comandos sugeridos[\s\S]*$/i, '')
-    // Convertir negritas Markdown (**texto**) a formato nativo de WhatsApp (*texto*)
-    .replace(/\*\*([^*\n]+)\*\*/g, '*$1*')
-    .replace(/\b(nya~?|purr|mrrp|meow|nekotina|uwu|onii-chan|senpai|kawaii|yamete)\b/gi, '');
+    .replace(/\b(nya|purr|mrrp|meow|nekotina|uwu|onii-chan|senpai|kawaii|yamete)\b~*/gi, '');
 
   if (Array.isArray(forbiddenWords)) {
     for (const w of forbiddenWords) {
       if (!w || !w.trim()) continue;
       const re = new RegExp(`\\b${w.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-      cleaned = cleaned.replace(re, '***');
+      cleaned = cleaned.replace(re, '');
     }
   }
 
-  return cleaned.trim();
+  // Markdown -> formato nativo de WhatsApp, espaciado limpio y sin artefactos
+  return formatForWhatsApp(cleaned);
 }
 
 /**
@@ -373,6 +377,7 @@ function generateCognitiveResponse(prompt, personality, history = [], userFacts 
   const userLoc = userFacts.ciudad || userFacts.location || null;
   const userBiz = userFacts.negocio || userFacts.business || null;
   const greetingName = userName ? `, ${userName}` : '';
+  const followUp = Array.isArray(history) && history.length > 0;   // ya hubo conversación: no se vuelve a saludar
   const {
     isAutoPilot = false,
     pilotPersona = 'as_assistant',
@@ -382,7 +387,7 @@ function generateCognitiveResponse(prompt, personality, history = [], userFacts 
     businessHours = null
   } = options;
 
-  // 1. Búsqueda directa en Base de Conocimiento del Bot (FAQs configuradas)
+  // 1. Base de conocimiento del bot (FAQs configuradas)
   if (Array.isArray(knowledge) && knowledge.length > 0) {
     const queryWords = pNorm.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length >= 4);
     if (queryWords.length > 0) {
@@ -400,44 +405,44 @@ function generateCognitiveResponse(prompt, personality, history = [], userFacts 
         }
       }
       if (bestKb && bestScore >= 1) {
-        return `📌 *${bestKb.title}*\n${bestKb.content}`;
+        return `*${bestKb.title}*\n${bestKb.content}`;
       }
     }
   }
 
-  // 2. Consultas sobre Productos, Servicios, Precios o Cotizaciones (usa catálogo real si existe)
+  // 2. Productos, servicios, precios o cotizaciones (usa el catálogo real si existe)
   if (/(precio|precios|costo|cuanto vale|cuanto cuesta|catalogo|planes|tarifas|servicios|productos|que ofrecen|que venden|cotizar|cotizacion)/i.test(pNorm)) {
     if (Array.isArray(products) && products.length > 0) {
       const list = products.slice(0, 8).map(pr =>
         `• *${pr.name}*: ${pr.price} ${pr.currency || 'USD'}${pr.description ? ` — ${pr.description}` : ''}`
       ).join('\n');
-      return `💼 Con gusto${greetingName}, aquí tienes nuestras opciones disponibles actualmente:\n\n${list}\n\n¿Sobre cuál de estas opciones te gustaría recibir más detalles?`;
+      return `Claro${greetingName}, estas son nuestras opciones:\n\n${list}\n\n¿Cuál te interesa?`;
     }
     if (isAutoPilot && pilotPersona === 'as_assistant') {
-      return `💼 Con todo gusto${greetingName}. Cuéntame exactamente qué producto, servicio o requerimiento deseas cotizar para dejarle el detalle completo a *${ownerName}* y darte el valor exacto.`;
+      return `Con gusto${greetingName}. ¿Qué producto o servicio quieres cotizar? Le paso el detalle a *${ownerName}* para darte el valor exacto.`;
     }
-    return `💼 Con gusto te brindo información${greetingName}. Indícame por favor qué servicio o requerimiento específico estás buscando para darte una orientación precisa.`;
+    return `Con gusto${greetingName}. ¿Qué servicio estás buscando? Así te oriento mejor.`;
   }
 
-  // 3. Consultas sobre Horarios de Atención
+  // 3. Horarios de atención
   if (/(horario|horarios|a que hora|cuando abren|cuando atienden|dias de atencion|estan abiertos)/i.test(pNorm)) {
     if (businessHours && businessHours.enabled) {
       const days = Array.isArray(businessHours.days)
         ? businessHours.days.map(d => DAY_NAMES[d]).filter(Boolean).join(', ')
         : 'Lunes a Viernes';
-      return `🕒 Nuestro horario de atención personalizada es de *${days}*, de *${businessHours.startTime || '09:00'}* a *${businessHours.endTime || '18:00'}*. Por este canal de WhatsApp puedes dejarnos tu consulta en cualquier momento.`;
+      return `Atendemos *${days}*, de *${businessHours.startTime || '09:00'}* a *${businessHours.endTime || '18:00'}*. Puedes dejar tu consulta por aquí a cualquier hora y te respondemos.`;
     }
-    return `🕒 Por este canal de WhatsApp recibimos y atendemos tus consultas las 24 horas. Si necesitas coordinar una atención específica, indícame qué día y hora te queda mejor.`;
+    return 'Puedes escribirnos por aquí a cualquier hora. ¿Qué día y hora te queda mejor para atenderte?';
   }
 
-  // 4. Cálculos matemáticos o porcentajes rápidos en lenguaje natural
+  // 4. Cálculos y porcentajes en lenguaje natural
   const pctMatch = pNorm.match(/(\d+(?:[.,]\d+)?)\s*%\s*(?:de|del)\s*(\d+(?:[.,]\d+)?)/);
   if (pctMatch) {
     const pct = parseFloat(pctMatch[1].replace(',', '.'));
     const base = parseFloat(pctMatch[2].replace(',', '.'));
     if (Number.isFinite(pct) && Number.isFinite(base)) {
       const val = (pct / 100) * base;
-      return `🧮 El *${pct}%* de *${base.toLocaleString('es-CO')}* es *${val.toLocaleString('es-CO', { maximumFractionDigits: 4 })}*.`;
+      return `El *${pct}%* de *${base.toLocaleString('es-CO')}* es *${val.toLocaleString('es-CO', { maximumFractionDigits: 4 })}*.`;
     }
   }
 
@@ -448,84 +453,86 @@ function generateCognitiveResponse(prompt, personality, history = [], userFacts 
       if (/^[0-9+\-*/().\s]+$/.test(sanitized)) {
         const res = Function(`"use strict"; return (${sanitized})`)();
         if (typeof res === 'number' && Number.isFinite(res)) {
-          return `🧮 El resultado de \`${sanitized}\` es *${res.toLocaleString('es-CO', { maximumFractionDigits: 6 })}*.`;
+          return `El resultado de \`${sanitized}\` es *${res.toLocaleString('es-CO', { maximumFractionDigits: 6 })}*.`;
         }
       }
     } catch { /* ignorar */ }
   }
 
-  // 5. Soporte ante Problemas, Reclamos o Inconvenientes
+  // 5. Problemas, reclamos o inconvenientes
   if (/(no funciona|tengo un problema|error|falla|reclamo|queja|demora|no me llego|ayuda urgente|inconveniente)/i.test(pNorm)) {
     if (isAutoPilot && pilotPersona === 'as_assistant') {
-      return `🤝 Lamento el inconveniente${greetingName} y entiendo la importancia de resolverlo pronto. Ya marqué tu caso con prioridad para *${ownerName}*. Por favor indícame en un mensaje qué ocurrió exactamente para adelantarlo de inmediato.`;
+      return `Lamento el inconveniente${greetingName}. Ya dejé tu caso como prioridad para *${ownerName}*. ¿Me cuentas qué pasó exactamente para adelantarlo?`;
     }
-    return `🤝 Entiendo perfectamente la situación${greetingName} y con gusto te ayudo a resolverla. Cuéntame paso a paso qué ocurrió o qué error te aparece para darte la solución exacta.`;
+    return `Entiendo${greetingName}, vamos a resolverlo. ¿Qué pasó y qué error te aparece?`;
   }
 
-  // 6. Modo Asesor / Ayudante Personal en Privado (conversación continua)
+  // 6. Modo asesor / ayudante personal en privado
   if (isAutoPilot) {
     if (pilotPersona === 'as_assistant') {
       if (/^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal|como estas|como te va|saludos)\b/i.test(pNorm)) {
-        return `👋 ¡Hola${greetingName}! Soy el asesor y ayudante personal de *${ownerName}*. En este momento no puede tomar el mensaje directamente, así que estoy aquí para atenderte con todo gusto. ¿En qué te puedo colaborar hoy?`;
+        return followUp
+          ? `Aquí sigo${greetingName}. ¿En qué te ayudo?`
+          : `¡Hola${greetingName}! Soy el asistente de *${ownerName}*, que no puede responder en este momento. ¿En qué te ayudo?`;
       }
       if (/(estas ahi|se encuentra|esta disponible|puedes hablar|ocupado|libre|llamar|llamada)/i.test(pNorm)) {
-        return `📌 En este momento *${ownerName}* se encuentra atendiendo unos compromisos, pero estoy activo como su ayudante personal para asistirte. Cuéntame qué necesitas y lo gestionamos enseguida.`;
+        return `*${ownerName}* está ocupado en este momento, pero yo puedo ayudarte. ¿Qué necesitas?`;
       }
       if (/(gracias|muchas gracias|perfecto|listo|vale|ok|dale|entendido|excelente)\b/i.test(pNorm) && pNorm.length < 40) {
-        return `🤝 ¡Con mucho gusto${greetingName}! Quedo atento por aquí por si necesitas agregar o consultar algo más.`;
+        return `¡Con gusto${greetingName}! Aquí estoy si necesitas algo más.`;
       }
       if (/(adios|chao|hasta luego|nos vemos|feliz noche|feliz tarde|feliz dia)\b/i.test(pNorm)) {
-        return `👋 ¡Que tengas un excelente resto de día${greetingName}! Todo lo conversado queda debidamente registrado para *${ownerName}*.`;
+        return `¡Hasta pronto${greetingName}! Le dejo todo anotado a *${ownerName}*.`;
       }
-      return `📝 Entendido${greetingName}. He tomado nota detallada de tu mensaje para *${ownerName}*. ¿Deseas agregar algún dato adicional o tienes alguna consulta puntual que pueda resolverte ahora mismo?`;
+      return `Anotado${greetingName}, se lo paso a *${ownerName}*. ¿Quieres agregar algo más?`;
     }
 
-    return `¡Hola${greetingName}! En este momento ando ocupado atendiendo unas gestiones, pero déjame los detalles por aquí y en cuanto me desocupe te respondo con calma.`;
+    return `¡Hola${greetingName}! Ando ocupado en este momento. Déjame tu mensaje y apenas pueda te respondo.`;
   }
 
   // 7. Memoria sobre el propio usuario
   if (/(como me llamo|cual es mi nombre|sabes mi nombre|te acuerdas de mi nombre)/i.test(pNorm)) {
     return userName
-      ? `Te llamas *${userName}*${userBiz ? ` y me comentaste sobre tu negocio de *${userBiz}*` : ''}. Lo tengo muy presente.`
-      : 'Aún no me has indicado tu nombre. ¿Cómo te llamas para dirigirme a ti como prefieras?';
+      ? `Te llamas *${userName}*${userBiz ? ` y tienes un negocio de *${userBiz}*` : ''}.`
+      : 'Aún no me has dicho tu nombre. ¿Cómo te llamas?';
   }
 
   if (/(cual es mi negocio|mi empresa|a que me dedico)/i.test(pNorm)) {
     return userBiz
-      ? `Me comentaste que tu negocio o actividad es *${userBiz}*. ¿Cómo te puedo apoyar hoy con eso?`
-      : 'Todavía no me has comentado a qué se dedica tu negocio o proyecto. Cuéntame y te apoyo.';
+      ? `Me contaste que tu negocio es *${userBiz}*. ¿En qué te apoyo con eso?`
+      : 'Todavía no me has contado a qué se dedica tu negocio. ¿Me cuentas?';
   }
 
   if (/(donde vivo|de donde soy|en que ciudad estoy)/i.test(pNorm)) {
     return userLoc
-      ? `Me indicaste que nos escribes desde *${userLoc}*.`
-      : 'Aún no me has comentado desde qué ciudad nos escribes.';
+      ? `Me dijiste que nos escribes desde *${userLoc}*.`
+      : 'Aún no me has dicho desde qué ciudad nos escribes.';
   }
 
-  // 8. Saludos, identidad, agradecimientos y despedidas generales
+  // 8. Saludos, identidad, agradecimientos y despedidas
   if (/^(?:etho\s+)?(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|que tal|como estas|como te va|saludos)\b/i.test(pNorm)) {
-    return `👋 ¡Hola${greetingName}! Todo excelente por aquí, listo para atenderte. ¿En qué te puedo ayudar hoy?`;
+    return followUp ? `Aquí sigo${greetingName}. ¿En qué te ayudo?` : `¡Hola${greetingName}! ¿En qué te puedo ayudar?`;
   }
 
   if (/(quien eres|como te llamas|que eres|presentate)/i.test(pNorm)) {
-    return `Soy *${botName}*, tu asistente virtual inteligente especializado en brindarte respuestas claras, soporte ágil y atención personalizada en todo lo que necesites.`;
+    return `Soy *${botName}*, tu asistente virtual. Cuéntame qué necesitas.`;
   }
 
   if (/(gracias|muchas gracias|te lo agradezco|muy amable|mil gracias)/i.test(pNorm)) {
-    return `🤝 ¡Con todo gusto${greetingName}! Estoy a tu disposición siempre que necesites resolver otra consulta.`;
+    return `¡Con gusto${greetingName}! Si necesitas algo más, aquí estoy.`;
   }
 
   if (/(adios|chao|hasta luego|nos vemos|bye|hasta pronto)/i.test(pNorm)) {
-    return `👋 ¡Hasta pronto${greetingName}! Que tengas un excelente día.`;
+    return `¡Hasta pronto${greetingName}! Cuando quieras, aquí estaré.`;
   }
 
-  // 9. Presentación del usuario
+  // 9. El usuario se presenta
   if (/(me llamo|mi nombre es)/i.test(pNorm) && userName) {
-    return `🤝 ¡Mucho gusto, *${userName}*!${userBiz ? ` Qué excelente lo de *${userBiz}*.` : ''}${userLoc ? ` Un saludo cordial hasta *${userLoc}*.` : ''} Cuéntame, ¿en qué te puedo ayudar hoy?`;
+    return `¡Mucho gusto, *${userName}*!${userBiz ? ` Qué bueno lo de *${userBiz}*.` : ''}${userLoc ? ` Saludos hasta *${userLoc}*.` : ''} ¿En qué te ayudo?`;
   }
 
-  // 10. Respuesta ejecutiva abierta
-  return `Entendido${greetingName}. Analicé tu consulta sobre *"${prompt}"*: para darte la respuesta más exacta posible, indícame por favor cualquier detalle específico o condición que quieras que tome en cuenta y lo resolvemos enseguida.`;
+  // 10. Respuesta abierta (sin repetir el mensaje del usuario)
+  return `No tengo ese dato confirmado${greetingName}. ¿Puedes darme un poco más de detalle para ayudarte mejor?`;
 }
 
 // Compatibilidad directa

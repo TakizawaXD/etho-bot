@@ -5,7 +5,7 @@ import { fmt, jidNum, levelOf, expForLevel, pick, webpToPng } from '../lib/utils
 import { bar, row, getCategoryEmoji, getCommandEmoji, SEP_BOLD, SEP_LINE, SEP_DOT } from '../lib/ui.js';
 import { askAI } from '../lib/ai.js';
 
-const joinCmds = (items) => items.join(`\n${SEP_DOT}\n`);
+const joinCmds = (items) => items.join("\n\n");
 
 export default [
  { name: 'menu', aliases: ['help', 'comandos', 'commands', 'ayuda', 'etho'], desc: 'Muestra el menú organizado de comandos disponibles.', usage: '[categoría]',
@@ -15,99 +15,68 @@ export default [
  const q = (c.text || '').toLowerCase().trim();
 
  if (!q) {
- let out = [
- `${SEP_BOLD}`,
- `📋 *MENÚ DE COMANDOS — ${botName.toUpperCase()}*`,
- `🔑 *Prefijo:* \`${P}\`  │  👤 *Usuario:* ${c.name || 'Usuario'}`,
- `${SEP_BOLD}`,
- ``,
- `⚡ *1. PRODUCTIVIDAD & ASISTENCIA*`,
- `${SEP_LINE}`,
- joinCmds([
- `🤖 *${P}ia* <mensaje> — Consulta inteligente con IA`,
- `⏰ *${P}recordar* <tiempo> <texto> — Crear recordatorio`,
- `📝 *${P}nota* <add|list|del> — Bloc de notas personal`,
- `🧮 *${P}calc* <operación> — Calculadora rápida`,
- `🌤️ *${P}clima* <ciudad> — Pronóstico del tiempo`,
- `🌐 *${P}traducir* <es|en> <texto> — Traductor`
- ]),
- ``,
- `${SEP_BOLD}`,
- `🛡️ *2. ADMINISTRACIÓN DE GRUPO*`,
- `${SEP_LINE}`,
- joinCmds([
- `📣 *${P}tagall* [motivo] — Mencionar a todos`,
- `📢 *${P}hidetag* [texto] — Aviso masivo limpio`,
- `🚫 *${P}antilink* <on|off> — Bloqueo de enlaces`,
- `🛡️ *${P}antispam* <on|off> — Protección anti-flood`,
- `🥾 *${P}kick* @mención — Expulsar miembro`,
- `⚠️ *${P}warn* @mención — Dar advertencia`
- ]),
- ``,
- `${SEP_BOLD}`,
- `🎨 *3. MULTIMEDIA, TIENDA & UTILIDADES*`,
- `${SEP_LINE}`,
- joinCmds([
- `🖼️ *${P}s* — Convertir foto o video a sticker`,
- `🏞️ *${P}toimg* — Convertir sticker a imagen PNG`,
- `🔳 *${P}qr* <texto> — Generar código QR`,
- `📦 *${P}catalogo* — Ver catálogo de productos`,
- `🤝 *${P}asesor* — Solicitar atención humana`
- ]),
- ``,
- `${SEP_BOLD}`,
- `🧭 *4. COMUNIDAD, JUEGOS & SISTEMA*`,
- `${SEP_LINE}`,
- joinCmds([
- `💰 *${P}balance* │ *${P}daily* — Economía y monedas`,
- `🎲 *${P}dado* │ *${P}trivia* │ *${P}ppt* — Juegos dinámicos`,
- `🪪 *${P}profile* │ *${P}level* — Perfil y nivel`,
- `📡 *${P}ping* │ 📈 *${P}status* │ ℹ️ *${P}botinfo*`
- ])
- ];
+      // Menú compacto: una línea por comando, secciones separadas por espacio (sin separadores por cada comando).
+      const item = (cmd, args, desc) => `• *${P}${cmd}*${args ? ` ${args}` : ''} — ${desc}`;
+      const section = (icon, title, lines) => [`*${icon} ${title}*`, ...lines].join('\n');
+      const sections = [
+        section('⚡', 'Productividad', [
+          item('ia', '<mensaje>', 'Consulta con IA'),
+          item('recordar', '<tiempo> <texto>', 'Crear recordatorio'),
+          item('nota', '<add|list|del>', 'Bloc de notas'),
+          item('calc', '<operación>', 'Calculadora'),
+          item('clima', '<ciudad>', 'Pronóstico del tiempo'),
+          item('traducir', '<es|en> <texto>', 'Traductor')
+        ]),
+        section('🛡️', 'Grupos', [
+          item('tagall', '[motivo]', 'Mencionar a todos'),
+          item('hidetag', '[texto]', 'Aviso masivo limpio'),
+          item('antilink', '<on|off>', 'Bloquear enlaces'),
+          item('antispam', '<on|off>', 'Protección anti-flood'),
+          item('kick', '@mención', 'Expulsar miembro'),
+          item('warn', '@mención', 'Dar advertencia')
+        ]),
+        section('🎨', 'Multimedia y tienda', [
+          item('s', '', 'Foto o video a sticker'),
+          item('toimg', '', 'Sticker a imagen'),
+          item('qr', '<texto>', 'Generar código QR'),
+          item('catalogo', '', 'Ver catálogo de productos'),
+          item('asesor', '', 'Hablar con una persona')
+        ]),
+        section('🧭', 'Comunidad y sistema', [
+          `• *${P}balance* · *${P}daily* — Economía`,
+          `• *${P}dado* · *${P}trivia* · *${P}ppt* — Juegos`,
+          `• *${P}profile* · *${P}level* — Perfil y nivel`,
+          `• *${P}ping* · *${P}status* · *${P}botinfo* — Sistema`
+        ])
+      ];
 
- if (c.isOwner) {
- out.push(
- ``,
- `${SEP_BOLD}`,
- `👑 *5. CONTROL EXCLUSIVO DEL DUEÑO*`,
- `${SEP_LINE}`,
- joinCmds([
- `✅ *${P}activar* — Habilitar bot en este grupo`,
- `🔒 *${P}desactivar* — Bloquear bot en este grupo`,
- `🎙️ *${P}piloto* <on|off|modo|ctx> — Hablar por Mí`,
- `📬 *${P}recados* — Mensajes atendidos por la IA`,
- `🎭 *${P}personalidad* — Ajustar tono e instrucciones`,
- `🔤 *${P}palabras* — Gestionar palabras bloqueadas`
- ])
- );
- }
+      if (c.isOwner) {
+        sections.push(section('👑', 'Solo dueño', [
+          item('activar', '', 'Habilitar el bot en este grupo'),
+          item('desactivar', '', 'Bloquear el bot en este grupo'),
+          item('piloto', '<on|off|modo|ctx>', 'Hablar por mí'),
+          item('recados', '', 'Mensajes atendidos por la IA'),
+          item('personalidad', '', 'Ajustar tono e instrucciones'),
+          item('palabras', '', 'Gestionar palabras bloqueadas')
+        ]));
+      }
 
- out.push(
- ``,
- `${SEP_BOLD}`,
- `💡 Escribe *${P}menu <categoría>* para ver todos los comandos de una sección (ej: *${P}menu administracion*, *${P}menu comunidad*, *${P}menu descargas*).`,
- `${SEP_BOLD}`
- );
+      const header = `*📋 Menú de ${botName}*\nPrefijo: \`${P}\` · Hola, ${c.name || 'Usuario'}\n${SEP_LINE}`;
+      const footer = `_Escribe ${P}menu <categoría> para ver más (ej: ${P}menu administracion, ${P}menu descargas)._`;
+      return c.raw([header, sections.join('\n\n'), footer].join('\n\n'));
+    }
 
- return c.raw(out.join('\n'));
- }
-
- // Búsqueda específica por categoría o comando
+    // Búsqueda específica por categoría o comando
  const norm = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
  const catHit = [...categories.entries()].filter(([n]) => norm(n).includes(norm(q)));
- if (catHit.length) {
- const out = catHit.map(([n, list]) => {
- const catEm = getCategoryEmoji(n);
- return [
- `${SEP_BOLD}`,
- `${catEm} *CATEGORÍA: ${n.toUpperCase()}* (${list.length} comandos)`,
- `${SEP_LINE}`,
- joinCmds(list.map((cmd) => `${getCommandEmoji(cmd.name, n)} *${P}${cmd.name}*${cmd.usage ? ` \`${cmd.usage}\`` : ''}\n   ↳ ${cmd.desc}${cmd.aliases?.length ? `\n   _Alias: ${cmd.aliases.map((a) => P + a).join(', ')}_` : ''}`)),
- `${SEP_BOLD}`
- ].join('\n');
- }).join('\n\n');
- return c.raw(out);
+    if (catHit.length) {
+      const out = catHit.map(([n, list]) => {
+        const catEm = getCategoryEmoji(n);
+        const lines = list.map((cmd) =>
+          `• *${P}${cmd.name}*${cmd.usage ? ` ${cmd.usage}` : ''}\n  ${cmd.desc}${cmd.aliases?.length ? `\n  _Alias: ${cmd.aliases.map((a) => P + a).join(', ')}_` : ''}`);
+        return [`*${catEm} ${n}* · ${list.length} comandos`, SEP_LINE, lines.join('\n\n')].join('\n');
+      }).join('\n\n');
+      return c.raw(out);
  }
 
  const results = [...new Set(commands.values())].filter((cmd) =>

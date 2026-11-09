@@ -6,6 +6,8 @@ import './db.js';
 import { botManager } from './manager.js';
 import { startServer, app } from './server.js';
 import { ffmpegPath } from './lib/utils.js';
+import { startMaintenance } from './lib/maintenance.js';
+import { alert } from './lib/alerts.js';
 
 export { app };
 export default app;
@@ -29,7 +31,17 @@ if (!process.env.VERCEL) {
     // 1. Iniciar el servidor web (Dashboard y API)
     await startServer();
 
-    // 2. Iniciar todos los bots configurados y activos
+    // 2. Mantenimiento automático (vencimiento de planes, limpieza, copias de seguridad)
+    startMaintenance({
+      onBotsChanged: (ids) => {
+        for (const botId of ids) {
+          const b = botManager.getBot(botId);
+          botManager.emit('bot_update', { botId, payment_status: b?.payment_status, expires_at: b?.expires_at, plan: b?.plan });
+        }
+      }
+    });
+
+    // 3. Iniciar todos los bots configurados y activos
     await botManager.initAllBots();
   }
 
@@ -41,23 +53,27 @@ if (!process.env.VERCEL) {
   });
 
   // Manejo de apagado limpio
-  process.on('SIGINT', async () => {
-    console.log('\nApagando sistema de bots...');
+  const shutdown = async (signal) => {
+    console.log(`\n${signal}: apagando sistema de bots...`);
     for (const bot of botManager.getAllBots()) {
       if (bot.status === 'online' || bot.status === 'connecting') {
         await botManager.stopBot(bot.id).catch(() => {});
       }
     }
     process.exit(0);
-  });
+  };
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
 
   // Protección contra caídas del proceso por errores asíncronos o cierres de red
   process.on('uncaughtException', (err) => {
-    console.warn('[Global Safe] Excepción interceptada:', err?.message || err);
+    console.error('[Global Safe] Excepción interceptada:', err?.stack || err);
+    alert('error', 'Excepción no controlada', err?.message || String(err));
   });
 
   process.on('unhandledRejection', (reason) => {
-    console.warn('[Global Safe] Rechazo interceptado:', reason?.message || reason);
+    console.error('[Global Safe] Rechazo interceptado:', reason?.stack || reason);
+    alert('error', 'Promesa rechazada sin manejar', reason?.message || String(reason));
   });
 
   process.on('exit', (code) => {

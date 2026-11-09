@@ -1118,7 +1118,9 @@ export function initDefaultAdmin() {
   if (!admin) {
     const adminId = 'usr_admin_master';
     const adminUser = (process.env.ADMIN_USERNAME || 'admin').toLowerCase().trim();
-    const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+    // Sin ADMIN_PASSWORD se genera una contraseña aleatoria (se muestra una sola vez en consola).
+    const generatedPass = process.env.ADMIN_PASSWORD ? null : crypto.randomBytes(9).toString('base64url');
+    const adminPass = process.env.ADMIN_PASSWORD || generatedPass;
     const pwdHash = hashPassword(adminPass);
     db.prepare(`
       INSERT INTO platform_users (id, username, email, password_hash, name, role, whatsapp, status, created_at)
@@ -1126,7 +1128,7 @@ export function initDefaultAdmin() {
     `).run(adminId, adminUser, pwdHash, Date.now());
     const seeded = getPlatformUserById(adminId);
     if (seeded) supaSyncPlatformUser({ ...seeded, password_hash: pwdHash });
-    const passHint = process.env.ADMIN_PASSWORD ? '[definida en ADMIN_PASSWORD]' : 'admin123';
+    const passHint = generatedPass ? `${generatedPass}  (generada ahora; cámbiala o define ADMIN_PASSWORD)` : '[definida en ADMIN_PASSWORD]';
     console.log(`[Auth] 👑 Usuario Administrador inicial creado: Usuario = ${adminUser} | Contraseña = ${passHint}`);
   }
 }

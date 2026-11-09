@@ -59,7 +59,9 @@ const FACET_PRESETS = {
   }
 };
 
-const MAX_BOTS = 4;
+// Tope de bots del plan del usuario; lo informa el servidor (cuenta gratuita: 3).
+let MAX_BOTS = 3;
+function setMaxBots(n) { if (Number.isFinite(Number(n)) && Number(n) > 0) MAX_BOTS = Number(n); }
 
 const state = {
   bots: [],
@@ -89,9 +91,29 @@ const state = {
   selectedIndustry: 'ecommerce',
 };
 
+// Toda llamada a /api/ desde el panel lleva la sesión (la API ahora exige autenticación).
+const _nativeFetch = window.fetch.bind(window);
+window.fetch = function (input, init = {}) {
+  try {
+    const url = typeof input === 'string' ? input : (input && input.url) || '';
+    const method = String(init.method || (typeof input !== 'string' && input.method) || 'GET').toUpperCase();
+    const isPublic = /^\/api\/(auth\/|status|health|events|billing\/plans)/.test(url) || (method === 'POST' && /^\/api\/tickets(\/lookup)?$/.test(url));
+    // Visitante sin sesión: no se llama a rutas protegidas (evita 401 innecesarios al cargar la landing).
+    if (!state.token && url.startsWith('/api/') && !isPublic) {
+      return Promise.resolve(new Response(JSON.stringify({ ok: false, error: 'No autenticado' }), { status: 401, headers: { 'Content-Type': 'application/json' } }));
+    }
+    if (state.token && url.startsWith('/api/')) {
+      const headers = new Headers(init.headers || (typeof input !== 'string' ? input.headers : undefined) || {});
+      if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${state.token}`);
+      init = { ...init, headers };
+    }
+  } catch { /* si algo falla, se envía tal cual */ }
+  return _nativeFetch(input, init);
+};
+
 function openCreateBotStudio() {
   if (state.bots.length >= MAX_BOTS) {
-    showToast(`Límite máximo alcanzado: solo se permiten hasta ${MAX_BOTS} bots en el panel de control.`, 'warning');
+    (window.promptUpgrade ? window.promptUpgrade : (m) => showToast(m, 'warning'))(`Tu plan permite hasta ${MAX_BOTS} bots. Mejora tu plan para crear más.`);
     return;
   }
   resetBotModalToCreate();
@@ -679,6 +701,7 @@ function connectSSE() {
       const data = JSON.parse(e.data);
       if (Array.isArray(data.bots)) {
         state.bots = data.bots;
+        setMaxBots(data.maxBots);
         renderBots();
         updateStats();
         updateFacetCounters();
@@ -766,6 +789,7 @@ async function fetchStatus() {
       state.supabaseStatus = data.supabase;
       updateSupabaseBadge(data.supabase);
       if (data.stats) {
+        setMaxBots(data.stats.maxBots);
         const el = document.getElementById('statTotalLogs');
         if (el) el.textContent = data.stats.totalLogs || 0;
         const miniEl = document.getElementById('sidebarTotalLogsMini');
@@ -796,6 +820,7 @@ async function fetchBots() {
     const data = await res.json();
     if (data.ok) {
       state.bots = Array.isArray(data.bots) ? data.bots : [];
+      setMaxBots(data.maxBots);
       renderBots();
       updateStats();
       updateFacetCounters();
@@ -932,13 +957,14 @@ function renderBots() {
         </div>
       `;
     } else {
-      const msLeft = Math.max(0, bot.expires_at - Date.now());
+      const hasExpiry = Number.isFinite(Number(bot.expires_at)) && Number(bot.expires_at) > 0;
+      const msLeft = hasExpiry ? Math.max(0, Number(bot.expires_at) - Date.now()) : 0;
       const days = Math.floor(msLeft / (24 * 60 * 60 * 1000));
       const hours = Math.floor((msLeft % (24 * 60 * 60 * 1000)) / (3600 * 1000));
       subBannerHtml = `
         <div class="bot-sub-banner trial">
           <span><i class="fa-solid fa-hourglass-start"></i> Prueba Gratuita</span>
-          <span>${days}d ${hours}h restantes</span>
+          <span>${hasExpiry ? `${days}d ${hours}h restantes` : 'Sin fecha de vencimiento'}</span>
         </div>
       `;
     }
@@ -1132,7 +1158,7 @@ function renderBots() {
     grid.innerHTML += `
       <div class="bot-limit-reached-bar" style="grid-column: 1 / -1;">
         <i class="fa-solid fa-shield-halved text-purple"></i>
-        <span><strong>Capacidad completa (${MAX_BOTS} / ${MAX_BOTS} bots):</strong> Has alcanzado el máximo de 4 instancias permitidas en el panel de control.</span>
+        <span><strong>Capacidad completa (${MAX_BOTS} / ${MAX_BOTS} bots):</strong> Has alcanzado el máximo de bots de tu plan. <a href="javascript:void(0)" onclick="switchTab('billing')">Mejorar plan</a></span>
       </div>
     `;
   }
@@ -1708,11 +1734,7 @@ function openSimulatorModal(botId, botName) {
   state.activeSimBotId = botId;
   document.getElementById('simModalTitle').textContent = `Simulador: ${botName}`;
   const container = document.getElementById('simMessagesContainer');
-  container.innerHTML = `
-    <div class="chat-bubble bot">
-      <span>¡Hola! Soy <strong>${escapeHtml(botName)}</strong> en modo simulación. Escribe algo para probar mis respuestas.</span>
-    </div>
-  `;
+  container.innerHTML = `<div class="chat-bubble bot"><span>¡Hola! Soy <strong>${escapeHtml(botName)}</strong> en modo simulación. Escribe algo para probar mis respuestas.</span></div>`;
   openModal('chatSimulatorModal');
   setTimeout(() => document.getElementById('simChatInput').focus(), 300);
 }
@@ -2265,7 +2287,7 @@ function initForms() {
       const purpose = document.getElementById('botPurposeInput')?.value.trim() || '';
 
       if (!editId && state.bots.length >= MAX_BOTS) {
-        showToast(`Límite máximo alcanzado: solo se permiten hasta ${MAX_BOTS} bots en el panel de control.`, 'error');
+        (window.promptUpgrade ? window.promptUpgrade : (m) => showToast(m, 'warning'))(`Tu plan permite hasta ${MAX_BOTS} bots. Mejora tu plan para crear más.`);
         return;
       }
 
@@ -2349,6 +2371,11 @@ function initForms() {
           body: JSON.stringify(payload)
         });
         const data = await res.json();
+        if (res.status === 402) {
+          closeModal('addBotModal');
+          (window.promptUpgrade ? window.promptUpgrade : (m) => showToast(m, 'warning'))(data.error);
+          return;
+        }
         if (data.ok) {
           if (wasOnlineAndChanged) {
             showToast(`El bot "${name}" fue apagado de forma segura y su personalidad actualizada (no fue borrado).`, 'success');
@@ -2547,7 +2574,7 @@ function initForms() {
       const container = document.getElementById('simMessagesContainer');
       const userBubble = document.createElement('div');
       userBubble.className = 'chat-bubble user';
-      userBubble.innerHTML = `<span>${escapeHtml(text)}</span>`;
+      userBubble.innerHTML = `<span>${waFormat(text)}</span>`;
       container.appendChild(userBubble);
       input.value = '';
       container.scrollTop = container.scrollHeight;
@@ -2569,7 +2596,7 @@ function initForms() {
 
         const botBubble = document.createElement('div');
         botBubble.className = 'chat-bubble bot';
-        botBubble.innerHTML = `<span>${escapeHtml(data.reply || 'Sin respuesta')}</span>`;
+        botBubble.innerHTML = `<span>${waFormat(data.reply || 'Sin respuesta')}</span>`;
         container.appendChild(botBubble);
         container.scrollTop = container.scrollHeight;
       } catch (err) {
@@ -2603,6 +2630,21 @@ function showToast(message, type = 'info') {
   }, 3500);
 }
 
+// Formato nativo de WhatsApp para el simulador: *negrita*, _cursiva_, ~tachado~, ```código``` y enlaces.
+// El texto se escapa primero, así que nunca se inserta HTML del usuario o de la IA.
+function waFormat(str) {
+  let h = escapeHtml(str);
+  h = h.replace(/```([\s\S]*?)```/g, (_, c) => `<code class="wa-code">${c.trim()}</code>`);
+  const wrap = (tag, ch) => {
+    const e = ch.replace(/[*_~]/g, '\\$&');
+    h = h.replace(new RegExp(`(^|[\\s(])${e}(?=\\S)([^${e}\\n]*?\\S)${e}(?=$|[\\s.,;:!?)])`, 'g'), `$1<${tag}>$2</${tag}>`);
+  };
+  wrap('strong', '*'); wrap('em', '_'); wrap('s', '~');
+  h = h.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+  return h;
+}
+window.waFormat = waFormat;
+
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)
@@ -2624,6 +2666,8 @@ function showHeroLandingPage() {
   const app = document.getElementById('appLayout');
   if (hero) hero.style.display = 'flex';
   if (app) app.style.display = 'none';
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2697,7 +2741,7 @@ async function handleHeroRegister(e) {
       if (data.bot) upsertBotInState(data.bot);
       showDashboard();
       switchTab('bots');
-      showToast('Cuenta creada. Tu bot tiene 3 días de prueba gratis; escanea el QR para conectarlo al panel.', 'success');
+      showToast('Cuenta creada. Tu bot tiene 7 días de prueba gratis; escanea el QR para conectarlo al panel.', 'success');
       await fetchBots();
       if (data.bot) {
         setTimeout(() => openQrModalForBot(data.bot.id, data.bot.name), 350);
@@ -2793,6 +2837,10 @@ function renderUserUI(user) {
         <button type="button" class="btn btn-secondary btn-sm nav-btn-install install-app-trigger" onclick="triggerInstallApp()" title="Instalar aplicación en Escritorio o Celular">
           <i class="fa-solid fa-desktop"></i> <span class="nav-text-full">Instalar en Escritorio</span><span class="nav-text-short">App</span>
         </button>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema"><i data-theme-icon class="fa-solid fa-sun"></i></button>
+        <button type="button" class="btn btn-secondary btn-sm nav-btn-report" onclick="openTicketModal()" title="Reportar un error o pedir ayuda">
+          <i class="fa-solid fa-bug"></i> <span class="nav-text-full">Reportar error</span><span class="nav-text-short">Error</span>
+        </button>
         <button type="button" class="btn btn-primary btn-sm nav-btn-login" onclick="showDashboard()">
           <i class="fa-solid fa-gauge-high"></i> <span class="nav-text-full">Ir a Mi Panel</span><span class="nav-text-short">Panel</span>
         </button>
@@ -2803,6 +2851,7 @@ function renderUserUI(user) {
           <i class="fa-solid fa-bars"></i>
         </button>
       `;
+      if (window.syncThemeIcons) window.syncThemeIcons();
     }
   } else {
     if (nameEl) nameEl.textContent = 'Invitado / Login';
@@ -2824,6 +2873,7 @@ function renderUserUI(user) {
         <button type="button" class="btn btn-secondary btn-sm nav-btn-install install-app-trigger" onclick="triggerInstallApp()" title="Instalar aplicación en Escritorio o Celular">
           <i class="fa-solid fa-desktop"></i> <span class="nav-text-full">Instalar en Escritorio</span><span class="nav-text-short">App</span>
         </button>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema"><i data-theme-icon class="fa-solid fa-sun"></i></button>
         <button type="button" class="btn btn-secondary btn-sm nav-btn-login" onclick="openAuthModal('login')">
           <i class="fa-solid fa-right-to-bracket"></i> <span class="nav-text-full">Iniciar Sesión</span><span class="nav-text-short">Entrar</span>
         </button>
@@ -2834,6 +2884,7 @@ function renderUserUI(user) {
           <i class="fa-solid fa-bars"></i>
         </button>
       `;
+      if (window.syncThemeIcons) window.syncThemeIcons();
     }
   }
   syncInstallButtonsUI();
@@ -2953,14 +3004,14 @@ function initAuthModal() {
       if (!val) {
         regMeterFill.style.width = '0%';
         regMeterFill.style.backgroundColor = 'var(--red)';
-        regMeterLabel.textContent = 'Mínimo 4 caracteres';
+        regMeterLabel.textContent = 'Mínimo 8 caracteres';
         regMeterLabel.style.color = 'var(--text-muted)';
-      } else if (val.length < 4) {
+      } else if (val.length < 8) {
         regMeterFill.style.width = '25%';
         regMeterFill.style.backgroundColor = '#ef4444';
-        regMeterLabel.textContent = 'Muy corta (mínimo 4 caracteres)';
+        regMeterLabel.textContent = 'Muy corta (mínimo 8 caracteres)';
         regMeterLabel.style.color = '#f87171';
-      } else if (val.length < 7) {
+      } else if (val.length < 10) {
         regMeterFill.style.width = '60%';
         regMeterFill.style.backgroundColor = '#f59e0b';
         regMeterLabel.textContent = 'Nivel medio de seguridad';
@@ -3082,7 +3133,7 @@ function initAuthModal() {
           if (data.bot) upsertBotInState(data.bot);
           showDashboard();
           switchTab('bots');
-          showToast(`Cuenta creada con éxito. Bienvenido ${data.user.name}. Tu prueba de 3 días está activa.`, 'success');
+          showToast(`Cuenta creada con éxito. Bienvenido ${data.user.name}. Tu prueba de 7 días está activa.`, 'success');
           formReg.reset();
           if (regMatchLabel) regMatchLabel.textContent = '';
           if (regMeterFill) regMeterFill.style.width = '0%';

@@ -15,9 +15,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="theme.js?v=8.4.1"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css?v=8.2.0">
+  <link rel="stylesheet" href="style.css?v=8.4.1">
+  <link rel="stylesheet" href="theme-pro.css?v=8.4.1">
 </head>
 <body>
   <!-- ================= PÁGINA PRINCIPAL / HERO PÚBLICA (VISITANTES & REGISTRO) ================= -->
@@ -44,6 +46,10 @@
         </button>
         <button type="button" class="btn btn-secondary btn-sm nav-btn-install install-app-trigger" onclick="triggerInstallApp()" title="Instalar aplicación en Escritorio o Celular">
           <i class="fa-solid fa-desktop"></i> <span class="nav-text-full">Instalar en Escritorio</span><span class="nav-text-short">App</span>
+        </button>
+        <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema"><i data-theme-icon class="fa-solid fa-sun"></i></button>
+        <button type="button" class="btn btn-secondary btn-sm nav-btn-report" onclick="openTicketModal()" title="Reportar un error o pedir ayuda">
+          <i class="fa-solid fa-bug"></i> <span class="nav-text-full">Reportar error</span><span class="nav-text-short">Error</span>
         </button>
         <button type="button" class="btn btn-secondary btn-sm nav-btn-login" onclick="openAuthModal('login')">
           <i class="fa-solid fa-right-to-bracket"></i> <span class="nav-text-full">Iniciar Sesión</span><span class="nav-text-short">Entrar</span>
@@ -79,10 +85,13 @@
           <i class="fa-solid fa-shield-halved text-green"></i> Reglas & Moderación
         </a>
         <a href="#heroPricingSection" class="mobile-link" onclick="toggleHeroMobileMenu(false)">
-          <i class="fa-solid fa-tag text-orange"></i> Planes & Precios (3 Días Gratis)
+          <i class="fa-solid fa-tag text-orange"></i> Planes & Precios (7 Días Gratis)
         </a>
       </div>
       <div class="hero-mobile-menu-actions">
+        <button type="button" class="btn btn-secondary btn-block" onclick="openTicketModal(); toggleHeroMobileMenu(false);">
+          <i class="fa-solid fa-bug"></i> Reportar un error / Soporte
+        </button>
         <button type="button" class="btn btn-install-accent btn-block install-app-trigger" onclick="triggerInstallApp(); toggleHeroMobileMenu(false);">
           <i class="fa-solid fa-download"></i> Instalar App en Escritorio / Celular
         </button>
@@ -127,12 +136,16 @@
           </div>
           
           <h1 class="hero-title">
-            Crea tu Propio <span>Bot de WhatsApp</span> en Minutos para tu Negocio
+            Atiende a tus clientes por WhatsApp, incluso cuando no estás
           </h1>
 
           <p class="hero-description">
-            Automatiza la atención a clientes 24/7, responde dudas con Inteligencia Artificial, ofrece tu catálogo con fotos y captura ventas directamente en WhatsApp. Pruébalo <strong>3 días gratis</strong> sin compromiso.
+            Tu bot responde dudas, muestra tu catálogo con fotos y anota los pedidos en WhatsApp, a cualquier hora. Pruébalo <strong>7 días gratis</strong>, sin tarjeta.
           </p>
+
+          <button type="button" class="hero-report-link" onclick="openTicketModal()">
+            <i class="fa-solid fa-life-ring"></i> ¿Algo no funciona? <strong>Reporta un error</strong> y te respondemos por correo
+          </button>
 
           <div class="hero-trust-list">
             <div class="hero-trust-item">
@@ -188,7 +201,7 @@
               <small>Atención sin pausas</small>
             </div>
             <div class="hero-stat-box">
-              <strong>3 Días</strong>
+              <strong>7 días</strong>
               <small>Prueba sin costo</small>
             </div>
             <div class="hero-stat-box">
@@ -202,7 +215,7 @@
         <div class="hero-form-col" id="heroRegisterCard">
           <div class="hero-register-card">
             <div class="register-card-header">
-              <div class="card-badge-gift"><i class="fa-solid fa-gift"></i> 3 DÍAS DE PRUEBA GRATIS</div>
+              <div class="card-badge-gift"><i class="fa-solid fa-gift"></i> 7 DÍAS DE PRUEBA GRATIS</div>
               <h3>Registra tu Cuenta & Solicita tu Bot</h3>
               <p>Completa tus datos y define para qué negocio quieres el bot. Se activará al instante.</p>
             </div>
@@ -226,7 +239,7 @@
 
               <div class="form-group">
                 <label>Contraseña de Acceso *</label>
-                <input type="password" id="heroPassword" class="form-input" placeholder="Mínimo 4 caracteres" required>
+                <input type="password" id="heroPassword" class="form-input" placeholder="Mínimo 8 caracteres" required>
               </div>
 
               <!-- PREGUNTA CLAVE SOLICITADA POR EL USUARIO -->
@@ -782,10 +795,10 @@
         <div class="hero-pricing-grid">
           <div class="hero-price-card">
             <div class="price-tier">Prueba Gratuita</div>
-            <div class="price-val">$0 <span>/ 3 días</span></div>
+            <div class="price-val">$0 <span>/ 7 días</span></div>
             <p>Para probar la vinculación y ver tu bot funcionando en vivo.</p>
             <ul class="price-features">
-              <li><i class="fa-solid fa-check text-green"></i> 1 Bot de WhatsApp propio exclusivo</li>
+              <li><i class="fa-solid fa-check text-green"></i> <strong>Hasta 3 bots</strong> de WhatsApp propios durante 7 días</li>
               <li><i class="fa-solid fa-check text-green"></i> Vinculación inmediata vía código QR</li>
               <li><i class="fa-solid fa-check text-green"></i> <strong>Recepción de notas de voz (Audios)</strong></li>
               <li><i class="fa-solid fa-check text-green"></i> Respuestas inteligentes sin emojis</li>
@@ -802,7 +815,7 @@
             <div class="price-val">$29.99 <span>/ mes</span></div>
             <p>Ideal para negocios, tiendas y emprendedores en crecimiento activo.</p>
             <ul class="price-features">
-              <li><i class="fa-solid fa-check text-green"></i> 30 días de servicio ininterrumpido 24/7</li>
+              <li><i class="fa-solid fa-check text-green"></i> 30 días de servicio ininterrumpido 24/7 · <strong>hasta 10 bots</strong></li>
               <li><i class="fa-solid fa-check text-green"></i> <strong>Comprensión avanzada de audios con IA</strong></li>
               <li><i class="fa-solid fa-check text-green"></i> Catálogo ilimitado con fotos, precios y pedidos</li>
               <li><i class="fa-solid fa-check text-green"></i> Modo "Hablar por Mí" (Piloto Automático en privados)</li>
@@ -821,7 +834,7 @@
             <div class="price-val">$79.99 <span>/ 3 meses</span></div>
             <p>Ahorra 15%, asegura tu bot activo con soporte preferencial y tecnología multimodal VIP.</p>
             <ul class="price-features">
-              <li><i class="fa-solid fa-check text-green"></i> <strong>90 días de servicio continuo sin interrupciones</strong></li>
+              <li><i class="fa-solid fa-check text-green"></i> <strong>90 días de servicio continuo · hasta 30 bots</strong></li>
               <li><i class="fa-solid fa-check text-green"></i> <strong>IA Multimodal VIP: Audios, Fotos y Textos</strong></li>
               <li><i class="fa-solid fa-check text-green"></i> <strong>Soporte VIP Directo 1-a-1 con el Administrador</strong></li>
               <li><i class="fa-solid fa-check text-green"></i> Memoria infinita de clientes y aprendizaje continuo</li>
@@ -840,6 +853,7 @@
 
       <!-- FOOTER PÚBLICO -->
       <footer class="hero-footer">
+        <p><a href="javascript:void(0)" class="hero-footer-link" onclick="openTicketModal()"><i class="fa-solid fa-bug"></i> Reportar un error</a> &nbsp;·&nbsp; <a href="javascript:void(0)" class="hero-footer-link" onclick="openTicketModal(null, 'lookup')"><i class="fa-solid fa-magnifying-glass"></i> Consultar un ticket</a></p>
         <p>© 2026 Etho Multi-Bot Hub. Plataforma de Automatización y Bots de WhatsApp.</p>
         <p class="text-muted" style="font-size: 12px; margin-top: 4px;">Plataforma Empresarial de Automatización y Alta Disponibilidad para WhatsApp.</p>
       </footer>
@@ -929,6 +943,16 @@
         </button>
 
         <div class="nav-section-title">CONFIGURACIÓN & VENTA</div>
+        <button class="nav-btn" data-tab="billing">
+          <i class="fa-solid fa-credit-card" style="color: #34d399;"></i>
+          <span>Planes & Pagos</span>
+          <span class="nav-pill" id="navBillingCount" style="display: none;"></span>
+        </button>
+        <button class="nav-btn" data-tab="support">
+          <i class="fa-solid fa-headset" style="color: #60a5fa;"></i>
+          <span>Soporte & Tickets</span>
+          <span class="nav-pill" id="navSupportCount" style="display: none;"></span>
+        </button>
         <button class="nav-btn" data-tab="pricing">
           <i class="fa-solid fa-tags"></i>
           <span>Guía de Precios</span>
@@ -987,6 +1011,7 @@
         </div>
 
         <div class="topbar-right">
+          <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema"><i data-theme-icon class="fa-solid fa-sun"></i></button>
           <!-- BOTÓN MÚSICA AMBIENTAL VIP -->
           <button type="button" class="btn btn-secondary btn-sm music-trigger-btn" id="topbarMusicBtn" onclick="handleMusicButtonClick(event)" title="Controlar música de la página">
             <span class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
@@ -1026,6 +1051,7 @@
 
         <!-- ================= PESTAÑA 1: GESTIÓN DE BOTS ================= -->
         <section id="tab-bots" class="tab-content active">
+        <div id="planBanner" class="plan-banner" style="display: none;"></div>
           <div class="section-header">
             <div>
               <h2>Instancias de WhatsApp</h2>
@@ -1332,6 +1358,103 @@
       </section>
 
       
+
+      <!-- ================= PESTAÑA: PLANES & PAGOS ================= -->
+      <section id="tab-billing" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Planes & Pagos</h2>
+            <p>La cuenta gratuita incluye 7 días de uso y hasta 3 bots. Para más tiempo o más bots, elige un plan.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="loadBilling()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+          </div>
+        </div>
+        <div id="billingStatus"></div>
+        <div id="billingPlans" class="billing-plans"></div>
+        <div class="card billing-card">
+          <h3><i class="fa-solid fa-receipt text-blue"></i> Mis órdenes de pago</h3>
+          <div id="billingOrders" class="table-scroll"></div>
+        </div>
+        <div class="card billing-card" id="accountSecurity">
+          <h3><i class="fa-solid fa-shield-halved text-green"></i> Seguridad de la cuenta</h3>
+          <p class="text-muted">Cambia tu contraseña o cierra tu sesión en todos los dispositivos (útil si perdiste un teléfono o usaste un equipo ajeno).</p>
+          <div class="security-actions">
+            <button class="btn btn-secondary" onclick="openPasswordModal()"><i class="fa-solid fa-key"></i> Cambiar contraseña</button>
+            <button class="btn btn-secondary" onclick="logoutAllDevices()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión en todos los dispositivos</button>
+          </div>
+        </div>
+        <div id="billingAdmin" class="card billing-card" style="display: none;">
+          <div class="billing-admin-head">
+            <h3><i class="fa-solid fa-user-shield" style="color:#fbbf24;"></i> Administración de pagos</h3>
+            <div id="billingAdminKpis" class="billing-kpis"></div>
+          </div>
+          <div class="billing-filter">
+            <label for="billingAdminFilter">Mostrar:</label>
+            <select id="billingAdminFilter" class="form-input" onchange="loadAdminOrders()">
+              <option value="awaiting_review">Por revisar (transferencias)</option>
+              <option value="">Todas</option>
+              <option value="paid">Pagadas</option>
+              <option value="pending">Pendientes</option>
+              <option value="rejected">Rechazadas</option>
+            </select>
+          </div>
+          <div id="billingAdminOrders" class="table-scroll"></div>
+          <div class="admin-tools">
+            <h4>Conceder plan o restablecer contraseña de un cliente</h4>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="adminUserSelect">Cliente</label>
+                <select id="adminUserSelect" class="form-input"></select>
+              </div>
+              <div class="form-group">
+                <label for="adminPlanSelect">Plan</label>
+                <select id="adminPlanSelect" class="form-input"></select>
+              </div>
+              <div class="form-group">
+                <label for="adminPlanDays">Días</label>
+                <input type="number" id="adminPlanDays" class="form-input" min="1" max="3650" value="30">
+              </div>
+            </div>
+            <div class="security-actions">
+              <button class="btn btn-primary" onclick="adminGrantPlan()"><i class="fa-solid fa-gift"></i> Conceder plan</button>
+              <button class="btn btn-secondary" onclick="adminResetPassword()"><i class="fa-solid fa-key"></i> Restablecer contraseña</button>
+            </div>
+            <div id="adminToolResult" class="admin-tool-result" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PESTAÑA: SOPORTE & TICKETS ================= -->
+      <section id="tab-support" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Soporte & Tickets</h2>
+            <p id="supportSubtitle">Reporta errores o pide ayuda. Te respondemos aquí y por correo.</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="openTicketModal()"><i class="fa-solid fa-plus"></i> Nuevo ticket</button>
+          </div>
+        </div>
+        <div class="support-layout">
+          <div class="card support-list-card">
+            <div class="support-filter">
+              <select id="ticketStatusFilter" class="form-input" onchange="loadTickets()">
+                <option value="">Todos los estados</option>
+                <option value="open">Abiertos</option>
+                <option value="in_progress">En curso</option>
+                <option value="waiting_user">Esperando respuesta</option>
+                <option value="resolved">Resueltos</option>
+                <option value="closed">Cerrados</option>
+              </select>
+            </div>
+            <div id="ticketList" class="ticket-list"></div>
+          </div>
+          <div class="card support-detail-card" id="ticketDetail">
+            <div class="empty-state-mini"><i class="fa-regular fa-comments"></i><p>Selecciona un ticket para ver la conversación.</p></div>
+          </div>
+        </div>
+      </section>
 
       <!-- ================= PESTAÑA 6: GUÍA DE PRECIOS ================= -->
       <section id="tab-pricing" class="tab-content">
@@ -2265,7 +2388,7 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
 
               <div class="alert alert-info" style="margin-top: 10px; font-size: 12.5px;">
                 <i class="fa-solid fa-circle-info"></i>
-                <span id="subTrialNotice">Al crearlo recibirás <strong>3 días de prueba gratuita</strong> para probar todas las funciones. Puedes renovar con el Administrador.</span>
+                <span id="subTrialNotice">Tu cuenta incluye <strong>7 días de prueba gratuita</strong> (hasta 3 bots). Después puedes elegir un plan de pago desde <em>Planes &amp; Pagos</em>.</span>
               </div>
             </div>
 
@@ -2485,6 +2608,177 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
     </div>
   </div>
 
+  <!-- ================= MODAL: REPORTAR ERROR / TICKETS ================= -->
+  <div class="modal" id="ticketModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-ticket">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bug text-orange"></i> Soporte técnico</h3>
+        <button class="modal-close" data-close="ticketModal" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="ticket-tabs" role="tablist">
+        <button type="button" class="ticket-tab active" id="ticketTabNew" onclick="setTicketTab('new')">Reportar un error</button>
+        <button type="button" class="ticket-tab" id="ticketTabLookup" onclick="setTicketTab('lookup')">Consultar ticket</button>
+      </div>
+
+      <form id="ticketForm" autocomplete="on" novalidate>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="ticketName">Tu nombre *</label>
+              <input type="text" id="ticketName" class="form-input" maxlength="80" placeholder="Ej: Carlos Gómez" autocomplete="name" required>
+            </div>
+            <div class="form-group flex-1">
+              <label for="ticketEmail">Correo para responderte *</label>
+              <input type="email" id="ticketEmail" class="form-input" maxlength="254" placeholder="tu@correo.com" autocomplete="email" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="ticketCategory">¿Qué tipo de problema es?</label>
+            <select id="ticketCategory" class="form-input">
+              <option value="error">Algo no funciona (error)</option>
+              <option value="bot">Mi bot / vinculación de WhatsApp</option>
+              <option value="pago">Pagos y planes</option>
+              <option value="cuenta">Mi cuenta / acceso</option>
+              <option value="sugerencia">Sugerencia</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ticketSubject">Asunto *</label>
+            <input type="text" id="ticketSubject" class="form-input" maxlength="120" placeholder="Ej: El código QR no aparece" required>
+          </div>
+          <div class="form-group">
+            <label for="ticketMessage">Cuéntanos qué pasó *</label>
+            <textarea id="ticketMessage" class="form-input" rows="5" maxlength="4000" placeholder="¿Qué estabas haciendo, qué esperabas y qué ocurrió? Si ves un mensaje de error, cópialo aquí." required></textarea>
+            <small class="text-muted" id="ticketMessageCount">0 / 4000</small>
+          </div>
+          <!-- Campo trampa contra bots: las personas no lo ven -->
+          <div class="hp-field" aria-hidden="true"><label>Sitio web <input type="text" id="ticketWebsite" tabindex="-1" autocomplete="off"></label></div>
+          <div class="ticket-error" id="ticketFormError" role="alert" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="ticketModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="ticketSubmitBtn"><i class="fa-solid fa-paper-plane"></i> Enviar reporte</button>
+        </div>
+      </form>
+
+      <div id="ticketSuccess" class="modal-body ticket-success" style="display:none;">
+        <div class="ticket-success-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h4>¡Reporte enviado!</h4>
+        <p>Tu código de seguimiento es:</p>
+        <div class="ticket-code" id="ticketCodeValue">TCK-XXXXXX</div>
+        <p class="text-muted">Guárdalo. Con este código y tu correo puedes ver el estado en “Consultar ticket”. Te responderemos lo antes posible.</p>
+        <div class="modal-footer" style="padding:0; border:0; justify-content:center;">
+          <button type="button" class="btn btn-secondary" onclick="copyTicketCode()"><i class="fa-regular fa-copy"></i> Copiar código</button>
+          <button type="button" class="btn btn-primary" data-close="ticketModal">Listo</button>
+        </div>
+      </div>
+
+      <div id="ticketLookupPane" style="display:none;">
+        <form id="ticketLookupForm" novalidate>
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="lookupCode">Código del ticket</label>
+                <input type="text" id="lookupCode" class="form-input" maxlength="12" placeholder="TCK-ABC123" autocapitalize="characters">
+              </div>
+              <div class="form-group flex-1">
+                <label for="lookupEmail">Correo usado</label>
+                <input type="email" id="lookupEmail" class="form-input" maxlength="254" placeholder="tu@correo.com">
+              </div>
+            </div>
+            <div class="ticket-error" id="lookupError" role="alert" style="display:none;"></div>
+            <div id="lookupResult"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-close="ticketModal">Cerrar</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Consultar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CAMBIAR CONTRASEÑA ================= -->
+  <div class="modal" id="passwordModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-ticket">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-key text-green"></i> Cambiar contraseña</h3>
+        <button class="modal-close" data-close="passwordModal" aria-label="Cerrar">&times;</button>
+      </div>
+      <form id="passwordForm" novalidate>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="pwCurrent">Contraseña actual</label>
+            <input type="password" id="pwCurrent" class="form-input" autocomplete="current-password" required>
+          </div>
+          <div class="form-group">
+            <label for="pwNew">Contraseña nueva (mínimo 8 caracteres)</label>
+            <input type="password" id="pwNew" class="form-input" autocomplete="new-password" minlength="8" required>
+          </div>
+          <div class="form-group">
+            <label for="pwRepeat">Repite la contraseña nueva</label>
+            <input type="password" id="pwRepeat" class="form-input" autocomplete="new-password" required>
+          </div>
+          <small class="text-muted">Al cambiarla se cerrará la sesión en tus otros dispositivos.</small>
+          <div class="ticket-error" id="pwError" role="alert" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="passwordModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="pwSubmitBtn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: PAGO POR TRANSFERENCIA ================= -->
+  <div class="modal" id="transferModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog modal-ticket">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-building-columns text-green"></i> Pago por transferencia</h3>
+        <button class="modal-close" data-close="transferModal" aria-label="Cerrar">&times;</button>
+      </div>
+      <form id="transferForm" novalidate>
+        <div class="modal-body">
+          <div class="transfer-summary" id="transferSummary"></div>
+          <div class="transfer-steps">
+            <strong>1. Haz la transferencia</strong>
+            <pre class="transfer-instructions" id="transferInstructions"></pre>
+            <div class="transfer-ref-box">
+              <span>2. Escribe esta referencia en el concepto de la transferencia:</span>
+              <div class="ticket-code" id="transferReference">ETHO-XXXXXXXX</div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="copyTransferRef()"><i class="fa-regular fa-copy"></i> Copiar</button>
+            </div>
+            <strong>3. Informa tu pago</strong>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="transferProofRef">N.º de comprobante o referencia del banco *</label>
+              <input type="text" id="transferProofRef" class="form-input" maxlength="40" placeholder="Ej: 004512987">
+            </div>
+            <div class="form-group flex-1">
+              <label for="transferPayer">Titular que transfirió *</label>
+              <input type="text" id="transferPayer" class="form-input" maxlength="80" placeholder="Nombre completo">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="transferNote">Nota (opcional)</label>
+            <input type="text" id="transferNote" class="form-input" maxlength="300" placeholder="Banco, fecha u otra información útil">
+          </div>
+          <small class="text-muted">Un administrador verificará el pago en el banco y activará tu plan. Normalmente toma pocas horas hábiles.</small>
+          <div class="ticket-error" id="transferError" role="alert" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="transferModal">Lo haré después</button>
+          <button type="submit" class="btn btn-primary" id="transferSubmitBtn"><i class="fa-solid fa-check"></i> Ya transferí</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ================= MODAL: SIMULADOR DE CHAT EN VIVO (#8) ================= -->
   <div class="modal" id="chatSimulatorModal">
     <div class="modal-backdrop"></div>
@@ -2643,7 +2937,7 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
             En tu teléfono abre <strong>WhatsApp &gt; Dispositivos vinculados &gt; Vincular un dispositivo &gt; Vincular con el número de teléfono</strong> e introduce este código:
           </p>
 
-          <div id="pairingCodeContainer" style="background: rgba(99, 102, 241, 0.08); border: 2px dashed rgba(99, 102, 241, 0.4); padding: 20px 14px; margin-bottom: 14px;">
+          <div id="pairingCodeContainer" style="background: var(--primary-glow); border: 2px dashed var(--border-accent); padding: 20px 14px; margin-bottom: 14px;">
             <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px;">Código de Vinculación</div>
             <div id="pairingCodeVal" style="font-size: 32px; font-weight: 900; letter-spacing: 0.18em; font-family: monospace; color: var(--text-main); line-height: 1.2;">
               --------
@@ -2833,7 +3127,7 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
 
           <div class="auth-switch-note">
             ¿Aún no tienes una cuenta activa?
-            <a href="javascript:void(0)" id="switchToRegisterLink">Crear cuenta gratis (3 días de prueba)</a>
+            <a href="javascript:void(0)" id="switchToRegisterLink">Crear cuenta gratis (7 días de prueba)</a>
           </div>
 
           <div class="auth-security-strip">
@@ -2848,7 +3142,7 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
         <div class="modal-body auth-modal-body">
           <div class="auth-trial-badge-box">
             <div class="auth-trial-pill">
-              <i class="fa-solid fa-bolt text-green"></i> 3 DÍAS GRATIS
+              <i class="fa-solid fa-bolt text-green"></i> 7 DÍAS GRATIS
             </div>
             <div class="auth-trial-text">
               Despliega tu propio asistente autónomo sin tarjetas de crédito y con soporte completo.
@@ -2908,7 +3202,7 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
               <label for="regPassword"><i class="fa-solid fa-lock text-purple"></i> Contraseña *</label>
               <div class="auth-input-wrap">
                 <i class="fa-solid fa-key auth-input-icon"></i>
-                <input type="password" id="regPassword" class="form-input auth-input" placeholder="Mínimo 4 caracteres" autocomplete="new-password" required>
+                <input type="password" id="regPassword" class="form-input auth-input" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required>
                 <button type="button" class="btn-toggle-pass" id="toggleRegPassBtn" title="Mostrar u ocultar contraseña">
                   <i class="fa-solid fa-eye"></i>
                 </button>
@@ -2916,7 +3210,7 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
               <div class="pass-meter">
                 <div class="pass-meter-fill" id="regPassMeterFill"></div>
               </div>
-              <small class="pass-meter-label" id="regPassMeterLabel">Mínimo 4 caracteres</small>
+              <small class="pass-meter-label" id="regPassMeterLabel">Mínimo 8 caracteres</small>
             </div>
 
             <div class="form-group flex-1">
@@ -3515,6 +3809,7 @@ create policy "etho bot_products policy" on bot_products for all using (true) wi
     <input type="file" id="customMusicFileInput" accept="audio/*" style="display: none;" onchange="handleCustomMusicFileSelected(event)">
   </div>
 
-  <script src="app.js?v=8.2.0"></script>
+  <script src="app.js?v=8.4.1"></script>
+  <script src="support-billing.js?v=8.4.1"></script>
 </body>
 </html>

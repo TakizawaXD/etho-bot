@@ -9,7 +9,9 @@ node_modules/
 # Sesiones vivas de WhatsApp Baileys y bases de datos SQLite locales
 data/session/
 data/sessions/
+data/backups/
 data/*.db
+data/.auth_secret
 data/*.db-*
 data/*.sqlite
 data/*.sqlite-*

@@ -1,9 +1,10 @@
 // Service Worker de Aplicación Ejecutiva - Etho Hub
-const CACHE_NAME = 'etho-hub-shell-v8.2';
+const CACHE_NAME = 'etho-hub-shell-v8.4.0';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
+  '/theme-pro.css',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/apple-touch-icon.png'

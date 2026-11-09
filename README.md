@@ -1,6 +1,6 @@
 # ETHO MULTI-BOT HUB & DASHBOARD PRO
 
-Sistema integral de WhatsApp: **Backend (Node.js 24 + Baileys Multi-Instancia) + Frontend Web Reactivo SaaS + Base de Datos en Supabase (PostgreSQL) + SQLite Local Nativo**.
+Sistema integral de WhatsApp: **Backend (Node.js 22.13+ y Baileys Multi-Instancia) + Frontend Web Reactivo SaaS + Base de Datos en Supabase (PostgreSQL) + SQLite Local Nativo**.
 
 Permite desplegar y controlar múltiples bots con diferentes números desde un panel visual ejecutivo, ver el código QR en vivo para vincular WhatsApp, crear bots con 4 facetas (Recreativo, Asistente, Asesor, IA Autónoma), gestionar catálogo de productos, capturar prospectos (CRM Leads), horarios de atención, transferencia a asesor humano (#asesor), probar en el simulador de chat en vivo y registrar toda la actividad en Supabase en tiempo real.
 
@@ -46,6 +46,49 @@ Permite desplegar y controlar múltiples bots con diferentes números desde un p
 
 ---
 
+## 📁 Estructura del repositorio
+
+```
+src/
+  index.js          Punto de entrada (servidor + bots)
+  server.js         API REST, SSE y autenticación
+  manager.js        Gestor multi-instancia de Baileys
+  handler.js        Procesamiento de mensajes
+  db.js             SQLite (node:sqlite) + espejo Supabase
+  commands/         Comandos por categoría
+  lib/              IA, auth, planes, facturación, tickets, mantenimiento, utilidades
+  routes/           Rutas de pagos y de tickets
+  web/public/       Frontend (único origen: index.html, app.js, style.css, PWA)
+scripts/            check.js (valida comandos), banner.js
+supabase/           schema.sql
+docs/DEPLOY.md      Guía de despliegue
+```
+
+## 💬 Estilo de los mensajes
+
+- **Respuestas de IA:** se convierten al formato nativo de WhatsApp (`*negrita*`, `_cursiva_`, viñetas `•`), sin títulos `#`, tablas ni `**`. Está en `src/lib/format.js`.
+- **Envío natural:** el bot muestra "escribiendo…" con una pausa proporcional al largo y parte los textos largos por párrafos.
+- **Comandos:** encabezado compacto (`*🎵 #play* · _Multimedia_`) definido en `skin()` de `src/lib/ui.js`; los separadores (`SEP_*`) están ahí mismo.
+- **Tono:** el prompt pide respuestas breves (2 a 5 líneas), máximo 2 emojis y una sola pregunta de cierre.
+- **Menú y avisos:** formato compacto (una línea por comando) y tarjetas uniformes con `card()` en `src/lib/ui.js`. Los errores técnicos ya no se muestran en el chat (solo en los logs).
+- **Comunicación de la IA** (`src/lib/ai-quality.js`): protocolo de 10 reglas (directo, sin repetir saludos, una sola pregunta, no inventar datos), responde en el idioma de la persona, resiste intentos de cambiarle las instrucciones, recorta historiales largos, corta siempre en una oración completa y usa un disyuntor para no esperar a proveedores caídos.
+- `npm test` valida formato, IA, mensajes, planes, pagos, rutas y mantenimiento.
+
+## 💳 Planes, pagos y soporte
+
+- **Cuenta gratuita:** 7 días de uso y máximo 3 bots. Más tiempo o más bots requiere un plan de pago.
+- **Pagos:** tarjeta con Stripe Checkout (activación solo por webhook firmado) y transferencia con aprobación manual. Ver **[docs/PAYMENTS.md](docs/PAYMENTS.md)**.
+- **Tickets:** botón *Reportar error* en la landing (sin cuenta) y bandeja *Soporte & Tickets* en el panel.
+- **Ideas a futuro:** [docs/ROADMAP.md](docs/ROADMAP.md).
+
+## ✅ Producción
+
+Antes de abrir al público revisa **[docs/PRODUCTION.md](docs/PRODUCTION.md)** y ejecuta `BASE_URL=https://tu-dominio.com npm run smoke` contra tu servidor desplegado.
+
+## ☁️ Despliegue
+
+Consulta **[docs/DEPLOY.md](docs/DEPLOY.md)** (Render, Railway, Docker/VPS y PM2).
+
 ## 🚀 Inicio Rápido en Windows
 
 Simplemente haz doble clic en el archivo:
@@ -64,6 +107,8 @@ npm install
 # 2. Iniciar servidor
 npm start
 ```
+
+En el primer arranque se crea el usuario admin; si no defines `ADMIN_PASSWORD` en `.env`, la contraseña generada aparece en la consola.
 
 Panel disponible en: **`http://localhost:3000`**
 
