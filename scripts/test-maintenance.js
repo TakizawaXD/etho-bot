@@ -1,3 +1,4 @@
+import './_test-env.js';
 import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -42,7 +43,7 @@ const { DatabaseSync } = await import('node:sqlite');
 const copy = new DatabaseSync(path.join(path.dirname(f1), kept[kept.length - 1]));
 assert.equal(copy.prepare("SELECT id FROM bots WHERE id='bot_x'").get().id, 'bot_x');             // la copia contiene los datos
 copy.close();
-assert.equal((fs.statSync(path.join(path.dirname(f1), kept[0])).mode & 0o077), 0);                // permisos privados
+if (process.platform !== 'win32') assert.equal((fs.statSync(path.join(path.dirname(f1), kept[0])).mode & 0o077), 0);                // permisos privados
 
 db.close(); fs.rmSync(tmp, { recursive: true, force: true });
 console.log('maintenance OK');

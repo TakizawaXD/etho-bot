@@ -1,3 +1,4 @@
+import './_test-env.js';
 // Pruebas de facturación, Stripe y tickets sobre una base SQLite temporal real.
 import os from 'node:os';
 import fs from 'node:fs';

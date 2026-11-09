@@ -12,7 +12,7 @@ create table if not exists platform_users (
   id text primary key,
   username text unique not null,
   email text unique,
-  password_hash text not null,
+  password_hash text, -- obsoleto: el backend ya no replica credenciales
   name text not null,
   role text default 'user', -- 'admin' o 'user'
   whatsapp text default '',
@@ -140,27 +140,16 @@ alter table bot_groups enable row level security;
 alter table bot_leads enable row level security;
 alter table bot_products enable row level security;
 
--- POLÍTICAS PERMISIVAS
+-- SIN POLÍTICAS PÚBLICAS (acceso solo desde el backend)
+-- RLS activo y sin políticas = las claves anon/publishable no pueden leer ni escribir nada.
+-- El servidor usa SUPABASE_SERVICE_ROLE_KEY (clave secreta), que omite RLS.
+-- Estas tablas contienen mensajes de WhatsApp, leads y datos de clientes: nunca las abras al público.
 drop policy if exists "etho platform_users policy" on platform_users;
-create policy "etho platform_users policy" on platform_users for all using (true) with check (true);
-
 drop policy if exists "etho bots policy" on bots;
-create policy "etho bots policy" on bots for all using (true) with check (true);
-
 drop policy if exists "etho bot_logs policy" on bot_logs;
-create policy "etho bot_logs policy" on bot_logs for all using (true) with check (true);
-
 drop policy if exists "etho custom_functions policy" on bot_custom_functions;
-create policy "etho custom_functions policy" on bot_custom_functions for all using (true) with check (true);
-
 drop policy if exists "etho bot_users policy" on bot_users;
-create policy "etho bot_users policy" on bot_users for all using (true) with check (true);
-
 drop policy if exists "etho bot_groups policy" on bot_groups;
-create policy "etho bot_groups policy" on bot_groups for all using (true) with check (true);
-
 drop policy if exists "etho bot_leads policy" on bot_leads;
-create policy "etho bot_leads policy" on bot_leads for all using (true) with check (true);
-
 drop policy if exists "etho bot_products policy" on bot_products;
-create policy "etho bot_products policy" on bot_products for all using (true) with check (true);
+revoke all on platform_users, bots, bot_logs, bot_custom_functions, bot_users, bot_groups, bot_leads, bot_products from anon, authenticated;

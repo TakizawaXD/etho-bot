@@ -1,3 +1,4 @@
+import './_test-env.js';
 // Prueba las rutas de pagos y tickets con un "app" falso (sin levantar Express) y la base de datos real.
 import os from 'node:os';
 import fs from 'node:fs';

@@ -20,6 +20,9 @@ Marca cada punto antes de abrir el servicio a clientes reales.
 - [ ] Disco persistente montado en `data/` (sesiones de WhatsApp y base de datos).
 - [ ] `MAX_ONLINE_BOTS` ajustado a la RAM disponible (≈ 60-100 MB por bot).
 - [ ] Una sola instancia por base de datos (nunca dos procesos con las mismas sesiones).
+- [ ] Si usas Supabase: `SUPABASE_SERVICE_ROLE_KEY` (clave **secreta**) en el servidor y la migración `supabase/migrations/20261109000000_lock_down_rls.sql` aplicada. Nunca uses la clave publishable/anon en el backend: las tablas guardan mensajes y leads.
+- [ ] `CORS_ORIGIN` con tu dominio (vacío = cualquier origen).
+- [ ] El backend (WhatsApp + SQLite) **no** corre en Vercel: necesita un proceso persistente con disco (Docker en Render/Railway/VPS). Vercel solo sirve la web estática si su `vercel.json` apunta `/api` al backend real.
 
 ## 3. Operación
 - [ ] Copias de `data/backups` descargadas fuera del servidor (el disco puede fallar con las copias dentro).

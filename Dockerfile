@@ -31,4 +31,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=25s --retries=3 \
   CMD curl -fsS http://localhost:${PORT:-3000}/health || exit 1
 
-CMD ["npm", "start"]
+# node directo (no npm) para que reciba SIGTERM y cierre bots y base de datos ordenadamente
+CMD ["node", "--max-old-space-size=1024", "src/index.js"]

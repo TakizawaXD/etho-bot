@@ -432,7 +432,8 @@ class BotManager extends EventEmitter {
   }
 
   /** Apaga un bot (desconecta el socket sin borrar credenciales) */
-  async stopBot(botId) {
+  /** Apaga un bot. Con `keepActive` (apagado del servidor) se conserva is_active para que vuelva a encender al reiniciar. */
+  async stopBot(botId, { keepActive = false } = {}) {
     const inst = this.instances.get(botId);
     if (inst) {
       inst.manualStop = true;
@@ -448,6 +449,11 @@ class BotManager extends EventEmitter {
       inst.qr = null;
       inst.qrRaw = null;
       inst.pairingCode = null;
+    }
+
+    if (keepActive) {
+      upsertBot({ id: botId, status: 'offline', qr_code: null });
+      return this.getBot(botId);
     }
 
     upsertBot({ id: botId, is_active: 0, status: 'stopped', qr_code: null });

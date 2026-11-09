@@ -4,9 +4,20 @@ import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 
 const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+// El servidor debe usar la clave SECRETA (service_role / sb_secret_...): las tablas tienen RLS sin
+// políticas públicas, así que solo el backend puede leer/escribir. Nunca expongas esta clave en la web.
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY;
 
-export const supabase = url && key ? createClient(url, key, { auth: { persistSession: false } }) : null;
+const isPublicKey = (k) => k.startsWith('sb_publishable_') || (() => {
+  try { return JSON.parse(Buffer.from(k.split('.')[1] || '', 'base64url').toString()).role === 'anon'; } catch { return false; }
+})();
+
+if (url && key && isPublicKey(key)) {
+  console.warn('[supabase] ⚠️ Se está usando una clave PÚBLICA (anon/publishable). Con RLS bloqueado la sincronización fallará; ' +
+    'define SUPABASE_SERVICE_ROLE_KEY con la clave secreta del proyecto.');
+}
+
+export const supabase = url && key ? createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } }) : null;
 
 const SYNCED_USER_FIELDS = ['coins', 'bank', 'exp', 'description', 'genre', 'partner'];
 const SYNCED_GROUP_FIELDS = ['welcome', 'goodbye', 'antilink', 'economy', 'gacha', 'nsfw', 'bot_on'];
@@ -62,7 +73,7 @@ export function syncBot(bot) {
     phone: bot.phone || '',
     prefix: bot.prefix || '#',
     status: bot.status || 'offline',
-    qr_code: bot.qr_code || null,
+    // qr_code no se replica: quien lo tenga puede vincular el WhatsApp del cliente.
     is_active: Boolean(bot.is_active),
     personality: bot.personality || 'recreational',
     system_prompt: bot.system_prompt || null,
@@ -176,7 +187,7 @@ export function syncPlatformUser(user) {
     id: user.id,
     username: user.username,
     email: user.email || null,
-    password_hash: user.password_hash,
+    // password_hash no se replica: las credenciales solo viven en la base local.
     name: user.name,
     role: user.role || 'user',
     whatsapp: user.whatsapp || '',

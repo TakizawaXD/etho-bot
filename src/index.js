@@ -2,7 +2,7 @@
 // Inicia el Servidor Web (Dashboard + API REST + SSE) y el Gestor Multi-Bot de Baileys.
 import path from 'path';
 import { config } from './config.js';
-import './db.js';
+import { db } from './db.js';
 import { botManager } from './manager.js';
 import { startServer, app } from './server.js';
 import { ffmpegPath } from './lib/utils.js';
@@ -53,13 +53,20 @@ if (!process.env.VERCEL) {
   });
 
   // Manejo de apagado limpio
+  let shuttingDown = false;
   const shutdown = async (signal) => {
-    console.log(`\n${signal}: apagando sistema de bots...`);
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`
+${signal}: apagando sistema de bots...`);
+    // Si algún socket no cierra, no bloquear el reinicio de la plataforma (stop_grace_period ~30 s)
+    setTimeout(() => { console.error('[Process] Apagado forzado por tiempo.'); process.exit(1); }, 20000).unref();
     for (const bot of botManager.getAllBots()) {
       if (bot.status === 'online' || bot.status === 'connecting') {
-        await botManager.stopBot(bot.id).catch(() => {});
+        await botManager.stopBot(bot.id, { keepActive: true }).catch(() => {});
       }
     }
+    try { db.pragma('wal_checkpoint(TRUNCATE)'); db.close(); } catch { /* ya cerrada */ }
     process.exit(0);
   };
   process.on('SIGINT', () => shutdown('SIGINT'));
